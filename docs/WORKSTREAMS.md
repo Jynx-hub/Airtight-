@@ -1,269 +1,270 @@
-# Airtight — Who Builds What (Plain-English Plan)
+# Airtight — Workstreams
 
-*A build plan for the actual **4-person team**, split so everyone can work at the same time without stepping on each other. Re-cut 2026-07-17 to match real roles.*
+The task board of record. Audited against the code on **2026-07-18**.
 
-This is the plain-English version. It says **who does what, in what order, on which branch.** The exact technical details live in `docs/ARCHITECTURE.md`, `docs/BUILD-PLAN.md`, `docs/INFERENCE-LOCAL.md`, and the `research/` files — this doc points to them when you need to dig in.
+**Notation.** `[x]` = verified working (observed, not reported) · `[ ]` = not started ·
+`◐` = real code exists but the item's defining requirement is unmet.
+Never promote a box on the strength of code existing or tests passing.
 
-> **New to the project? Read in this order:** `README.md` → `docs/ARCHITECTURE.md` → your section below.
-
----
-
-## What we're building, in one paragraph
-
-Airtight is a **robot patent lawyer**. You tell it your invention, and it writes a filing-ready patent for you. To win the hackathon it has to be three things at once: **smart** (it learns from past patents and gets better over time), **safe** (it can't be tricked or leak a client's secret invention), and **useful** (a real person can click it and get something they'd actually file). Four people build four parts of that robot.
+**Read first:** `README.md` → `docs/ARCHITECTURE.md` → the block you're working.
+Ground truth on the tools is in `research/` — read it before writing integration code.
+What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.md`.
 
 ---
 
-## The 4 people (and their branch)
+## Where we are
 
-| Person | Their part | Branch | In one sentence |
-|--------|-----------|--------|-----------------|
-| **1 — Data** | The library | `lane/data` | Finds the patents, rejections, and ground truth the robot learns from — and the test set that proves it learned. |
-| **2 — Inference** | The brain hosting | `lane/inference` | Deploys Nemotron on vLLM to Modal's free tier (scale-to-zero), with the NVIDIA NIM free endpoint as a one-flip fallback, and hands everyone one endpoint behind `inference.local`. Then moves onto the locked doors. |
-| **3 — Surface** | The screen + the show | `lane/surface` | Builds what people click, and runs the live demo for the judges. |
-| **4 — Anudeep** | The robot itself | `lane/agent` | The agent loop, the security bus, the memory, and the "it got smarter" proof. The critical path. |
-
-**How the work splits:** Person 4's shared doorway (with a fake "all clear" stub) goes into `main` on day one, so Persons 1–3 never wait on anyone. Person 1 and Person 2 are fully independent of each other. Person 2's job is front-loaded — once the endpoint is live, they roll onto the OpenShell locks (F5–F7) so Person 4 isn't carrying security alone. On those locks the line is: **Person 2 owns the boundary, Person 4 owns what runs inside it.** P4 hands P2 the list of paths, binaries, and endpoints the agent actually touches; P2 turns that into policy.
-
----
-
-## Where we actually are (audited 2026-07-18)
-
-Every box below was checked against the code, not against what anyone reported. `[x]` means *verified working*; **◐** means real code exists but the item's defining requirement isn't met yet.
-
-| Lane | Done | Partial | Not started | Reality |
-|---|---|---|---|---|
-| **1 · Data** (Sreesanth) | **E1–E5** | — | — | **134 real patents across G06N/G06F/H04L + 193 real office-action defects tracked in git**, loading natively into P4's harness; the two-vector poison PDF (E5) is real and the ingest path extracts both hidden vectors. Pulled by `data/pull_uspto.py --groundtruth`; the dead `src/` pipeline is quarantined under `attic/`. |
-| **2 · Inference** (Steven) | **F1–F4** | — | F5a, F5b, F6, F7 | First half fully done and measured. Second half (OpenShell) is a green field — **no `openshell`/`nemoclaw` CLI installed anywhere**. |
-| **3 · Surface** | D1, D2, D4 | D3 | D5, D6 | 379 lines total, landed by Anudeep as a starter. **No `feat/surface-*` branch has ever existed.** |
-| **4 · Agent** (Anudeep) | **G0, G4, G1 (agent-side)** | G2, G3 | G5 (agent-side done) | HiddenLayer **live-verified** (real injection catch, all 5 hops, real event_id `0fc717c2`); Policy Advisor client built (G1). **G3 ran live but the effect is contested:** a 6-disclosure run on distilled-FWD loopholes showed warmed **5/6**, while Sreesanth's salvaged 5-pair run ran **backwards** (4/10→1/10). Cause is a **statute-blind retrieval bug** (G2: `memory.py` ranks class+overlap, ignores §-type; `LoopholeRecord` has no statute field) — fix before trusting the delta. G1/G5 sandbox + F6 gaps are P2's. |
-
-**The three things that decide whether this demos:**
-
-1. **G3 has run live, but the Track-1 effect is currently unproven — and the larger sample we have points the other way.** E1+E2 landed and the harness was wired to the real pull (`--layout pooled`), so on **2026-07-18 the ablation ran against live Nemotron on real USPTO data for the first time.** A 2-disclosure pilot showed the signal on all three axes at once (`uspto-19206781`: **1/1 vs 0/1** caught, **28.5s vs 49.6s**, **5 vs 10** defects). **The judged `--n 10` run then stalled at 5 of 10 and had to be killed** (timeout bug, below), so `results.json` still does not exist — but the 5 completed pairs *were* flushed to disk, and re-deriving them shows the effect running **backwards on all three axes** (**4/10 → 1/10** caught, **113 → 123s**, **44 → 47** defects), with the pilot's own headline disclosure failing to reproduce. Both samples are small; the honest read is that the pilot is n=1 and is not yet evidence. **Two fixes come before spending another GPU minute:** a per-call timeout (G3) and statute-aware ranking in `retrieve()` (G2) — the latter is the measured explanation for the reversal and is free to fix offline. Re-running the judged ablation remains the single highest-leverage action on the board; it is now gated on those two, not on data.
-2. **D5 + D6 have zero lines and no owner.** The ablation chart is the item this doc calls *"the picture that wins the demo"*, and the demo script that stitches the beats doesn't exist. Both are downstream of #1 anyway.
-3. **Nothing is actually contained yet.** `containment/` is a self-declared simulation (`openshell_sim.py:6`: *"This is presentation, not enforcement"*) — the 403 is a `print()`. F5a is the binary go/no-go that unblocks F5b–F7, G1's sandbox requirement, and G5.
-
-**Two cross-lane facts worth naming:** Anudeep has been covering three lanes (agent + the surface starter + the one working USPTO puller), and Person 3 has never committed to this repo. Commit counts: Steven 20, Anudeep 12, Sreesanth 2.
-
----
-
-## Branches, in plain terms
-
-A **branch** is your own workspace copy of the project. You build on your branch, and when a piece is done and working, you merge it into `main` (the shared official copy).
-
-```
-main   ← the shared, always-working copy
- ├── lane/data        (Person 1)
- ├── lane/inference   (Person 2)
- ├── lane/surface     (Person 3)
- └── lane/agent       (Person 4 — Anudeep)
-```
-
-- Work on **your** branch. For a big task, make a small side-branch (like `feat/data-ptab`), finish it, then fold it back into your lane branch.
-- Merge into `main` often, in small pieces — not one giant merge at the end.
-- Each person owns their own folder (`data/`, `inference/`, `surface/`, `agent/`), so you almost never touch someone else's files.
-
----
-
-## Before ANYONE starts: the 2-hour shared setup
-
-**Do this together, first, and put it in `main`.** Person 4 leads it; everyone agrees on the shapes before splitting off.
-
-1. **One doorway for the AI brain.** Every model call goes through *one* shared function (Person 4 builds it, stubbed to return "all clear" at first). Persons 1–3 build against the stub from minute one. Full contract: `docs/INFERENCE-LOCAL.md`.
-2. **A folder for each person** so nobody's files collide.
-3. **Agreed data shapes** — what a "Disclosure," a "Draft," a "LoopholeRecord," and an "EvalResult" look like — written down once so all four parts speak the same language. Person 1 and Person 4 co-own this; it's the contract between the data and the harness.
-4. **A secrets file** listing the keys each part needs (Modal endpoint URL + HF token; NIM `nvapi-` key for the fallback/dev endpoint; HiddenLayer key; USPTO endpoints). Check they all work on day one.
-5. **The one rule nobody breaks:** *the operator chooses the AI model, never the robot.* Everything runs remote — nothing on a laptop. (`docs/INFERENCE-LOCAL.md`.)
-
----
-
-## Person 1 · Data — the library · `lane/data`
-
-**Your job:** Get the real patents and real examiner rejections the robot studies, and build the fair test that proves it got smarter. Person 4's memory and eval harness are only as good as what you feed them — **the ablation chart is built on your ground truth.** Scope everything to **software/electronics** (richest data, readable claims). Sources and dataset names: `docs/ARCHITECTURE.md` §Reduction to Practice.
-
-> **Status (updated 2026-07-18, real ODP pull now extended to three CPC classes):** ✅ **E1–E5 done — the lane is complete.** `data/real/` now holds **134 real granted patents across G06N (40) / G06F (44) / H04L (50)** with real abstracts and real claims, **94 held-out checklists**, and **193 loopholes mined from actual examiner office actions** — §103 ×111, §101 ×27, §112 ×39, §102 ×16, which is exactly the software-patent failure profile `CLAUDE.md` scopes this project to. Verified end to end, not just written: Person 4's own `load_disclosures` / `load_checklist` read the layout natively and `assert_no_overlap` passes at **0 id collisions, 0 Jaccard flags** across all three classes. Built on Anudeep's `data/pull_uspto.py`, extended with a `--groundtruth` mode.
->
-> ✅ **`data/real/` is tracked in git as of 2026-07-18 — pulling `main` gets you this data.** It is 2.8M across 229 files of public-domain USPTO text, small enough to version, and versioning it means every arm of the ablation runs against byte-identical claims instead of whatever each laptop happened to pull. No key needed to *consume* it. You still need one to *extend* it further — register free at https://data.uspto.gov, then `USPTO_API_KEY=... python -m data.pull_uspto --groundtruth --cpc <class> --limit 50` (~5 min per class, rate-limited on purpose). One caveat when extending: a run **overwrites** `groundtruth/loopholes.json` with only its own defects, so rebuild it as the union of all `checklists/*.json` afterward (`disclosures/` + `checklists/` merge additively). No key, no pull — the puller never fabricates.
->
-> **✅ Done — the `src/` pipeline (`01f4daf`) was quarantined under `attic/`, not repaired.** The audit behind this found it targeting three retired endpoints (PEDS, legacy PatentsView, `ptabdata`) and speaking a `Disclosure` schema that never matched `airtight/shapes.py:11`. All three had been superseded by the one ODP host `api.uspto.gov/api/v1` that `data/pull_uspto.py` already speaks, so porting them would have arrived where we already were — dead weight, not a base to build on. **Its file:line refs now resolve under `attic/`** (`attic/config.py:28` PEDS, `attic/config.py:36` PatentsView, `attic/src/clients/ptab_client.py:37` ptabdata, `attic/src/fixture_builder.py:44` schema); nothing exists at those paths in the working tree. Two corrections to that audit, both verified before the move. (a) It was **3,112 lines** in `src/`, not 4,500 (4,176 counting the eight scripts, which moved too). (b) `tests/test_extractor.py` contributed **23 of the 71 passing tests**, so a blind delete would have silently broken the documented suite count — the tests moved with the code they cover, taking the baseline to **48 passed**, which the pooled-layout tests then brought to **55 passed, 1 skipped** (56 with a local `data/real/` pull). Root `config.py` moved as well: `oa_extractor.py` reads four regex tables from it and no working-path module imports it. Rescue paths for the two offline-clean files are in `attic/README.md`.
->
-> **✅ Done — the two data-fabricating scripts are quarantined and unreachable.** Both now sit under `attic/` (`attic/scripts/fetch_50k.py`, `attic/src/extractors/groundtruth_builder.py`). Re-verified 2026-07-18: neither path exists in the working tree, `src/` is gone entirely, `scripts/` holds only `bigquery_export.sql`, and the only surviving references to either name are inside `attic/` itself. `data/corpus/patents/` was never created and no file under `data/` carries the `hupd_synthetic` tag. What they did, for the record: `fetch_50k.py:133-158` cloned **one** hardcoded record 50,000 times with incremented IDs tagged `"source": "hupd_synthetic"` — it would have filled `data/corpus/patents/` and looked like a successful pull; `groundtruth_builder.py:126` derived fake PTAB outcomes from an MD5 hash with a hardcoded rationale. Either would have poisoned the benchmark silently.
-
-- [x] **E1** `feat/data-corpus` — Pull full-text granted patents from the USPTO Open Data Portal for the 2-3 CPC classes we pick. Target: a clean warming set of **~50 same-class patents** plus a few hundred more for ingest.
-  **Done — 134 patents across three CPC classes on disk, with real invention text.** `data/real/disclosures/` holds 134 granted applications across G06N (40) / G06F (44) / H04L (50), each a valid `Disclosure` carrying a **real abstract** (~1.5k chars) and its **real claims** (~12k chars) — not the metadata boilerplate the thin `--patents` path produces. The search endpoint exposes no abstract at all, so the puller walks the file wrapper, where `ABST` and `CLM` are separate documents downloadable as a tar of ST.96 XML. Records are constrained to granted `REGULAR` applications carrying a real CPC, and anything unclassifiable is dropped rather than guessed at. **Scope:** the 2-3 CPC classes are **done** — G06N, G06F and H04L, pulled with the same command, so the class-match sort in `agent/memory.py:46` now has real signal to rank on (some multi-class applications were re-pulled and reassigned a primary class, which is why the per-class counts sum to 134, not 150). Only the optional "few hundred more for ingest" was not pulled.
-- [x] **E2** `feat/data-groundtruth` — Pull the **PTAB decisions dataset** + office-action rejections. For each patent in our classes: *which claims died, and why.* This is the scoring key for everything.
-  **Done — 193 defects mined from real examiner office actions across three classes.** For each application the puller fetches its `CTNF`/`CTFR` rejection and parses the formal rejection statement — *"Claims 1-5, 8, 10-14, 17, and 19-20 are rejected under 35 U.S.C. 103 as being unpatentable over Mohammed et al (US 2025/0348732) in view of Rubin (US 2018/0095935)"* — which yields the claim numbers, the statute and the cited prior art in one sentence, then resolves those numbers to real claim text from `CLM`. Out to `data/real/groundtruth/loopholes.json` (rebuilt as the union of all 94 checklists after the multi-class pull): **§103 ×111, §101 ×27** (Alice/Mayo abstract-idea, the dominant software rejection), **§112 ×39** (indefiniteness, antecedent-basis, written description, enablement), **§102 ×16**.
-  **Route changed, deliberately:** office actions, *not* the PTAB decisions dataset — an OA names the claim, the statute and the prior art in a single fixed grammar, which PTAB trial metadata does not. Person 4's parallel PTAB route (`data/distill_loopholes.py` + `data/assemble_eval.py`, plus a small `data/real/ptab/` + `data/real/loopholes/` set) landed on `main` separately; on the 2026-07-18 merge we kept the office-action pull as the **single `data/real` ground truth** and dropped that PTAB data, so those two scripts now have no default input. The office-action leg is what the ablation, checklists and `groundtruth/loopholes.json` are built on.
-  ⚠️ **`oa_extractor.py` is not on the path, and is now quarantined** at `attic/src/extractors/oa_extractor.py` — a correction to the earlier audit, which recommended salvaging it. Its 23/23 tests passed against a clean synthetic fixture, but its rationale windows centre on marker words, so on real office actions they land on the obviousness *reasoning* ("It would have been obvious to one of ordinary skill…") and never contain the claim list. It produced claim shapes like `"(Canceled) Canceled 3"` and *"Determining the scope and contents of the prior art"* (Graham v. Deere boilerplate, not a claim). Its 23 tests moved with it (`attic/test_extractor.py`), taking the suite baseline 71 → 48; the pooled-layout tests then brought it to **55 passed, 1 skipped** (56 with a local `data/real/` pull).
-- [x] **E3** `feat/data-fixtures` — Build the **fixed disclosure set**: 3-5 invention write-ups (in the agreed Disclosure shape) used in every eval run, each with a **held-out loophole checklist** derived from E2 that the robot is graded against. Never let the checklist leak into the warming data.
-  **Done — 94 held-out checklists, and unlike the placeholders these *are* derived from E2.** `data/real/checklists/{disclosure_id}.json`, one per disclosure that actually drew a rejection, well past the 3-5 target. Each grades against the real claim the examiner rejected and the real ground they rejected it on. The 2 hand-written fixtures (`disc-0001`, `disc-0002`) remain and are still consumed by `tests/test_episodes.py:16` and `tests/test_subagents.py:18` — keep them; they are the offline/stub path. The no-leak rule is enforced by Person 4's `agent/eval/harness.py:41` and is now **verified against real data**: excluding a disclosure's own records from the 193-record pool gives 0 collisions and 0 Jaccard flags.
-  One design note worth keeping: a checklist file is written **only** for disclosures that have defects. The 12 clean ones get none on purpose — an empty checklist scores 0-of-0 and would read as a *passing* ablation.
-- [x] **E4** `feat/data-loaders` — Simple loaders that hand all of the above to Person 4's code in the agreed shapes. A folder of clean JSON beats a database — simplest thing that works.
-  **Done — by output layout, not by new loader code.** The lane's "Done when" is that Person 4 can load with one call each, and the puller's output feeds the harness's own loaders directly: `load_disclosures(Path('data/real/disclosures'))` → 50 records, `load_checklist(Path('data/real/checklists'), id)` → that disclosure's held-out set. Writing loaders nobody imports was the original failure mode; matching the consumer's shapes is the simpler thing that works.
-  **One correction:** the *shapes* matched, but the *directory layout* did not — `run_ablation` wanted `fixtures/disclosures` + `groundtruth/checklists` + `corpus/loopholes`, while the puller writes one undivided pool (`disclosures/` + `checklists/`). That is now bridged by `--layout pooled`, which also does the thing the pool genuinely needs: `data/real/groundtruth/loopholes.json` is the **union of all 94 checklists**, so warming from it would hand the warmed arm the exact records it is graded on. The harness instead splits the pool into a graded holdout and a corpus built from every *other* application's records. Run it with `python -m agent.eval --data-root data/real --layout pooled --n 10`.
-  ⚠️ **`src/loaders.py` was 318 lines of dead, broken code** — nothing imported it, and all 5 functions failed against the repo's own files (`load_fixtures` globs `disc_*.json` against `disc-0001.json`; `load_checklists` reads a directory that doesn't hold them; the other three `FileNotFoundError`). **Now quarantined** at `attic/src/loaders.py` — leaving a plausible-looking loader that silently returns `[]` next to a working path was a trap for whoever read this lane next.
-- [x] **E5** `feat/data-poison` — The **booby-trapped prior-art PDF**: a plausible patent PDF with hidden "leak the client's disclosure" text inside, for the security demo. Coordinate the hiding trick with Person 4 so the scanner genuinely catches it.
-  **Done — real two-vector PDF, and the scanner can actually see inside it.** `data/poison_builder.py` (rescued from `attic/`, its one `config.DATA_DIR` coupling swapped for a local path + a `python -m data.poison_builder` entrypoint) writes `data/fixtures/poisoned_prior_art.pdf`: a plausible patent PDF hiding the `CONFIDENTIAL … Acme Corp` leak phrase in **two independent vectors** — white-on-white 0.1pt content-stream text and the XMP `author`/`subject`/`keywords` fields. The gain over the old `.txt` is that the payload is genuinely *hidden*, not visible.
-  **The load-bearing half was the read path, which the earlier "one-line rescue" estimate missed:** `agent/ingest.py` did `Path(path).read_text()`, which `UnicodeDecodeError`s on a binary PDF and would never surface either vector. Added `_extract_text()` — on a `.pdf` it flattens every page via pdfplumber `extract_text()` plus all `pdf.metadata` values, so both vectors reach the HiddenLayer bus. Verified end to end: `_extract_text()` on the PDF contains `CONFIDENTIAL`/`Acme Corp` (un-faked), and `python -m agent.ingest data/fixtures/poisoned_prior_art.pdf --fake-detect` quarantines it. New `tests/test_guardrails.py:test_ingest_poison_pdf_end_to_end` asserts both; the plain-text fixture + its test stay as the offline path. Deps are the new `poison` extra (`reportlab`+`pdfplumber`) — the PDF test `importorskip`s pdfplumber, so `.[dev,web]` without it is 56 passed / 1 skipped, `.[dev,web,poison]` is 57 passed.
-
-**Done when:** Person 4 can load the warming corpus, the ground-truth checklists, the fixed disclosures, and the poisoned PDF with one call each — and the checklist provably doesn't overlap the warming set.
-
-**→ Met.** Corpus, checklists, disclosures and now the poisoned PDF all load through the harness's / ingest's own calls, and the no-overlap proof is green on real data (0 collisions, 0 Jaccard flags). **Remaining work in this lane:** (1) **Done (E5):** the poison PDF is real, hidden in two vectors, and the ingest read path extracts both — `data/poison_builder.py` + `agent/ingest.py:_extract_text` + `test_ingest_poison_pdf_end_to_end`. (2) **Done:** the corpus now spans G06N (40) / G06F (44) / H04L (50) = 134 disclosures, 94 checklists, 193 defects — the class-match sort in `agent/memory.py:46` finally has ≥2 classes to discriminate on, and the no-overlap guard stays green across all three (`loopholes.json` rebuilt as the union of all checklists after the pull). **(3) Done:** the whole `src/` tree, root `config.py` and the eight scripts that drove them are quarantined under `attic/` — see `attic/README.md` for why and for the two rescue paths.
-
----
-
-## Person 2 · Inference — the brain hosting · `lane/inference`
-
-**Your job:** Stand up the AI brain everyone else calls, then help lock the doors. Your first job (F1-F4) is **M1b** and the **$500 vLLM bounty** — it's front-loaded, so plan to finish it early and roll onto the second half. Serving detail: `research/vllm.md` · wiring: `docs/INFERENCE-LOCAL.md`.
-
-> **Status (2026-07-18):** ✅ **F1 + F2 done** — Nemotron 3 Nano deployed on vLLM to Modal's free tier, `inference.local` live, and the concurrent-batching numbers are on record: **10.67× aggregate throughput (65.2 → 695.8 tok/s)** with the curve kneeing at C=16 exactly where `--max-num-seqs 16` is pinned. That's **M1b** plus the $500 bounty evidence (`docs/THROUGHPUT.md`). ✅ **F3 done** too — one-var `INFERENCE_BACKEND` flip, all three backends (legacy/modal/nim) verified green end-to-end. ✅ **F4 done** — `runtime/RUNBOOK.md` is the team handoff (consumer quickstart + five-line demo-day card + NIM flip), and the re-benchmark it triggered changed the demo plan: the judged profile is now **`a100-bf16`**, because `l40s-fp8` — faster and cheaper to run — needs **~12 min** to cold start vs the A100's ~1–2, and Modal preempts containers. The documented "~2–5 min cold start" was wrong. **That closes M1b and the whole first half of this lane.** **Next:** the OpenShell locks, starting with **F5a**: a sandbox has to exist on hosted DGX Spark before F5b–F7 have anything to attach to.
-
-### First: the endpoint (M1b + the $500 vLLM bounty)
-- [x] **F1** `feat/inference-modal` — Deploy **Nemotron 3 Nano** on vLLM to **Modal's free tier** (`modal deploy runtime/modal_app.py`). **L40S + FP8** is the guaranteed fit; weights cached in a Modal Volume, HF token as a Modal Secret. Scale-to-zero for dev — you only burn credits while a request is running. (Serve **Super** only if you later land a bigger box; don't burn hours on it.)
-- [x] **F2** `feat/inference-verify` — Prove the Modal endpoint is OpenAI-compatible (chat + streaming), then **load-test it with concurrent requests** and write down the throughput numbers. Continuous batching under concurrent load is exactly what the $500 bounty judges — a real before/after number is gold. → **`docs/THROUGHPUT.md`: 65.2 → 695.8 tok/s = 10.67× from continuous batching**, curve knees at C=16 exactly where `--max-num-seqs 16` is pinned. Harness `runtime/bench.py`, raw JSON in `runtime/bench-results/`. Found en route: the streaming path mislabels all output as `reasoning_content` (see THROUGHPUT.md §Open issue) — bites the Surface lane's streaming UI, not blocking F2.
-- [x] **F3** `feat/inference-routing` — Point `inference.local` → the **Modal URL** (creds host-side, never in the sandbox), and set the **NVIDIA NIM free dev endpoint** as the fallback so **one env flip** swaps backends if Modal is cold or credits run out. → **Done.** The flip is the single var `INFERENCE_BACKEND=modal|nim`; both credential sets coexist so flipping never destroys the other key (the old three-var flip overwrote `INFERENCE_API_KEY` with the nvapi key). **All three backends verified green end-to-end** — legacy, modal, and nim — each passing models + chat + tool-call, and the doorway's `chat()` runs unchanged across them (both reasoning modes; NIM accepts `chat_template_kwargs` with no 400). Prove it any time: `bash runtime/serve-nim.sh`. Fixed en route: `verify.sh` sourced `.env` in a way that *overwrote* exported vars, so `INFERENCE_BACKEND=nim bash verify.sh` would have silently tested Modal and passed — a green check proving nothing. No automatic failover by design (a silent hop to hosted NIM would void the bounty evidence). Two honest gaps recorded in `docs/INFERENCE-LOCAL.md`: `inference.local` is still a naming contract with no gateway process, and creds are still read inside the sandbox — both close at F5.
-- [x] **F4** `feat/inference-runbook` — Hand the team one base URL + model name via the secrets file. Write the 5-line "keep it warm for the demo / flip to NIM" runbook, and own keeping the endpoint alive through judging (`min_containers=1` for the show). → **Done.** `runtime/RUNBOOK.md` is the handoff: a consumer quickstart that explicitly needs **no Modal account, no CLI, no `HF_TOKEN`** (deployer-only — that split existed nowhere before), the five-line demo-day card, the NIM flip with its 40 req/min ceiling, and the known surprises so streaming's empty `content` doesn't read as a bug. Base URL stays **out of the public repo** and is handed out of band; `.env.example` gained the vars the doorway actually reads (`MODAL_BASE_URL`/`MODAL_MODEL`/`MODAL_API_KEY`, `INFERENCE_TIMEOUT`) — verified `MODAL_BASE_URL` really does win over `INFERENCE_BASE_URL`. **Found en route, and it changed the demo plan:** the `l40s-fp8` profile everything documented as "the default" is genuinely faster *and* cheaper (865 vs 696 tok/s at C=16, $1.95 vs $2.50/hr) but its vLLM `init engine` takes **494–602s vs the A100's 29s**, so a cold start is **~12 min, not ~2–5** — measured twice, with weights *and* compile cache warm. Modal preempted a container the same session, so the judged profile is now pinned to **`a100-bf16` for recovery time**, and the ~2–5 min cold-start figure in the docs was simply wrong. L40S numbers kept as corroboration: batching holds at 9.4–11× across two GPUs, two precisions, two attention backends. Cost of the window: ~$1.20, now logged in the new `docs/COSTS.md` spend ledger.
-
-### Then: the locked doors (M5)
-
-**Nothing here is started.** No `openshell`/`nemoclaw` CLI is installed anywhere yet and there is no policy YAML in the repo — F5–F7 are a green field, not a polish pass.
-
-**Who owns what in this block:**
-
-| | Person 2 (owner) | Person 4 (supplies / consumes) |
+| Lane | State | One-line reality |
 |---|---|---|
-| **F5a** host standup | does all of it | — |
-| **F5b** the four locks | writes + applies the policy | hands P2 the agent's real touch-list (paths, binaries, endpoints) |
-| **F6** the gradient | writes the rule tiers, runs the operator side of approvals | agent must read the Policy Advisor skill and submit proposals (G1) |
-| **F7** audit → enforce | runs the sweep, reads the logs, flips to enforce | agent has to actually *run* for there to be anything to observe |
+| **Data** | ✅ done | 134 patents (G06N/G06F/H04L), 94 held-out checklists, 193 real office-action defects, tracked in git |
+| **Inference** | ✅ first half | Nemotron on vLLM/Modal, `INFERENCE_BACKEND=modal\|nim`, 10.67× batching on record |
+| **Agent** | ◐ built, shallow | loop + guardrails + eval harness all real and tested; memory is static RAG, nothing compounds |
+| **Containment** | ⚠️ simulated | `policy.py` decision logic is real, and now so is an escalation client — but enforcement is still a `print()`. No OpenShell exists |
+| **Surface** | ◐ starter | idea → draft → patent works; edit boxes discard input; no chart view |
 
-Person 2 owns the boundary; Person 4 owns the thing inside it. The handoff in both directions is a list of what the agent touches — get that written down early, it's the whole input to F5b.
+Suite: `.venv/bin/pytest tests/` → **67 passed**, 0 skipped, stub mode, no network.
 
-> ⚠️ **Read before starting: you need a Linux host, and it isn't your laptop.** OpenShell's containment is Linux **Landlock LSM + seccomp-BPF + namespaces** — it cannot run natively on macOS (`docs/BUILD-PLAN.md` §Deployment decision). The standing decision is **hosted DGX Spark** (`build.nvidia.com/spark/nemoclaw`), never local and never venue hardware. Until a sandbox exists there, F5b–F7 have nothing to attach to.
+**The two headline numbers, stated honestly:**
 
-- [ ] **F5a** `feat/inference-sandbox` — **Prerequisite, do this first.** Get `nemoclaw onboard` to complete on **hosted DGX Spark** and shell in (`nemoclaw <name> connect`). Deliverable is small and binary: a named sandbox you can enter. If the early preview won't stand up, fall back to `research/nemoclaw-openshell.md` §8 (gVisor/Firecracker + OPA/Rego + a NIM proxy) on a **remote** Linux host, described in the same four-tier vocabulary — the fallback stays non-local too.
-- [ ] **F5b** `feat/inference-openshell` — One policy YAML in the repo covering all four enforcement tiers. Schema-accurate shape: `research/nemoclaw-openshell.md` §3 and §5.
+- **$500 vLLM bounty — solid.** 65.2 → 695.8 tok/s, 10.67× from continuous batching,
+  curve kneeing at the pinned `--max-num-seqs 16`. Evidence: `docs/THROUGHPUT.md`.
+- **Track-1 ablation — real but not reproducible.** The completed 6-disclosure live run
+  (`results/ablation/20260718-122807/`) has warmed beating empty on **5 of 6** disclosures,
+  **5/36 → 20/36** loopholes caught. But it ran on `--data-root data/real-eval` with
+  `corpus_size: 17`, and **`data/real-eval/` no longer exists in the tree** — so the
+  headline cannot currently be re-derived. The pooled layout over the real 193-record
+  corpus has never produced a `results.json`. Treat the 5/6 as a real result on a
+  deleted input, not as a reproducible claim. Time deltas from that run are not usable:
+  the aggregate 348.8s → 126.4s is one 257.8s outlier on the empty arm.
 
-  | Tier | What to pin | Mutability |
-  |---|---|---|
-  | Filesystem | `read_write: [/sandbox, /tmp]`, everything else read-only; disclosures mounted read-only | static — locked at creation |
-  | Process | `run_as_user: agent` — never root/0 | static |
-  | Network | egress allowlist, per-binary; needs **two** inference destinations (Modal *and* NIM), not one | dynamic, hot-reload |
-  | Inference | an `inference.local` endpoint entry at `enforcement: enforce` | dynamic, hot-reload |
-
-  **F5b is also where the two honest gaps close** (both written down in `docs/INFERENCE-LOCAL.md` §Known gaps so nobody claims them early):
-  - `inference.local` becomes a **real resolvable host with a gateway process** in front of it, instead of a naming contract that resolves to the operator-pinned Modal URL in `runtime/.env`.
-  - **Credentials move host-side.** Today `runtime/inference_local.py` reads the API key from inside the sandbox, so "creds never in the sandbox" is currently *false*. The gateway has to inject them and the sandbox has to hold none. ← **this is the real engineering in F5b, not the YAML.**
-- [ ] **F6** `feat/inference-gradient` — Three levels, not one blunt "no". Note this is **a flow, not a YAML key** — there is no `require_approval:` (`research/nemoclaw-openshell.md` §4):
-  - **Tier 1 · auto-allow** — reversible reads and searches match an `allow` rule and just go.
-  - **Tier 3 · hard-deny** — `deny_rules` for the truly-never: actually filing, repo deletion, branch-protection changes.
-  - **Tier 2 · escalate to a human** — everything else falls through default-deny into **Policy Advisor**: `403` with `agent_guidance` → agent reads `/etc/openshell/skills/policy_advisor.md` → `POST /v1/proposals` (an `addRule` op) via `policy.local` → operator runs `openshell rule approve|reject <sandbox> --chunk-id <id>` **from outside the sandbox** → hot-reload → agent retries.
-
-  Rehearse the answer to *"isn't `enforcement: audit` your approval gate?"* — **no.** Audit logs violations and **lets the traffic through**; it is a discovery mode, not a gate. Judges are expected to probe exactly this distinction.
-- [ ] **F7** `feat/inference-audit` — Set `enforcement: audit` on every endpoint, run the full agent flow end to end, and capture what it actually *tries* (`openshell logs <name> --tail --source sandbox`). Then flip to `enforce` for the judged run. **This is the pass that catches the door nobody thought of** — "a policy judges break via an un-covered egress path" is the named top risk on this track (`docs/BUILD-PLAN.md` scorecard). Depends on Person 4's agent being runnable (G1, ideally G2) — you cannot observe the egress of an agent that doesn't exist yet, so schedule F7 after their loop is alive.
-
-**Done when:** everyone's calls hit a real vLLM-served Nemotron through `inference.local` with concurrency numbers on record — and the trick prompt *"file now + back up to Dropbox"* gets hard-blocked by policy you set. That prompt is the acceptance test for this whole block: **Dropbox** = un-allowlisted egress (F5b), **filing** = `deny_rules` (F6). It's also Person 3's demo beat *"the wall"* in D6 — so F6 landing is what unblocks their rehearsal.
+  The two live runs also **disagree, on different corpora** — the distilled-FWD run above
+  warmed 5/6, while the salvaged office-action pairs
+  (`results/ablation/20260718-100851/transcripts/`) ran backwards 4/10 → 1/10. That is
+  exactly what a statute-blind ranker produces, which is why **C1 gates the Track-1 claim**
+  rather than sitting parallel to it. Neither number belongs on a slide until retrieval
+  ranks statute-first and both corpora re-run against it.
 
 ---
 
-## Person 3 · Surface — the screen + the show · `lane/surface`
+## The focus now
 
-**Your job:** Build the thing judges actually click (type an idea → get a patent), and run the live demo that shows off everything in one smooth flow. Build every screen against **fake sample data first** so you're never waiting on anyone.
+Four blocks, in dependency order. **A3, B, C and D are all unblocked and can start today** —
+only A1/A2/A4/A5 wait on hosted hardware.
 
-> **Status (audited 2026-07-18):** ⚠️ **Nobody is currently building this lane.** The whole surface is **4 files, 379 lines**, landed as a starter by **Anudeep** (`a51b4bf`) while covering for the lane — **no `feat/surface-*` branch has ever existed** and Person 3 has not committed to this repo. The click-through half genuinely works (idea → draft → patent, against the real agent loop). The *show* half — D5 and D6, the two items that carry the demo — has **zero lines written**. No Next.js, no React, no Streamlit anywhere: one hand-written static HTML file with vanilla JS.
+### A · Containment — make OpenShell real
 
-### The screen
-- [x] **D1** `feat/surface-backend` — The thin connector that hands requests to the robot and answers back. Keep it thin — the robot is the star. → **Done, and genuinely wired** — `surface/app.py:19` imports `draft_patent` and `:66` calls it for real; security findings come off the live guardrails bus (`:67-72`). Not mocked. *(Caveat: `g.AUDIT_LOG` is read as a module global after the draft, so concurrent requests would cross-attribute findings — fine for a demo, wrong under load.)*
-- [x] **D2** `feat/surface-intake` — The intake screen: a few simple questions that capture the invention. *(Default: Next.js. Streamlit is the faster backup if time's tight.)* → **Done — a human can actually click it.** Real form at `surface/static/index.html:75-90`, served at `/`, with sample-prefill wired to `/api/sample`. **Stack deviates:** neither Next.js nor Streamlit — one static HTML file with inline CSS and vanilla JS. Functionally satisfies the item; architecturally there's no build step or component structure to grow into.
-- [ ] **D3** `feat/surface-studio` — The review screen: read the draft, tweak it.
-  **◐ Partial — and the most misleading item on the board, because it demos as working.** Claims render into editable `<textarea>`s (`index.html:161-169`), but **the edits go nowhere**: no change handler, no save button, no local state, and no route that accepts a modified `Draft` — `/api/draft` only ever accepts a `Disclosure`. A user can type into the boxes and their edits are silently discarded. "Read the draft" is done; "tweak it" is a text box that looks interactive and isn't.
-- [x] **D4** `feat/surface-grant` — The final screen: finished patent **plus** the loophole report (security catches + smart catches). → **Done.** All four blocks render (`index.html:99-118`): specification, smart catches, loopholes pre-empted from memory, runtime security findings. Notably honest — when HiddenLayer is off it says so rather than faking a clean scan (`index.html:180-182`). *(No export/download; the patent is a raw text dump. Literal checklist is met.)*
-- [ ] **D5** `feat/surface-chart` — The **ablation chart view**: empty-memory vs trained-memory, side by side, from Person 4's EvalResult output. **This is the picture that wins the demo — make it unmissable.**
-  **Not started — zero lines, and no input data either.** Grep for `chart|ablation|eval` across `surface/` returns **no hits**. ⚠️ **Don't mistake `chart.html` for this being done:** that file is emitted by *Person 4's* harness (`agent/eval/harness.py:190`) and its own docstring calls itself "the zero-dependency fallback... Person 3's D5 view consumes `results.json`" (`agent/eval/chart.py:3-4`). No surface route serves it. `results/ablation/` now exists, but the only completed run there is the killed judged attempt — 10 transcripts and **no `results.json`**, which is the file D5 would consume. The 2-disclosure pilot that did complete wrote to a scratch dir, not here.
+Today: `containment/policy.py` is a genuine, data-driven, tested policy evaluator, and
+everything around it is theatre. `containment/openshell_sim.py:5-6` says so in its own
+docstring. Every "403" is a `print()` (`:29`, `:36`). `attempt_egress()` never opens a
+socket. No `openshell` or `nemoclaw` binary is installed anywhere — every occurrence in
+the repo is prose or an f-string.
 
-### The live show
-- [ ] **D6** `feat/demo-runbook` — Stitch the moments into one script: **the glow-up** (ablation chart), **the trap** (poisoned PDF caught on ingest), **the wall** (file-and-exfil prompt blocked live), and the optional **whitespace** beat only if everything else is green. **Rehearse at least twice**; pre-record a backup for every live call.
-  **Not started — zero lines.** No demo script exists anywhere in `docs/`. ⚠️ **`runtime/RUNBOOK.md` is not this** — that's Person 2's *inference* runbook, a different artifact. Three of the four beats exist as separate executables owned by *other* lanes (the wall → `containment/demo.py`, the trap → `agent/ingest.py --fake-detect`, the glow-up → the eval harness) and the whitespace beat has no code path at all. Nothing stitches them. No rehearsals, no pre-recorded backups.
+- [ ] **A1 · Stand up the sandbox.** `nemoclaw onboard` on **hosted DGX Spark**, then
+  `nemoclaw <name> connect`. Binary go/no-go; gates A2, A4, A5 and the sandbox half of B.
+  Steps (all CLI verbs still UNVERIFIED): `inference/policy/ONBOARDING.md`.
+  Fallback if the preview won't stand up: `research/nemoclaw-openshell.md` §8
+  (gVisor/Firecracker + OPA/Rego + a NIM proxy) on a **remote** Linux host — never local,
+  never venue hardware. OpenShell needs Linux Landlock + seccomp-BPF; macOS cannot run it.
+- [ ] **A2 · Make the policy YAML enforce.** `inference/policy/airtight-sandbox.yaml`
+  covers all four tiers on paper but **ships `enforcement: audit` on every endpoint**
+  (`:26,37,43,49,61,75`) — which per `research/nemoclaw-openshell.md` §5 *logs and lets
+  traffic through*. The strictness only exists as a Python default arg
+  (`containment/policy.py:63`), so the simulator is stricter than the artifact it models.
+  Needed: `enforce` on the inference endpoint, **two** inference destinations (Modal *and*
+  NIM, not one), and validation against the live schema.
+- [ ] **A3 · Wire the Policy Advisor client in — the unblocked one.** The client itself now
+  **exists and is tested**: `agent/policy_advisor.py` (landed `0878a5f`) turns a default-deny
+  into a narrow `addRule` proposal, blocks on the operator's decision, and refuses to
+  escalate a `HARD_DENY` — against an injectable transport that is a mock today and
+  `policy.local` when A1 lands. Four tests cover it.
+  **But nothing calls it.** `grep -rn policy_advisor` returns its own test and one f-string;
+  `containment/demo.py` still runs the nine hardcoded prints in `openshell_sim.py:40-49`,
+  with a **pre-written rejection** and no approve path. The escalation logic is a library,
+  not a path the demo executes. The remaining work is the wiring: replace `proposal_flow()`
+  with a real `PolicyAdvisorClient.escalate()` call, and exercise `MockTransport(approve=True)`
+  so both branches are demonstrable. Still does not need A1.
+- [ ] **A4 · Close the two honest gaps** (both recorded in `docs/INFERENCE-LOCAL.md`):
+  `inference.local` becomes a resolvable host with a gateway process instead of a naming
+  contract, and **credentials move host-side** — today `runtime/inference_local.py` reads
+  the API key from inside the sandbox, so "creds never in the sandbox" is currently false.
+  The gateway injection is the real engineering here, not the YAML.
+- [ ] **A5 · Audit → enforce sweep.** Run the full agent under `enforcement: audit`,
+  read what it actually tries (`openshell logs <name> --tail --source sandbox`), then flip
+  to `enforce`. This is the pass that catches the door nobody thought of — an un-covered
+  egress path is the named top risk on this track. Needs a runnable agent, so schedule after B.
+- [ ] **A6 · Fix the dead M2 fusion.** `containment/demo.py:11-12` claims the demo fuses
+  OpenShell and HiddenLayer on one action — "the one boundary story". It doesn't: the
+  `@g.guarded_tool` block at `:36-45` is only reachable on `Decision.ALLOW`, and both
+  `attempt_egress` calls return on deny before reaching it. Beat 3 (`:61`) bypasses it
+  entirely. **The headline claim of that file is unreachable code at runtime.** Also
+  `containment/fixtures/exfil_request.json` is read by nothing.
 
-**Done when:** someone can click idea → draft → patent, and the show runs start to finish without a hitch.
+**Done when:** the trick prompt *"file now + back up to Dropbox"* is blocked by policy the
+operator set — filing by `deny_rules`, Dropbox by un-allowlisted egress — with a real 403,
+and a proposal the operator can actually approve *or* reject.
+
+### B · Recursion — make the loop compound
+
+Today the loop is a straight line and nothing carries across runs. This is the Track-1
+mechanism, and it is the largest gap between what `docs/ARCHITECTURE.md:105-110` claims
+and what the code does.
+
+- [ ] **B1 · Add a revise turn.** `agent/loop.py` is three sequential calls — plan (`:81`),
+  draft (`:82-87`), critique (`:88`) — and then stops. The critique lands in
+  `Draft.critique_notes` (`:94`) and is **never fed back**. `Draft.specification` (`:93`)
+  is even set to the raw *pre-critique* text. A hostile examiner finds defects and the run
+  ends with those defects still in the draft. Feed the critique back as a revision turn,
+  loop until no new findings or N rounds. ~10 lines, and it is the difference between
+  "self-critique" and self-*correction*.
+- [ ] **B2 · Turn episodic memory on.** `airtight/config.py:37` defines
+  `EPISODES_ENABLED` — and **it is referenced nowhere else in the repo**. Setting
+  `AIRTIGHT_EPISODES_ENABLED=true` changes nothing. The real gate is the `--episodes` CLI
+  flag (`agent/run_smoke.py:24`) and the `episode_sink=None` default (`agent/loop.py:60`),
+  which the eval harness never passes (`agent/eval/harness.py:181`). `memory/episodes/`
+  holds one 0-byte `.gitkeep`; **no episode has ever been written.** Consequence worth
+  saying out loud: the measured ablation contains zero compounding — it measures static
+  RAG only.
+- [ ] **B3 · Bound the distillation before switching it on.** `compress_run`
+  (`agent/episodes.py:49-59`) appends **one synthetic `LoopholeRecord` per line of
+  `critique_notes`**, and `critique_notes` is every non-blank line of the reply
+  (`agent/loop.py:94`) — so markdown headers and "Here are the defects:" become
+  first-class memory records that re-enter retrieval. Combined with C2's unnormalized
+  ranking, self-generated noise outranks real PTAB records within a few runs. **Do B3
+  before B2 ships**, or compounding poisons its own corpus.
+
+Two smaller correctness items in the same area: `EpisodeStore.load` uses `rglob`
+(`agent/episodes.py:84`) while `LoopholeStore.load` uses `glob` (`agent/memory.py:31`) —
+the two stores disagree on recursion. And `.gitignore` ignores `memory/episodes/*.json`
+while `record()` writes to `memory/episodes/<disclosure_id>/*.json`, so the first episodes
+ever written get staged despite the stated intent.
+
+### C · Context memory — make retrieval right
+
+`agent/memory.py` ranks on a 3-tuple: `technology_class` exact match, raw token overlap,
+then `rec.id` reverse-alphabetical (`:41-48`). The store is a plain Python list hydrated
+from a flat JSON directory (`:25`, `:29-35`) — no index, no embeddings.
+
+- [ ] **C1 · Rank by statute.** Nothing in the ranking considers statute type, and
+  `LoopholeRecord` (`airtight/shapes.py:22-32`) **has no statute field at all** — §101/§112
+  survive only as free text inside `pattern`, and the tokenizer strips `§`. So a §112
+  disclosure gets primed with §103 rejections. This is the measured explanation for the
+  earlier backwards ablation: `19195387`'s checklist is 3×§103 but retrieval returned
+  3×§101; `19221862`'s is 4×§112 but retrieval returned 3×§103. Add the field, rank
+  statute-first. Offline, free, testable against the salvaged pairs in
+  `results/ablation/20260718-100851/transcripts/`.
+  **This is the item that gates the Track-1 claim** — see the two disagreeing runs above.
+  The shape change touches the cross-lane `LoopholeRecord`, so flag it before landing.
+- [ ] **C2 · Normalize the overlap score.** Overlap is a raw unnormalized count against
+  `pattern + claim_shape + remedy`, and real records carry 600+ char `claim_shape` fields
+  (full amended claim text). Longest record mechanically wins. Normalize by length or
+  weight by IDF.
+- [ ] **C3 · Give the store a write API.** `LoopholeStore` has no `add()` and no `save()` —
+  it is read-only by construction, which is precisely why D exists as a separate block.
+- [ ] **C4 · Decide the knowledge graph question, and say so.** There is **no graph in
+  code** — no `networkx`, no node/edge types, no traversal. The "graph" is one boolean
+  equality on `technology_class`. `README.md:8` and `docs/ARCHITECTURE.md:80,105-110`
+  assert a persistent knowledge graph as fact. Either build edges (statute ↔ claim shape ↔
+  CPC class) or change the prose. Do not walk a judge into that gap.
+  Note `db/schema.sql` already designed the richer shape — `statutory_defect_category`,
+  `cpc_class`, confidence and provenance columns — before it was abandoned for flat JSON.
+  It is dead (`duckdb` is still an unused dependency), but it is a good spec for C1.
+
+### D · Ingest → memory — close the circuit
+
+**The circuit is open.** `agent/ingest.py` imports only `airtight.config` and
+`airtight.guardrails` — never `agent.memory`, never `LoopholeRecord`. `ingest_document`
+(`:44-49`) returns the admitted text, and every caller drops it: `:87` uses it for `len()`
+in a print at `:103`; `agent/poison_demo.py:71` checks it for `None`. The
+`"loophole report: attempted indirect injection recorded"` line at `:98-99` is a **print,
+not a write** — nothing is recorded anywhere, and `g.QUARANTINE_LOG` / `g.AUDIT_LOG`
+(`airtight/guardrails.py:90-91`) are module-level lists that die with the process.
+
+Ingest is a security demo with a CLI. It is not a data path.
+
+- [ ] **D1 · Distill admitted text into records.** Don't write a new prompt —
+  `DISTILL_SYSTEM` (`data/distill_loopholes.py:28-35`) already emits exactly
+  `{pattern, claim_shape, remedy}` and `_parse_json` (`:38-46`) already handles extraction.
+  Wrap it as `distill_text(text, source, tech_class) -> list[LoopholeRecord]`, routed
+  through `call_model` so the doorway and guardrail hop still fire.
+- [ ] **D2 · Write, then merge into retrieval.** Persist to `memory/ingested/` and merge
+  via `CompositeStore` (`agent/episodes.py:112`), which already does base+extra merging
+  with id-dedup. `LoopholeStore.load` accepts both list- and object-shaped files, so a flat
+  directory needs no loader change. Depends on C3.
+- [ ] **D3 · Quarantined content must never reach memory — and this is the story.**
+  Ingest is the poisoned-PDF path (`data/fixtures/poisoned_prior_art.pdf`, two hidden
+  vectors, live-verified against real HiddenLayer). Wiring ingest into memory without a
+  gate would let an attacker write directly into the agent's long-term store — a
+  persistent, compounding injection. The HiddenLayer bus is what makes D safe, and
+  `INGESTED_DOCUMENT` already fails **closed** (`airtight/guardrails.py:84`).
+  **Say this on stage:** Track 2 isn't a bolt-on next to Track 1 — it's the precondition
+  for it. A learning agent that ingests untrusted documents *must* have a scanner on that
+  hop, or its memory is an attack surface. Add the test that proves a quarantined document
+  leaves zero records behind.
+
+**Done when:** a document read at ingest changes what the agent retrieves on the next run,
+and a poisoned one provably does not.
 
 ---
 
-## Person 4 · Anudeep — the robot itself · `lane/agent`
+## Done
 
-**Your job:** The agent, its memory, its security bus, and the proof it gets smarter. This is the **critical path** — the Claude Code kickoff prompts in `docs/SESSIONS.md` are your per-milestone scripts. Ship the shared doorway stub to `main` first so nobody waits on you.
-
-> **Status (audited 2026-07-18):** **The most-built lane — and the most honest.** Everything on this list exists as tested code, and the lane consistently refuses to overclaim: stub mode won't fabricate an ablation delta, `UNVERIFIED` markers sit on the exact lines needing re-verification, and the containment sim banners itself on every run. The gap was uniform and had one shape — everything built and tested in stub/simulation mode, nothing touching real infrastructure. **G3 broke that on 2026-07-18:** the ablation ran against live vLLM-served Nemotron on the real USPTO pull and reproduced the Track-1 effect, though the judged 10-disclosure run still needs a re-run behind a call timeout. Real HiddenLayer (G4) and actual OpenShell (G1, G5) remain absent, and two of those three are blocked on P2. Anudeep also covered work outside this lane: the surface starter (D1/D2/D4) and the one working USPTO puller.
-
-- [x] **G0** `feat/agent-doorway` — The shared inference doorway (stubbed "all clear"), into `main` day one. Contract: `docs/INFERENCE-LOCAL.md`. → **Done**, and it holds. Single entry point (`airtight/doorway.py:58`), `AIRTIGHT_MODE` defaults to `stub` so a fresh clone runs with no network, and the "no other model client" rule is *enforced*, not just documented — `tests/test_smoke.py:22` makes constructing a client in stub mode a hard test failure. Landed day one in `6a27c65`.
-- [ ] **G1** `feat/agent-core` — The work loop: plan → draft → self-critique → hand back, running in the OpenShell sandbox (hosted, never local), every call through the doorway. Needs P2's **F5a** sandbox to exist; in return, **write down every path, binary, and endpoint your loop touches and hand it to P2** — that list is the entire input to their F5b policy. The loop also has to read the Policy Advisor skill and submit `addRule` proposals when it hits a 403, or P2's F6 escalation tier has no agent side. *(Session A, M1)*
-  **◐ Agent-side complete — blocked only on P2's F5a.** The loop is real and tested (`agent/loop.py`), every turn through the doorway. The audit's second gap is now closed: **the agent-side Policy Advisor client is built and tested** (`agent/policy_advisor.py` + `tests/test_policy_advisor.py`) — on a default-deny it submits a narrow `addRule` proposal and blocks on the operator's approve/reject (hard-deny is refused as non-escalable), against an injectable transport that's a mock today and `policy.local` when F5 lands. So P2's F6 now has its agent counterpart. **The one remaining requirement is P2's:** running *inside* the OpenShell sandbox (F5a) — no sandbox exists yet to run in. Everything on the agent side of G1 is done.
-- [ ] **G2** `feat/agent-memory` — The learning: ingest Person 1's corpus into the edge-case store (simplest store that answers "5 most relevant past mistakes for this kind of invention"), RAG-from-self into the drafting prompt, save a lesson after every draft. *(M3)*
-  **◐ Partial — closest to done.** All four sub-parts have working, tested code: `retrieve(disclosure, k=5)` (`agent/memory.py:41`), RAG into the draft/critique prompts (`agent/loop.py:64`), lesson-write via `compress_run()` (`agent/episodes.py:38`). Two gaps: it still ingests **6 hand-written fixture records rather than Person 1's corpus** — which now exists (193 real office-action defects across three classes, E2), so this is a wiring job, not a blocked one — and "after every draft" is **off by default** — `AIRTIGHT_EPISODES_ENABLED=false` (`airtight/config.py:34`), and `memory/episodes/` is empty, so no lesson has ever actually been saved.
-  ⚠️ **A third gap, found 2026-07-18 while salvaging the killed G3 run: `retrieve()` ranks on the wrong signal, and it is the leading explanation for G3's backwards ablation.** `agent/memory.py:44` ranks by `(technology_class match, keyword_overlap, id)`. **Statute type is not part of the ranking**, so a §112 disclosure gets primed with §103 rejections (measured: see G3's salvage note for the two disclosures where this cost the warmed arm 2 caught loopholes each). *(Update 2026-07-18: those pairs were measured when `data/real/` was single-class G06N, making the class term constant-true so ranking collapsed to bag-of-words overlap on `pattern + claim_shape + remedy`; the data lane has since pulled G06F+H04L, so class now discriminates — but statute still isn't in the ranking, so the fix stands. Re-measure the salvaged pairs against the multi-class pool before spending GPU.)* This makes G2 the **blocking prerequisite for G3's re-run**, not a parallel nice-to-have — the item's own spec says the store must answer *"5 most relevant past mistakes for this kind of invention"*, and on the evidence it currently does not. Fix is offline and free to test: rank statute-first, and validate against the 5 salvaged pairs before spending GPU.
-- [ ] **G3** `feat/agent-eval` — The **money shot**: the eval harness on Person 1's fixtures — same invention, same model, same prompt, memory empty vs warmed on 50 patents; three metrics (loopholes caught ▲, time ▼, defects ▼); EvalResult out to Person 3's chart. *(Session B, M4 — protect this above everything)*
-  **◐ Partial — built to a high standard, now run live once, judged run still outstanding.** The harness is the highest-quality code in the repo and exceeds the spec: paired back-to-back runs (`harness.py:175`), a `scaffold_proof()` asserting both conditions render byte-identical templates outside the memory slot (`:64`), a hard train/test leakage guard (`:43`), a config fingerprint with git SHA + prompt hashes (`:81`), and a blinded judge that downgrades any "closed" verdict whose quoted evidence isn't literally in the claims (`judge.py:88`). In stub mode the delta is **zero by construction** (`judge.py:81`) — `tests/test_eval.py` asserts exactly that — so a green suite proves plumbing, not that memory helps. *(Superseded: the earlier audit listed four confirmations this had never run — no `results/ablation/`, gitignored output, leaked pytest artifacts in `results/security/` carrying the canned `"event_id": "e"` from `tests/test_containment.py:73`, and a 2-disclosure fixture set. The first and last no longer hold; see the two notes below.)*
-  ✅ **The P1 gap that blocked this is closed.** "Memory empty vs warmed on real patents" now has its corpus: `data/real/disclosures` (134 across G06N/G06F/H04L), `data/real/checklists` (94 held-out), `data/real/groundtruth/loopholes.json` (193 defects from real office actions). The harness's own loaders read them and `assert_no_overlap` passes at 0 collisions, so the warmed arm retrieves from **real examiner rejections**, not 6 hand-written notes. The data is **tracked in git as of 2026-07-18 — it comes with `main`**. *(Note: the salvaged G3 numbers above were measured on the earlier single-class 50-patent G06N pool, which has since grown to three classes — re-run against the current pool.)*
-  ✅ **RUN LIVE 2026-07-18 — "BUILT, never RUN" is retired.** The harness executed against live Nemotron (`nemotron` on Modal/vLLM) on the real pull, and the Track-1 effect showed up on all three axes on the same disclosure: `uspto-19206781` went **0/1 → 1/1 loopholes caught**, **49.6s → 28.5s** drafting, **10 → 5 defects**, warmed vs empty. The warmed arm retrieved 5 records, all from *other* applications, overlap guard clean (0 collisions, 0 Jaccard flags). A second disclosure moved 0/1 on both arms — reported because a 1-record checklist is a coarse instrument, not because the run failed. Stub mode's zero-delta-by-construction (`judge.py:81`) is unchanged and still the offline default. **⚠️ Read this with the salvage note two blocks down: that pilot is a one-disclosure result, and the larger run's recovered data does not reproduce it.**
-  ⚠️ **The judged `--n 10` run stalled at 5 of 10 and was killed — no `results.json` yet.** Root cause is a **missing per-call timeout**: `grep timeout` across `airtight/doorway.py`, `agent/loop.py` and `agent/eval/judge.py` returns nothing, so one hung request blocks the whole run forever. Observed: 10+ minutes on a `--fast` call capped at 1100 tokens, against a pilot baseline of 25–50s, with the client socket `ESTABLISHED` and several sibling sockets in `CLOSE_WAIT` (the server had closed them). **The endpoint was healthy throughout** — `/v1/models` answered 200 in 0.3s and a fresh completion returned in under a second while the harness sat blocked, so this is a client-side hang, not a GPU outage. It burns GPU credit at ~$2.50/hr while stuck and cannot self-recover. **Fix before re-running: a request timeout in the doorway plus a retry (or skip-and-record) at the harness level, so one bad call costs one disclosure rather than the whole judged run.**
-  ⚠️ **The killed run's data survived — and across 5 paired disclosures the effect runs backwards.** `results.json` is missing because `run_ablation` writes it only after the loop completes (`harness.py:284`), but `run_condition` flushes each transcript to disk immediately (`harness.py:208`), so **all 5 completed pairs are on disk** at `results/ablation/20260718-100851/transcripts/` — 10 files, each carrying a full `EvalResult` in its `result` key with `judge_mode: "live"`. Re-derived from those transcripts (read `result` from each; arms verified distinct — `empty` has `retrieved_ids: []`, `warmed` injects 5 records into the memory slot):
-
-  | disclosure | caught e→w | secs e→w | defects e→w |
-  |---|---|---|---|
-  | uspto-19194270 | 0/1 → 0/1 | 23.6 → 24.8 | 6 → 21 |
-  | uspto-19195387 | **2/3 → 0/3** | 22.6 → 23.0 | 5 → 4 |
-  | uspto-19196841 | 0/1 → **1/1** | 20.7 → 27.4 | 5 → 12 |
-  | uspto-19206781 | 0/1 → 0/1 | 22.1 → 23.2 | 10 → 7 |
-  | uspto-19221862 | **2/4 → 0/4** | 23.9 → 24.7 | 18 → 3 |
-  | **aggregate** | **4/10 → 1/10** | **113.0 → 123.2s** | **44 → 47** |
-
-  **All three axes move against Track-1** — fewer loopholes caught, slower, marginally more defects. Two cautions in both directions: this is 10 checklist items across 5 disclosures, far too small to be conclusive *either way*, and it is not the same config as the pilot (these drafts run 20–24s against the pilot's 28–50s, consistent with `--fast`). But note that **`uspto-19206781`, the disclosure the headline win is built on, did not reproduce here** — 0/1 → 0/1, 22.1 → 23.2s, 10 → 7, against the pilot's 0/1 → 1/1, 49.6 → 28.5s, 10 → 5. The honest current state is that the Track-1 effect rests on **n=1 disclosure** and the only larger sample we have contradicts it. Do not put the pilot numbers on a slide unqualified.
-
-  ⚠️ **There is a mechanism for the backwards result, and it is a retrieval bug, not a memory-doesn't-work result.** `retrieve()` (`agent/memory.py:44`) ranks by `(technology_class == disclosure.technology_class, keyword_overlap, rec.id)`. When the two losing pairs below were measured, every disclosure in `data/real/` was G06N, so **the class term was constant-true** and ranking collapsed to raw keyword overlap between the disclosure text and `pattern + claim_shape + remedy` (the data lane has since pulled G06F+H04L, so class now discriminates — re-measure against the multi-class pool). Either way, **nothing in the ranking considers statute type.** In both disclosures where the warmed arm *lost* ground, retrieval served the wrong statute: `19195387`'s checklist is 3×§103 but retrieval returned 3×§101, 1×§103, 1×§112; `19221862`'s is 4×§112 but retrieval returned 3×§103, 2×§112. The warmed arm is being primed toward the wrong failure mode and drafting defenses for it. **Fix this before buying another judged run** — it is offline, free, testable against the 5 salvaged pairs, and re-running `--n 10` against today's `retrieve()` most likely buys a larger, better-documented null result. The fix lands in G2's code, not G3's.
-
-  📌 **Two operational notes for whoever re-runs it.** The served model alias is **`nemotron`** — `airtight/config.py:22` still defaults `AIRTIGHT_MODEL` to `nvidia/nemotron-3-nano-31b-a3b`, which the server does not answer to; the file's own `UNVERIFIED` comment asks for exactly this correction. Live invocation: `AIRTIGHT_MODE=live AIRTIGHT_BASE_URL=<url>/v1 AIRTIGHT_API_KEY=airtight-local AIRTIGHT_MODEL=nemotron python -m agent.eval --data-root data/real --layout pooled --n 10 --fast`. Budget from measurement, not guesswork: the 2-disclosure pilot took **2m38s**, so `--n 10` is ~15–20 min ≈ $0.85 with `--fast`.
-  ⚠️ **A separate 6-disclosure run (Anudeep, distilled-FWD loopholes) showed warmed 5/6 — and it does not settle the question, it sharpens it.** `results/ablation/20260718-122807/` (concurrent judge, deadline-guarded, ran to completion) warmed on 17 loopholes distilled from real PTAB *Final Written Decisions* — a **different corpus** than `data/real/`'s office-action defects — and there loopholes-caught went 0.83 → 3.33 avg, warmed better on 5 of 6. So the two live runs **disagree on different data**, which is exactly what the statute-blind retrieval bug above predicts: a corpus whose retrieved loopholes happen to match the disclosure's statute helps; one that doesn't hurts. **Neither number belongs on a slide until `retrieve()` ranks statute-first and both corpora re-run against it.** The harness is sound; the retrieval signal is the open variable — the fix lands in G2.
-- [x] **G4** `feat/agent-guardrails` — The security bus: HiddenLayer scanning on **all five** hops (user input, robot output, tool asks, tool answers, **documents it reads**), graded responses (pass / redact / quarantine / block+alert), fail-closed on the risky two. *(Session C, M2)*
-  **Done — LIVE-verified 2026-07-18.** All three audit caveats resolved: (1) **all five hops fire in one real flow** — `agent/poison_demo.py` wraps a `prior_art_search` in `guarded_tool` (tool_call + tool_result) and ingests the poisoned doc, alongside the doorway's user_prompt/model_response; the run prints all five as analyzed. (2) The **SDK is installed** (`hiddenlayer-sdk` 3.8.0) and `_raw_analyze()` was rewritten against its real API (`bearer_token`/`client_id`+`secret`, `hl_project_id`) — no longer UNVERIFIED. (3) **Ran against the real AIDR API:** the poisoned prior-art doc flagged as `prompt_injection` with real event_id `0fc717c2-…` → quarantined. Graded actions + fail-closed on the risky two remain tested (`tests/test_guardrails.py`). Still off by default (correct — needs a key); the event key's ruleset flags injection but not PII, so the redact path is implemented + unit-tested, not live-exercised.
-- [ ] **G5** `feat/agent-adversarial` — With Persons 1 & 2: the poisoned-PDF catch and the "file now + Dropbox" wall, wired end to end for the demo. The wall is **P2's policy doing the blocking** (F5b un-allowlisted egress + F6 `deny_rules`), not your code — your part is the agent genuinely attempting it and surfacing the refusal. Blocked until F6 lands. *(Session D, M6)*
-  **◐ Agent-side done — real blocking is P2's F6.** The two halves have moved: (a) **the poisoned-doc catch is LIVE-verified** — `agent/poison_demo.py` against the real HiddenLayer AIDR API flags the injection and quarantines it (see G4). (b) **The agent genuinely attempts the wall and surfaces the refusal** — `containment/demo.py` drives the file-now + Dropbox-backup scenario, and the agent's escalation now runs through the real `agent/policy_advisor.py` client (proposal submitted, operator rejects, egress never proceeds), decisions parsed from the real `inference/policy/airtight-sandbox.yaml`. Per this item's own wording, the agent's part — "genuinely attempting it and surfacing the refusal" — is done. **What's still simulation is the enforcement itself:** `containment/openshell_sim.py` banners "presentation, not enforcement," the 403 is a `print()`, no socket is opened. Real blocking is **P2's F6 `deny_rules` + F5b egress on a live OpenShell sandbox** — none of which exists yet. Blocked on P2, correctly.
-
-**Done when:** the ablation runs on command with an honest chart, all five scan-points provably fire, and the wall holds under a judge's adversarial prompt.
+- **Data (E1–E5)** — 134 patents across G06N/G06F/H04L with real abstracts and claims;
+  94 held-out checklists; 193 defects mined from real office actions (§103 ×111, §101 ×27,
+  §112 ×39, §102 ×16). Tracked in git — `main` gets you the data, no key needed to consume.
+  Overlap guard green: 0 id collisions, 0 Jaccard flags. Two-vector poison PDF real and
+  extractable through `agent/ingest.py:_extract_text`. Dead `src/` pipeline and both
+  data-fabricating scripts quarantined under `attic/`.
+- **Inference (F1–F4)** — Nemotron 3 Nano on vLLM → Modal free tier; `inference.local`
+  live; one-var `INFERENCE_BACKEND=modal|nim` flip with all three backends verified green;
+  `runtime/RUNBOOK.md` handoff. Judged GPU profile is **`a100-bf16`**, chosen on recovery
+  time not price: `l40s-fp8` is faster *and* cheaper (865 vs 696 tok/s, $1.95 vs $2.50/hr)
+  but cold-starts in **~12 min** vs ~1–2, and Modal preempts containers. The "~2–5 min cold
+  start" in the old docs was wrong on both profiles. Weights pinned to a per-profile commit SHA.
+- **Doorway (G0)** — single legal model hop (`airtight/doorway.py:58`), `AIRTIGHT_MODE`
+  defaults to `stub` so a fresh clone runs offline, and the no-other-client rule is
+  *enforced* by `tests/test_smoke.py:22`, not just documented.
+- **Guardrails (M2)** — all five hops and all four graded actions implemented, fail-closed
+  on `TOOL_CALL` and `INGESTED_DOCUMENT`. **Live-verified 2026-07-18** against the real
+  AIDR API: the poisoned doc flagged as `prompt_injection`, real `event_id`. **All five
+  hops now fire in one real flow** — `agent/poison_demo.py` wraps `prior_art_search` in
+  `@g.guarded_tool` (`:26`) for the two tool hops and ingests the poisoned document,
+  alongside the doorway's user_prompt/model_response. One caveat left: this key's ruleset
+  flags injection but not PII, so the graded *redact* path is a tested capability, not a
+  live demo beat.
+- **Eval harness (M4)** — paired runs, `scaffold_proof()` asserting byte-identical
+  templates outside the memory slot, a hard leakage guard, a config fingerprint with git
+  SHA + prompt hashes, and a blinded judge that downgrades any verdict whose quoted
+  evidence isn't literally in the claims. Stub mode has zero delta by construction, so a
+  green suite proves plumbing, not effect. Doorway timeout and `--deadline-min` landed
+  after the `--n 10` run hung on a call with no timeout and burned GPU credit.
+- **Surface (D1, D2, D4)** — idea → draft → patent, wired to the real agent loop, not
+  mocked. One static HTML file, no build step.
 
 ---
 
-## What order it all happens
+## Open risks
 
-```
-Step 0  →  The 2-hour shared setup (everyone, together). Doorway stub in main.
-Step 1  →  All four lanes run in parallel:
-           P1 pulls data · P2 deploys vLLM to Modal (free tier) · P3 builds screens on mocks
-           P4 builds the agent loop against the stub
-Step 2  →  Swap the fakes for the real thing: doorway → real vLLM endpoint (P2),
-           mocks → real robot (P3), stub scanner → real HiddenLayer (P4).
-           P2 rolls onto the OpenShell locks.
-Step 3  →  P1's fixtures + P4's harness = the ablation run. P3 wires the chart
-           and the 3-moment show. Rehearse twice.
-```
-
-**The one path that can't slip:** P1's ground truth → P4's eval harness → P3's chart. **If you run out of time, the very last thing to cut is the ablation chart** — it earns points in four different ways at once. Build order stays M1+M1b → **M4 immediately** → the rest (`CLAUDE.md`).
+| Risk | Plan |
+|---|---|
+| **The ablation headline rests on a deleted input** | Re-run pooled over `data/real/` after C1. Until then don't put 5/6 on a slide without the caveat |
+| **The two live runs disagree on the Track-1 effect** | Expected under statute-blind ranking. C1 first, then re-run *both* corpora — the distilled-FWD set and the office-action set — before any delta is quoted |
+| NemoClaw preview won't stand up (A1) | It's a small binary go/no-go — attempt it **early**, fail fast, fall back to §8 on a remote Linux host in the same four-tier vocabulary |
+| Judges find an egress path the policy never covered | That is exactly what A5 is for. Don't skip it to save time |
+| Docs claim enforcement the code doesn't have | `docs/ARCHITECTURE.md:95,236` assert real Landlock enforcement and real Policy-Advisor HITL. Both collapse under a `grep openshell`. Fix the prose or build the thing — C4 is the same problem for the knowledge graph |
+| **Two implementations of the one hop** | `airtight/doorway.py` and `runtime/inference_local.py` are parallel clients for the same operator-pinned boundary. Not broken, but "one boundary, three tracks" currently has two doorways. Steven + Anudeep pick the canonical one and delegate the other — see `docs/INTEGRATION-STATUS.md` |
+| Compounding poisons its own corpus | B3 before B2. Non-negotiable ordering |
+| Modal cold start / credits | Keep the app **paused** by default; `min_containers=1` only in the demo window; NIM is one env flip away |
 
 ---
 
-## What could go wrong (and the plan for it)
+## Standing rules
 
-| Person | The worry | The plan |
-|--------|-----------|----------|
-| 1 | Rejection/PTAB data is messier than expected, or the checklist leaks into the warming set | Confirm the datasets download **on day one** (C0b-style spike); keep checklist and warming corpus in separate files with an overlap check |
-| 2 | Modal cold-start stalls the demo, or the free credit runs out | Nano is the guaranteed fit on L40S; **keep one Modal container warm** (`min_containers=1`) for the demo window; the NIM free endpoint is one env-flip away; scale-to-zero keeps dev effectively free |
-| 2 | The NemoClaw/OpenShell early preview won't stand up (F5a), leaving F5b–F7 with nothing to attach to | Attempt `nemoclaw onboard` on **hosted DGX Spark early** — it's a small binary go/no-go, so fail fast rather than at the venue; fallback is `research/nemoclaw-openshell.md` §8 (gVisor/Firecracker + OPA/Rego + NIM proxy) on a remote Linux host, presented in the same four-tier vocabulary |
-| 2 | Judges find an egress path the policy never covered | That's exactly what **F7** is for — audit-mode sweep of the *real* agent first, read the denial logs, then flip to enforce. Don't skip it to save time; it's the pass that catches the door nobody thought of |
-| 3 | A live internet call glitches mid-demo | Every moment has a pre-recorded backup; rehearse twice |
-| 4 | One person owning agent + memory + security + eval is too much | The stub-first doorway means nothing blocks on you; P2 takes the OpenShell locks; if still tight, P1 co-owns eval scoring (they built the checklist) and M6 polish gets cut before M4 does |
-
----
-
-*Keep this current — tick the boxes as things get done. This is the team's to-do list of record.*
-
-*Convention, set by the 2026-07-18 audit: **`[x]` means verified against the code**, not self-reported. **◐ Partial** means real code exists but the item's defining requirement isn't met — read the note for what's missing before assuming it's nearly done. Several items looked done by filename and were not, so tick from evidence.*
+- **The Modal app stays paused.** Un-pause only for a step that genuinely needs the GPU,
+  re-pause immediately. Pausing is the operator's call — ask, don't do it unprompted.
+- **Build against `runtime/mock_endpoint.py` first.** Debugging on a metered cold start is
+  how the credit disappears. Get it green offline, then spend one short scripted live window.
+- **Check for concurrent sessions before a metered run** — another agent can wake or
+  redeploy the app mid-measurement.
+- **Finish a task by updating this file in the same change.** Record partial and failed
+  outcomes with the same care as wins; the entries that have saved the most time here are
+  the honest ones.
