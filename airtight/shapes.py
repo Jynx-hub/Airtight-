@@ -44,6 +44,11 @@ class LoopholeRecord(BaseModel):
     remedy: str
     source: str  # citation to the PTAB decision / office action
     statute: str = ""  # 101 | 102 | 103 | 112 | "" — the failure mode retrieval balances on
+    # 1.0 = mined from ground truth; lower = inferred from an untrusted document.
+    # Semantics and default taken from db/schema.sql's extraction_confidence column.
+    # Optional so the 193 tracked records validate unchanged, and unread by
+    # loop.render_guardrails so it cannot perturb the ablation prompt.
+    extraction_confidence: float = 1.0
 
     @model_validator(mode="after")
     def _derive_statute(self):

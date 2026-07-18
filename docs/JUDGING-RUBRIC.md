@@ -35,7 +35,7 @@
 | Rubric line (pts) | Airtight's answer | Proven by |
 |---|---|---|
 | **Completeness** (15) | End-to-end flow runs without crashing: light intake → draft → filing-ready specification | Demo triad; M1–M6 |
-| **Technical Depth** (15) | Edge-case knowledge graph + episodic memory + RAG-from-self + eval harness — a pipeline, not a wrapper | M3, M4 |
+| **Technical Depth** (15) | Statute-diversified, BM25-ranked edge-case retrieval + episodic memory + RAG-from-self + eval harness — a pipeline, not a wrapper | M3, M4 |
 | **The Stack** (15) | HiddenLayer AIDR on all five interaction hooks; NemoClaw/OpenShell 3-tier containment; Nemotron on operator-pinned inference | M1, M2, M5 |
 | **The "Why"** (15) | *"One boundary, three tracks"* — inference pinned to `inference.local` so the security bus and containment boundary converge on the same model hop | `README.md`, `docs/INFERENCE-LOCAL.md` |
 | **Insight Quality** (10) | Loopholes-caught delta on real patent data + examiner rejections — a metric most teams won't have | M4 ablation |
