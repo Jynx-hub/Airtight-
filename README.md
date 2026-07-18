@@ -79,14 +79,14 @@ Quick start (Python 3.10+; 3.12 is what the suite is verified on):
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -e ".[dev,web,poison]" && .venv/bin/pytest tests/
-# expect: 138 passed — no network, no .env, no GPU
+# expect: 149 passed — no network, no .env, no GPU
 ```
 
 Take the `web` and `poison` extras even if you aren't touching the surface or the E5
 security demo. `tests/test_surface.py` `importorskip`s fastapi and the two poison-PDF tests
-`importorskip` pdfplumber *by design*, so a `.[dev]`-only clone reports a green **118 passed,
-20 skipped** — green, but with all twenty surface tests and both poison-PDF tests silently
-not run (`.[dev,web]` without `poison` is **136 passed, 2 skipped**). **138 passed** (no
+`importorskip` pdfplumber *by design*, so a `.[dev]`-only clone reports a green **127 passed,
+22 skipped** — green, but with all twenty surface tests and both poison-PDF tests silently
+not run (`.[dev,web]` without `poison` is **147 passed, 2 skipped**). **149 passed** (no
 skips) is the number that means "everything a fresh clone can run, ran."
 
 Then see it: `uvicorn surface.app:app` serves the applicant intake at `/` and the engine

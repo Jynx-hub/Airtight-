@@ -22,7 +22,13 @@ What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.m
 | **Containment** | ⚠️ simulated | `policy.py` decision logic is real, and now so is an escalation client — but enforcement is still a `print()`. No OpenShell exists |
 | **Surface** | ✅ two frames | intake (retrieval → live pipeline → grant) + engine panel over every committed artifact; D3's dishonest edit boxes replaced with a labelled seam |
 
-Suite: `.venv/bin/pytest tests/` → **138 passed**, 0 skipped, stub mode, no network.
+Suite: `.venv/bin/pytest tests/` → **149 passed**, 0 skipped, stub mode, no network.
+
+📌 **Unrecorded on this board:** `main` gained live USPTO prior-art search
+(`agent/prior_art.py`) and an MPEP statute reference grounding the draft/critique/revise
+loop (`agent/statute_reference.py`) at `5e5f9eb`/`f85faa7`, +11 tests, with no lane entry.
+Both claim product-path-only isolation from the M4 ablation. Noted here so it isn't lost —
+**not verified by the Surface lane**; the author should grade it against the notation above.
 
 **The two headline numbers, stated honestly:**
 
