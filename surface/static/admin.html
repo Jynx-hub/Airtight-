@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Airtight — Engine</title>
+<link rel="stylesheet" href="/static/airtight.css">
+</head>
+<body>
+
+<div class="bar">
+  <div class="brand"><b>■ AIRTIGHT</b> <span class="sep">/</span> ENGINE</div>
+  <div class="leds">
+    <span class="led" id="led-mode">MODE <b>…</b></span>
+    <span class="led" id="led-corpus">CORPUS <b>…</b></span>
+    <span class="led" id="led-hl">BUS <b>…</b></span>
+  </div>
+  <nav>
+    <a href="/">Intake</a>
+    <a href="/admin" aria-current="page">Engine</a>
+  </nav>
+</div>
+
+<main>
+
+  <!-- ============ what it knows ============ -->
+  <div class="grid two">
+    <section class="panel">
+      <div class="panel-hd">
+        <h2>Retrieval corpus</h2>
+        <span class="meta" id="corpus-meta">—</span>
+      </div>
+      <div class="panel-bd" id="corpus-body"><p class="empty">loading…</p></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-hd">
+        <h2>What it has learned</h2>
+        <span class="meta" id="learn-meta">—</span>
+      </div>
+      <div class="panel-bd" id="learn-body"><p class="empty">loading…</p></div>
+    </section>
+  </div>
+
+  <!-- ============ retrieval inspector ============ -->
+  <section class="panel" style="margin-top:1rem">
+    <div class="panel-hd">
+      <h2>Retrieval inspector</h2>
+      <span class="meta" id="insp-meta">pick a disclosure</span>
+    </div>
+    <div class="panel-bd">
+      <div class="row" style="margin:0 0 .8rem">
+        <select id="insp-pick" style="max-width:420px"></select>
+        <button class="btn ghost" id="insp-run">Retrieve</button>
+      </div>
+      <div id="insp-body"><p class="empty">Runs the real ranker against a real disclosure — no model call.</p></div>
+    </div>
+  </section>
+
+  <!-- ============ corpus browser ============ -->
+  <section class="panel" style="margin-top:1rem">
+    <div class="panel-hd">
+      <h2>Failure library</h2>
+      <span class="meta" id="rec-meta">—</span>
+    </div>
+    <div class="panel-bd">
+      <div class="row" style="margin:0 0 .7rem">
+        <select id="f-statute" style="max-width:130px"></select>
+        <select id="f-cpc" style="max-width:130px"></select>
+        <input id="f-q" placeholder="search pattern or claim text" style="max-width:340px">
+      </div>
+    </div>
+    <div class="scroll"><table id="rec-table"><thead><tr>
+      <th style="width:60px">§</th><th style="width:150px">ID</th><th style="width:60px">CPC</th>
+      <th>Failure mode · rejected claim language</th><th style="width:60px">Conf</th>
+    </tr></thead><tbody id="rec-body"></tbody></table></div>
+  </section>
+
+  <!-- ============ ablation ============ -->
+  <section class="panel" style="margin-top:1rem">
+    <div class="panel-hd">
+      <h2>Ablation · empty vs warmed</h2>
+      <span class="meta" id="abl-meta">—</span>
+    </div>
+    <div class="panel-bd" id="abl-body"><p class="empty">loading…</p></div>
+  </section>
+
+  <!-- ============ bus + throughput ============ -->
+  <div class="grid two" style="margin-top:1rem">
+    <section class="panel">
+      <div class="panel-hd">
+        <h2>Guardrail bus · 5 hops</h2>
+        <span class="meta" id="sec-meta">—</span>
+      </div>
+      <div class="panel-bd" id="sec-body"><p class="empty">loading…</p></div>
+      <div class="stream" id="sec-stream"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-hd">
+        <h2>Throughput · vLLM batching</h2>
+        <span class="meta" id="tp-meta">—</span>
+      </div>
+      <div class="panel-bd" id="tp-body"><p class="empty">loading…</p></div>
+    </section>
+  </div>
+
+  <!-- ============ containment ============ -->
+  <section class="panel" style="margin-top:1rem">
+    <div class="panel-hd">
+      <h2>Containment · four enforcement tiers</h2>
+      <span class="meta">NemoClaw / OpenShell</span>
+    </div>
+    <div class="panel-bd" id="cont-body"><p class="empty">loading…</p></div>
+  </section>
+
+</main>
+
+<script src="/static/admin.js"></script>
+</body>
+</html>

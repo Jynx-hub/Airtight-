@@ -1,31 +1,87 @@
-# surface/ — Person 3's lane
+# surface/ — the two frames
 
-The Applicant Surface (intake → draft studio → grant + loophole report) and the demo show. Tasks D1-D6: `docs/WORKSTREAMS.md`.
-
-**A working starter is here** — thin but clickable end to end, the way `inference/vllm_modal.py` starts Person 2. Make it pretty (or throw a Next.js frontend at the JSON API below); the contract is defined so your work isn't wasted.
+The Applicant Surface (what a user touches) and the Engine panel (what the judges
+should see underneath). Tasks D1–D5: `docs/WORKSTREAMS.md`.
 
 ## Run it
 
 ```bash
 pip install -e ".[web]"
-uvicorn surface.app:app --reload      # open http://localhost:8000
+uvicorn surface.app:app --reload      # http://localhost:8000
 ```
 
-Works in stub mode with no network. Set `AIRTIGHT_MODE=live` (+ Person 2's Modal URL) for real drafts.
+Works in stub mode with no network, no GPU and no keys — every panel reads
+committed artifacts off disk. Set `AIRTIGHT_MODE=live` (+ the Modal URL) for real
+drafts.
 
-## What's built
+## The frames
 
-- `app.py` — FastAPI backend (D1). Calls only `agent.loop.draft_patent`, so the doorway/HiddenLayer invariant holds.
-- `static/index.html` — one self-contained page: intake (D2), draft studio with editable claims (D3), grant + loophole report (D4). No build step, no CDN, theme-aware.
+**`/` — intake.** Disclosure in → matched context → live pipeline → grant.
+Retrieval runs *as you type*: it is BM25 over the corpus with no model call, so
+watching the matched failure modes shift while the invention is described costs
+nothing. Drafting goes through `POST /api/draft/start` + polling, so the loop's
+turns (plan → draft → critique → revise → re-critique) are visible while they
+run rather than hidden behind a multi-minute spinner. Polling rather than
+streaming is deliberate — with reasoning off the streaming path routes output to
+`reasoning_content` and leaves `content` empty (upstream, `docs/THROUGHPUT.md`).
 
-## JSON contract (what a Next.js frontend would call)
+**`/admin` — engine.** Corpus facets by statute and CPC; a retrieval inspector
+that shows which *higher-ranked* records diversification passed over; the
+empty-vs-warmed ablation; the five-hop guardrail bus; the vLLM throughput curve;
+and the four containment tiers.
 
-- `GET /api/health` → `{mode, model, hl_enabled}`
-- `GET /api/sample` → a `Disclosure` to prefill the form
-- `POST /api/draft` → body is a `Disclosure` (see `airtight/shapes.py`); returns `{draft: Draft, report: LoopholeReport}`
-  - `LoopholeReport` = `smart_catches` (self-critique) + `loopholes_closed` (memory pre-empted) + `security_findings` (Person 2's HiddenLayer catches) + `security_scanning` (false in stub/HL-off — honest, not faked)
+## Files
 
-## Still yours (D5-D6)
+| File | Role |
+|---|---|
+| `app.py` | Routing only. Calls just `agent.loop.draft_patent`, so the doorway / HiddenLayer invariant holds. |
+| `sources.py` | Tolerant read-only views over `results/`, `data/`, `memory/`, `runtime/bench-results/`. Nothing raises; missing or stale data becomes a labelled seam. |
+| `explain.py` | Recomputes *why* retrieval picked what it picked, reusing `agent/memory.py`'s own `_rank` / `diversify_by_statute` / BM25 constants. |
+| `jobs.py` | In-process job registry + the worker that runs a draft with a live transcript. |
+| `static/` | `airtight.css` (shared tokens), `index.html`+`intake.js`, `admin.html`+`admin.js`. No build step, no CDN. |
 
-- D5 — the ablation chart view: consume `results/ablation/latest/results.json` (the harness already emits a standalone `chart.html` you can borrow from).
-- D6 — the 3-moment demo runbook: glow-up (chart), trap (`python -m agent.ingest ... --fake-detect`), wall (`python -m containment.demo`).
+**Do not** reach into `agent/memory.py` or `agent/loop.py` from here. Retrieval is
+frozen at a recorded SHA for the GPU re-run, and the loop's system prompts are
+hashed into every ablation fingerprint — a display concern is not a reason to
+touch either. `explain.py` exists precisely so the panel can show the reasoning
+without the engine having to expose it.
+
+## Seams
+
+Anything not yet real renders a badge naming the exact path or command that fills
+it (`NOT POPULATED · memory/episodes/… · AIRTIGHT_EPISODES_ENABLED=1`). That is a
+house rule, not decoration: this lane already shipped one control that looked
+interactive and silently discarded input (D3's claim textareas). If it looks
+done, it must be done — or say plainly that it isn't.
+
+Current seams: episodic memory and ingested records (both empty), the ablation
+run (superseded corpus, awaiting the GPU re-run), containment enforcement
+(simulated — `print()`, not Landlock), `inference.local` (naming contract, no
+gateway until F5), and claim editing (needs `PATCH /api/draft/{job_id}`).
+
+## JSON contract
+
+```
+GET  /api/health                     → {mode, model, hl_enabled}
+GET  /api/sample                     → a Disclosure to prefill intake
+POST /api/draft                      → Disclosure → {draft, report}   (synchronous)
+POST /api/draft/start                → Disclosure → {job_id}
+GET  /api/draft/{job_id}             → {status, elapsed_s, retrieval, stages[], draft?, report?}
+GET  /api/disclosures                → pulled disclosures, summary only
+GET  /api/memory/stats               → corpus / episode / ingested counts + facets
+GET  /api/memory/records             → ?statute= &cpc= &q= &limit=
+POST /api/memory/retrieve            → Disclosure → the k picks, scored and explained
+GET  /api/memory/retrieve/{disc_id}  → same, against a corpus disclosure
+GET  /api/ablation                   → runs + selected + caveat
+GET  /api/security                   → hop × action matrix, live vs synthetic, event tail
+GET  /api/throughput                 → sweeps + curve + knee
+GET  /api/containment                → four tiers + network rules + seams
+```
+
+`LoopholeReport` = `smart_catches` (self-critique) + `loopholes_closed` (what memory
+put in front of the drafting turn) + `security_findings` + `security_scanning`
+(false in stub / HL-off — honest, not faked).
+
+Note `loopholes_closed` is what the draft was *primed with*, not a verified cure.
+Closure is graded by `agent/eval/judge.py`, which does not run on this path — the
+UI says so rather than implying a graded result.
