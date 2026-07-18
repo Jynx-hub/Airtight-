@@ -32,9 +32,14 @@ VLLM_PORT = 8000
 SERVED_NAME = os.environ.get("INFERENCE_MODEL", "nemotron")  # backend-agnostic client alias
 
 # ── GPU / precision profile ───────────────────────────────────────────────────
-# Default is the CHEAPEST tier that fits Nano: L40S (48GB) + the FP8 checkpoint
-# (Ada natively runs FP8). Swap to the A100-80GB BF16 quality path with ONE env var
-# at deploy time: `MODAL_GPU_PROFILE=a100-bf16 modal deploy runtime/modal_app.py`.
+# Default is a100-bf16 — the JUDGED profile, chosen for COLD-START RECOVERY, not price.
+# Measured 2026-07-18 (docs/THROUGHPUT.md): l40s-fp8 is genuinely faster and cheaper to
+# run (865 vs 696 tok/s at C=16, $1.95 vs $2.50/hr) but its engine init takes 494-602s
+# vs the A100's 29s, so a cold start is ~12 min instead of ~1-2. Modal preempted a
+# container during that same session, so mid-demo recovery is a real risk — and 12
+# minutes of dead air loses the demo that the cheaper GPU was meant to fund.
+# Swap with ONE env var at deploy time:
+#   MODAL_GPU_PROFILE=l40s-fp8 bash runtime/modal-deploy.sh
 # Weights: 30B params ≈ 30GB FP8 / 60GB BF16. Nano's hybrid Mamba arch keeps only 6
 # attention layers' KV cache, so long context is cheap on modest headroom.
 PROFILES = {
@@ -53,7 +58,7 @@ PROFILES = {
         "extra_env": {},
     },
 }
-_PROFILE_NAME = os.environ.get("MODAL_GPU_PROFILE", "l40s-fp8")
+_PROFILE_NAME = os.environ.get("MODAL_GPU_PROFILE", "a100-bf16")
 PROFILE = PROFILES[_PROFILE_NAME]
 MODEL_REVISION = os.environ.get("MODAL_MODEL_REVISION", "main")  # pin a commit SHA before the demo
 

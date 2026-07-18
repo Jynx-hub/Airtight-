@@ -59,4 +59,10 @@ Airtight/
 
 ## Status
 
-**Phase: architecture / planning.** Nothing built yet. Next highest-leverage step is the eval-harness ablation (see `docs/BUILD-PLAN.md` → M4) — it's both the Track-1 proof and the best demo moment.
+**Phase: the inference spine is built and measured; the other lanes are still planning.**
+
+Lane A (Inference) has landed **M1b** — Nemotron 3 Nano served by vLLM on Modal's free tier, reachable through the one pinned `inference.local` hop, with the $500-bounty evidence on record: **10.67× aggregate throughput from continuous batching (65.2 → 695.8 tok/s)**, the curve kneeing at exactly the pinned `--max-num-seqs 16`. Numbers and method: `docs/THROUGHPUT.md`. Backend swapping is one operator env var (`INFERENCE_BACKEND=modal|nim`), never automatic.
+
+**If you just need to call the model,** start at `runtime/RUNBOOK.md` — it's the consumer quickstart and the demo-day operator card. You do not need a Modal account.
+
+Lanes Data / Surface / Agent are still architecture. The live checklist of record is `docs/WORKSTREAMS.md`. Next highest-leverage step is the eval-harness ablation (`docs/BUILD-PLAN.md` → M4) — both the Track-1 proof and the best demo moment.

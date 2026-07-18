@@ -1,0 +1,136 @@
+{
+  "provenance": {
+    "captured_utc": "2026-07-18T06:57:08+00:00",
+    "base_url": "https://steven-ortega426--airtight-nemotron-serve.modal.run/v1",
+    "served_model": "nemotron",
+    "gpu_reported_by_operator": "L40S-48GB / Nemotron-3-Nano-30B-A3B FP8 (modelopt, kv fp8)",
+    "notes": "F4 re-benchmark on the judged l40s-fp8 profile; vLLM 0.12.0; FLASHINFER attn, CUTLASS MoE (TRTLLM needs SM100+)",
+    "max_num_seqs_deployed": 16,
+    "modal_concurrent_max_inputs": 16,
+    "models_endpoint": [
+      "nemotron"
+    ]
+  },
+  "config": {
+    "levels": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      32
+    ],
+    "max_tokens": 128,
+    "ignore_eos": true,
+    "temperature": 0.0,
+    "streaming": true,
+    "prompt": "You are a prior-art retrieval sub-agent. Summarize the closest prior art for a foldable phone hinge with a flexible display substrate. Be specific and concise.",
+    "requests_per_level": "max(8, 2*concurrency)"
+  },
+  "levels": [
+    {
+      "concurrency": 1,
+      "requests": 8,
+      "wall_s": 11.155,
+      "output_tokens": 1024,
+      "aggregate_tok_s": 91.8,
+      "requests_s": 0.717,
+      "latency_p50": 1.364,
+      "latency_p95": 1.456,
+      "ttft_p50": 0.281,
+      "ttft_p95": 0.374,
+      "errors": 0,
+      "error_samples": [],
+      "token_count_mismatch": false
+    },
+    {
+      "concurrency": 2,
+      "requests": 8,
+      "wall_s": 7.212,
+      "output_tokens": 1024,
+      "aggregate_tok_s": 142.0,
+      "requests_s": 1.109,
+      "latency_p50": 1.729,
+      "latency_p95": 2.002,
+      "ttft_p50": 0.371,
+      "ttft_p95": 0.666,
+      "errors": 0,
+      "error_samples": [],
+      "token_count_mismatch": false
+    },
+    {
+      "concurrency": 4,
+      "requests": 8,
+      "wall_s": 3.582,
+      "output_tokens": 1024,
+      "aggregate_tok_s": 285.9,
+      "requests_s": 2.233,
+      "latency_p50": 1.76,
+      "latency_p95": 1.821,
+      "ttft_p50": 0.379,
+      "ttft_p95": 0.392,
+      "errors": 0,
+      "error_samples": [],
+      "token_count_mismatch": false
+    },
+    {
+      "concurrency": 8,
+      "requests": 16,
+      "wall_s": 3.726,
+      "output_tokens": 2048,
+      "aggregate_tok_s": 549.7,
+      "requests_s": 4.294,
+      "latency_p50": 1.826,
+      "latency_p95": 1.917,
+      "ttft_p50": 0.42,
+      "ttft_p95": 0.465,
+      "errors": 0,
+      "error_samples": [],
+      "token_count_mismatch": false
+    },
+    {
+      "concurrency": 16,
+      "requests": 32,
+      "wall_s": 4.734,
+      "output_tokens": 4096,
+      "aggregate_tok_s": 865.2,
+      "requests_s": 6.759,
+      "latency_p50": 2.353,
+      "latency_p95": 2.45,
+      "ttft_p50": 0.453,
+      "ttft_p95": 0.605,
+      "errors": 0,
+      "error_samples": [],
+      "token_count_mismatch": false
+    },
+    {
+      "concurrency": 32,
+      "requests": 64,
+      "wall_s": 8.12,
+      "output_tokens": 8192,
+      "aggregate_tok_s": 1008.9,
+      "requests_s": 7.882,
+      "latency_p50": 3.857,
+      "latency_p95": 4.265,
+      "ttft_p50": 2.183,
+      "ttft_p95": 2.619,
+      "errors": 0,
+      "error_samples": [],
+      "token_count_mismatch": false
+    }
+  ],
+  "summary": {
+    "baseline_concurrency": 1,
+    "baseline_tok_s": 91.8,
+    "peak_concurrency": 32,
+    "peak_tok_s": 1008.9,
+    "peak_speedup_x": 10.99,
+    "knee_concurrency": null,
+    "operating_point_concurrency": 16,
+    "operating_point_tok_s": 865.2,
+    "headline_speedup_x": 9.42,
+    "latency_cost_p50_x": 1.73,
+    "verdict": "batching engaged"
+  },
+  "markdown_table": "| Concurrency | Reqs | Wall (s) | Out tok | **Aggregate tok/s** | Req/s | Lat p50 | Lat p95 | TTFT p50 | TTFT p95 | Err |\n|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n| 1 | 8 | 11.155 | 1024 | **91.8** | 0.717 | 1.364 | 1.456 | 0.281 | 0.374 | 0 |\n| 2 | 8 | 7.212 | 1024 | **142.0** | 1.109 | 1.729 | 2.002 | 0.371 | 0.666 | 0 |\n| 4 | 8 | 3.582 | 1024 | **285.9** | 2.233 | 1.76 | 1.821 | 0.379 | 0.392 | 0 |\n| 8 | 16 | 3.726 | 2048 | **549.7** | 4.294 | 1.826 | 1.917 | 0.42 | 0.465 | 0 |\n| 16 | 32 | 4.734 | 4096 | **865.2** | 6.759 | 2.353 | 2.45 | 0.453 | 0.605 | 0 |\n| 32 | 64 | 8.12 | 8192 | **1008.9** | 7.882 | 3.857 | 4.265 | 2.183 | 2.619 | 0 |"
+}

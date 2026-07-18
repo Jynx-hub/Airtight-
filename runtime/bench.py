@@ -311,7 +311,8 @@ def _summary(levels: list[LevelResult], operating_point: int = 16) -> dict[str, 
 # ── modes ─────────────────────────────────────────────────────────────────────
 async def do_warmup(ep: Endpoint) -> None:
     """First request after an un-pause. Its latency IS the cold-start number F4 needs."""
-    print("▶ warmup — first request after cold start (this can take 2-5 min on Modal)")
+    print("▶ warmup — first request after cold start "
+          "(~1-2 min on a100-bf16, ~12 min on l40s-fp8)")
     client = ep.client()
     started = time.perf_counter()
     try:

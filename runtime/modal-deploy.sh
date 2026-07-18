@@ -44,9 +44,12 @@ cat <<'EOF'
        INFERENCE_API_KEY=airtight-local
   2) Smoke test:            bash verify.sh
   3) Doorway test:          python inference_local.py        # expect AIRTIGHT-OK
-  4) Keep warm for demo:    MODAL_MIN_CONTAINERS=1 modal deploy modal_app.py
-  5) Stop billing after:    MODAL_MIN_CONTAINERS=0 modal deploy modal_app.py
+  4) Keep warm for demo:    MODAL_MIN_CONTAINERS=1 bash modal-deploy.sh
+  5) Stop billing after:    MODAL_MIN_CONTAINERS=0 bash modal-deploy.sh
      (scale-to-zero is automatic 5 min after the last request; step 4/5 only pin a
-      warm replica for the judged run.)
+      warm replica for the judged run. Go through this script rather than bare
+      `modal deploy` — it cd's correctly and loads .env non-destructively, so the
+      inline var actually wins.)
   Fallback to the free NIM endpoint any time:  bash serve-nim.sh
+  Demo-day card + consumer quickstart:         RUNBOOK.md
 EOF

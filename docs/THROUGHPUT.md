@@ -84,6 +84,61 @@ Run B passed the container-boundary check independently: its sweep ended **06:08
 and the next container began loading the model at **06:09:26**, 40s later — too late to
 serve any measured request. Both runs are therefore single-A100 numbers.
 
+## Second profile — L40S/FP8, and why the demo does not run on it
+
+Re-measured **2026-07-18 06:57 UTC** on `l40s-fp8` (Nemotron-3-Nano-30B-A3B **FP8**,
+ModelOpt quantization, `--kv-cache-dtype fp8`, 128k ctx, same harness and settings).
+Raw JSON: `runtime/bench-results/sweep-20260718T065759Z.json`.
+
+| Concurrency | A100 BF16 tok/s | L40S FP8 tok/s | Δ |
+|---:|---:|---:|---:|
+| 1 | 65.2 | **91.8** | +41% |
+| 2 | 88.0 | **142.0** | +61% |
+| 4 | 150.2 | **285.9** | +90% |
+| 8 | 362.4 | **549.7** | +52% |
+| **16** | 695.8 | **865.2** | **+24%** |
+| 32 | 722.7 | **1008.9** | +40% |
+
+**L40S/FP8 is faster at every level and costs less per hour** ($1.95 vs $2.50). Zero errors
+at every level. On raw serving economics it is the better box, and the batching gain
+reproduces on it: **9.42× C=1→C=16, 10.99× at peak.**
+
+**Two things are weaker on L40S, and both are honest caveats rather than deal-breakers:**
+
+- **The knee is not clean.** On A100, C=32 buys only +3.9% over C=16 — a saturated batch.
+  On L40S, C=32 still adds +16.6%, so `bench.py` reports no knee at all. The cap is still
+  binding — TTFT p50 jumps **4.8×** (0.453s → 2.183s) and p50 latency 1.64× for that 17%
+  — but the crisp "aggregate throughput plateaus exactly at the pinned `--max-num-seqs 16`"
+  story is an A100 result, not a universal one. Quote the knee claim from the A100 run.
+- **The multiple is lower because the baseline is faster.** 9.42× vs 10.67× is not worse
+  batching; it is a 41% faster single-stream baseline (91.8 vs 65.2 tok/s) dividing into a
+  24% faster C=16. A speedup ratio rewards a slow baseline. The absolute number — 865 tok/s
+  on one mid-range GPU — is the stronger claim.
+
+### The disqualifier: cold-start recovery
+
+| | A100 BF16 | L40S FP8 |
+|---|---|---|
+| vLLM `init engine` | **29.3s** | **493.5s / 601.6s** (two runs) |
+| Graph capture | 14s | 42s |
+| Full cold start → first token | ~1–2 min | **812.3s cold Volume / 736.8s warmed Volume** |
+
+The L40S cold start is ~**12 minutes**, and it is *not* a caching problem — the second
+measurement had warm weights *and* a warm `torch.compile` cache and still took 736.8s,
+because the cost is vLLM's `profile / create kv cache / warmup model` phase on FP8 MoE
+kernels (L40S is Ada/SM89, so FlashInfer falls back from TRTLLM to **CUTLASS** MoE).
+Modal also had to **queue for L40S capacity** before scheduling, which the A100 never did.
+
+During this same session Modal **preempted a running container**. On A100 that costs ~1–2
+minutes; on L40S it costs ~12 minutes of dead air in front of judges. That is why
+`MODAL_GPU_PROFILE` defaults to `a100-bf16` — the judged profile is chosen for recovery
+time, not for price or peak throughput.
+
+**What the two profiles jointly prove:** continuous batching delivers a ~9–11× aggregate
+throughput gain across **two different GPUs, two different precisions, and two different
+attention backends** (FLASH_ATTN on A100, FLASHINFER on L40S). That is a stronger claim
+than any single sweep.
+
 ## Method (and why each choice matters)
 
 - **`ignore_eos` + fixed `max_tokens=128`** — every request emits exactly the same number
@@ -161,11 +216,15 @@ vLLM ships `nano_v3` built-in and drop the plugin (`USE_REASONING_PLUGIN=False` 
 
 ## Notes for the writeup
 
-- The deployment measured was the **A100-80GB BF16** profile (`MODAL_GPU_PROFILE=a100-bf16`
-  in `runtime/.env`), not the `l40s-fp8` default documented as the cheap path. Re-run this
-  sweep if the demo ships on L40S/FP8 — the numbers will differ.
-- Cold start (container scaled to zero → first token) runs ~2–5 min: weights load ~36s,
-  model load ~60s, then torch.compile and CUDA-graph capture. For judging, deploy with
-  `MODAL_MIN_CONTAINERS=1` so no cold start lands in the demo, then set it back to 0.
+- **Both profiles are now measured** (§Second profile). The demo runs `a100-bf16`, which is
+  also what the headline above was measured on — the earlier "re-run this if the demo ships
+  on L40S" caveat is resolved: it was re-run, and the demo stayed on A100 anyway.
+- **Cold start is profile-dependent and was previously understated.** A100 recovers in
+  ~1–2 min (`init engine` 29.3s). L40S/FP8 takes **736.8–812.3s (~12 min)**, measured, with
+  caches warm. Either way: deploy `MODAL_MIN_CONTAINERS=1` before judging so no cold start
+  can land in the demo, then set it back to 0. Pin at **T-minus 15**, not T-minus 5.
 - Idle containers scale to zero after 5 min (`scaledown_window`), so an abandoned warm box
-  stops billing on its own.
+  stops billing on its own. Observed lag from last request to `tasks=0` was ~5.9 min.
+- **Preemption is real.** Modal preempted a container mid-session on 2026-07-18
+  ("Container terminated due to preemption. Your Function will be restarted"). Recovery
+  time therefore belongs in the profile decision, not just cost and throughput.
