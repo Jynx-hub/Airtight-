@@ -44,7 +44,7 @@ Airtight/
 ├── CLAUDE.md                         ← context for Claude Code sessions in this repo
 ├── airtight/                         ← shared package: the doorway (one model hop) + data shapes
 ├── agent/                            ← Person 4: work loop, memory, guardrails, eval harness
-├── src/                              ← Person 1: USPTO/PTAB ingestion pipeline (corpus, groundtruth, loaders)
+├── attic/                            ← quarantined: the retired src/ ingestion pipeline, not on the path (see attic/README.md)
 ├── data/                            ← Person 1: corpora, ground truth, fixtures (the pipeline's output)
 ├── runtime/                          ← Person 2 (LIVE): deployed Modal/vLLM app, doorway, RUNBOOK, bench harness — F1–F4
 ├── inference/                        ← Person 2: `policy/` is the F5 OpenShell groundwork (sandbox YAML + DGX Spark
@@ -79,16 +79,17 @@ Quick start (Python 3.10+; 3.12 is what the suite is verified on):
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -e ".[dev,web]" && .venv/bin/pytest tests/
-# expect: 71 passed — no network, no .env, no GPU
+# expect: 48 passed — no network, no .env, no GPU
 ```
 
 Take the `web` extra even if you aren't touching the surface. `tests/test_surface.py`
-`importorskip`s fastapi *by design*, so a `.[dev]`-only clone reports a green **67 passed,
-1 skipped** — green, but with the four surface tests silently not run. 71 is the number
+`importorskip`s fastapi *by design*, so a `.[dev]`-only clone reports a green **44 passed,
+1 skipped** — green, but with the four surface tests silently not run. 48 is the number
 that means "everything ran."
 
 Two things that quick start deliberately leaves out: `requirements.txt` (aiohttp/duckdb/
-pdfplumber — only the `scripts/` + `data/` pipeline needs those, not the test suite), and
+pdfplumber — these belonged to the quarantined `attic/` pipeline; the live puller
+`data/pull_uspto.py` is pure stdlib, and the test suite needs none of them), and
 `requirements-lock.txt`, the exact 52-package set the green run above was recorded with —
 use it if you need a byte-identical env rather than a working one.
 

@@ -1,5 +1,5 @@
 -- DuckDB schema for the patent prosecution defect database
--- Run automatically by src/db.py on first connection.
+-- Was run by src/db.py, now quarantined at attic/src/db.py — nothing on the path reads this.
 
 CREATE TABLE IF NOT EXISTS patent_defects (
     id                       VARCHAR   PRIMARY KEY,   -- SHA-1(app_number + defect_category + claim_hash)
