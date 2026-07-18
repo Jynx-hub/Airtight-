@@ -1,4 +1,5 @@
-# Person 1 data pipeline output (tracked fixtures stay; regenerated bulk data does not)
+# Person 1 data pipeline output — pulled bulk data stays local (data/real/…).
+# Tracked fixtures and the committed puller scripts are unaffected (already tracked).
 data/
 *.duckdb
 checkpoint.json
