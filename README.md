@@ -75,7 +75,22 @@ Airtight/
 
 **The inference spine is deployed and measured** (M1b): Nemotron 3 Nano served by vLLM on Modal's free tier behind the one pinned `inference.local` hop, with the $500-bounty evidence on record — **10.67× aggregate throughput from continuous batching (65.2 → 695.8 tok/s)**, the curve kneeing at exactly the pinned `--max-num-seqs 16` (`docs/THROUGHPUT.md`). Backend swapping is one operator env var (`INFERENCE_BACKEND=modal|nim`), never automatic.
 
-Quick start: `python3 -m venv .venv && .venv/bin/pip install -e ".[dev]" && .venv/bin/pytest tests/`
+Quick start (Python 3.10+; 3.12 is what the suite is verified on):
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -e ".[dev,web]" && .venv/bin/pytest tests/
+# expect: 71 passed — no network, no .env, no GPU
+```
+
+Take the `web` extra even if you aren't touching the surface. `tests/test_surface.py`
+`importorskip`s fastapi *by design*, so a `.[dev]`-only clone reports a green **67 passed,
+1 skipped** — green, but with the four surface tests silently not run. 71 is the number
+that means "everything ran."
+
+Two things that quick start deliberately leaves out: `requirements.txt` (aiohttp/duckdb/
+pdfplumber — only the `scripts/` + `data/` pipeline needs those, not the test suite), and
+`requirements-lock.txt`, the exact 52-package set the green run above was recorded with —
+use it if you need a byte-identical env rather than a working one.
 
 **If you just need to call the model,** start at `runtime/RUNBOOK.md` — the consumer quickstart and the demo-day operator card. You do not need a Modal account.
 
