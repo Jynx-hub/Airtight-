@@ -3,215 +3,106 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Airtight — Applicant Surface</title>
-<style>
-  :root {
-    --bg: #f7f7f5; --surface: #ffffff; --ink: #14140f; --ink-2: #56554e;
-    --line: #e2e1da; --accent: #2a6f4f; --accent-ink: #ffffff;
-    --warn-bg: #fdf2e6; --warn-ink: #8a5a12; --radius: 10px;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #14140f; --surface: #1e1e19; --ink: #f3f2ea; --ink-2: #a8a79c;
-      --line: #2f2f28; --accent: #4fae7d; --accent-ink: #0d0d0a;
-      --warn-bg: #2c2312; --warn-ink: #e2b567;
-    }
-  }
-  * { box-sizing: border-box; }
-  body {
-    margin: 0; background: var(--bg); color: var(--ink);
-    font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
-  }
-  header {
-    display: flex; align-items: center; gap: .75rem; flex-wrap: wrap;
-    padding: 1rem 1.25rem; border-bottom: 1px solid var(--line); background: var(--surface);
-  }
-  header h1 { font-size: 1.05rem; margin: 0; font-weight: 650; }
-  header .tag { color: var(--ink-2); font-size: .85rem; }
-  .badge {
-    margin-left: auto; font-size: .75rem; padding: .2rem .6rem; border-radius: 999px;
-    border: 1px solid var(--line); color: var(--ink-2);
-  }
-  main { max-width: 820px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
-  section {
-    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 1.25rem; margin-bottom: 1.25rem;
-  }
-  h2 { font-size: .95rem; margin: 0 0 .9rem; letter-spacing: .01em; }
-  label { display: block; font-size: .8rem; color: var(--ink-2); margin: .7rem 0 .25rem; }
-  input, textarea {
-    width: 100%; padding: .55rem .7rem; border: 1px solid var(--line); border-radius: 8px;
-    background: var(--bg); color: var(--ink); font: inherit; resize: vertical;
-  }
-  textarea { min-height: 4.5rem; }
-  button {
-    margin-top: 1rem; padding: .6rem 1.1rem; border: 0; border-radius: 8px;
-    background: var(--accent); color: var(--accent-ink); font: inherit; font-weight: 600;
-    cursor: pointer;
-  }
-  button.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
-  button:disabled { opacity: .5; cursor: default; }
-  .hidden { display: none; }
-  .claim { padding: .6rem .8rem; border: 1px solid var(--line); border-radius: 8px; margin-bottom: .5rem; }
-  .claim .n { color: var(--ink-2); font-size: .78rem; }
-  pre { white-space: pre-wrap; word-wrap: break-word; font: inherit; color: var(--ink-2); margin: 0; }
-  ul { margin: .3rem 0 0; padding-left: 1.1rem; }
-  li { margin: .2rem 0; }
-  .report-block { margin-top: 1rem; }
-  .report-block h3 { font-size: .82rem; margin: 0 0 .35rem; color: var(--ink-2); }
-  .note { background: var(--warn-bg); color: var(--warn-ink); padding: .5rem .7rem; border-radius: 8px; font-size: .85rem; }
-  .muted { color: var(--ink-2); font-size: .85rem; }
-</style>
+<title>Airtight — Intake</title>
+<link rel="stylesheet" href="/static/airtight.css">
 </head>
 <body>
-<header>
-  <h1>Airtight</h1>
-  <span class="tag">draft a loophole-free patent from an invention disclosure</span>
-  <span class="badge" id="mode-badge">…</span>
-</header>
+
+<div class="bar">
+  <div class="brand"><b>■ AIRTIGHT</b> <span class="sep">/</span> INTAKE</div>
+  <div class="leds">
+    <span class="led" id="led-mode">MODE <b>…</b></span>
+    <span class="led" id="led-model">MODEL <b>…</b></span>
+    <span class="led" id="led-hl">HIDDENLAYER <b>…</b></span>
+  </div>
+  <nav>
+    <a href="/" aria-current="page">Intake</a>
+    <a href="/admin">Engine</a>
+  </nav>
+</div>
 
 <main>
-  <!-- Intake (D2) -->
-  <section id="intake">
-    <h2>1 · Invention disclosure</h2>
-    <label>Title</label>
-    <input id="f-title">
-    <label>Technology class (CPC)</label>
-    <input id="f-class">
-    <label>Inventors (comma-separated)</label>
-    <input id="f-inventors">
-    <label>Summary</label>
-    <textarea id="f-summary"></textarea>
-    <label>Details</label>
-    <textarea id="f-details"></textarea>
-    <button id="btn-draft">Draft patent</button>
-    <button class="secondary" id="btn-sample" type="button">Load sample</button>
-    <p class="muted" id="status"></p>
+  <div class="grid side">
+
+    <!-- ---------------- disclosure ---------------- -->
+    <section class="panel">
+      <div class="panel-hd">
+        <h2>01 · Disclosure</h2>
+        <span class="meta" id="disc-meta">awaiting input</span>
+      </div>
+      <div class="panel-bd">
+        <label for="f-title">Title</label>
+        <input id="f-title">
+
+        <label for="f-class">Technology class · CPC</label>
+        <input id="f-class" placeholder="G06F">
+
+        <label for="f-inventors">Inventors</label>
+        <input id="f-inventors" placeholder="comma separated">
+
+        <label for="f-summary">Summary</label>
+        <textarea id="f-summary"></textarea>
+
+        <label for="f-details">Details</label>
+        <textarea id="f-details" style="min-height:8rem"></textarea>
+
+        <div class="row">
+          <button class="btn" id="btn-draft">Draft patent</button>
+          <button class="btn ghost" id="btn-sample" type="button">Load sample</button>
+        </div>
+        <p class="small muted" id="status" style="margin:.7rem 0 0"></p>
+      </div>
+    </section>
+
+    <!-- ---------------- context match ---------------- -->
+    <section class="panel">
+      <div class="panel-hd">
+        <h2>02 · Context match</h2>
+        <span class="meta" id="ctx-meta">—</span>
+      </div>
+      <div class="panel-bd" id="ctx-body">
+        <p class="empty">Submit a disclosure to see which recorded failure modes it matches.</p>
+      </div>
+    </section>
+  </div>
+
+  <!-- ---------------- pipeline ---------------- -->
+  <section class="panel" id="pipeline-panel" style="margin-top:1rem">
+    <div class="panel-hd">
+      <h2>03 · Pipeline</h2>
+      <span class="meta" id="pipe-meta">idle</span>
+    </div>
+    <div class="panel-bd" id="pipeline">
+      <p class="empty">The drafting loop runs plan → draft → critique, then revises itself while the
+        examiner turn still finds a material defect.</p>
+    </div>
   </section>
 
-  <!-- Draft studio (D3) -->
-  <section id="studio" class="hidden">
-    <h2>2 · Draft studio — review &amp; steer the claims</h2>
-    <div id="claims"></div>
-  </section>
-
-  <!-- Grant (D4) -->
-  <section id="grant" class="hidden">
-    <h2>3 · Grant — filing-ready specification + loophole report</h2>
-    <div class="report-block">
-      <h3>Specification</h3>
-      <pre id="spec"></pre>
+  <!-- ---------------- grant ---------------- -->
+  <section class="panel hidden" id="grant-panel" style="margin-top:1rem">
+    <div class="panel-hd">
+      <h2>04 · Grant</h2>
+      <span class="meta" id="grant-meta">—</span>
     </div>
-    <div class="report-block">
-      <h3>Loophole report — smart-catches (self-critique)</h3>
-      <ul id="smart"></ul>
-    </div>
-    <div class="report-block">
-      <h3>Loophole report — loopholes pre-empted from memory</h3>
-      <ul id="closed"></ul>
-    </div>
-    <div class="report-block">
-      <h3>Loophole report — runtime security (HiddenLayer)</h3>
-      <div id="security"></div>
+    <div class="panel-bd">
+      <div class="grid two">
+        <div>
+          <h3 class="mono small" style="color:var(--muted);letter-spacing:.12em;text-transform:uppercase">Claims</h3>
+          <div id="claims"></div>
+        </div>
+        <div>
+          <h3 class="mono small" style="color:var(--muted);letter-spacing:.12em;text-transform:uppercase">Loophole report</h3>
+          <div id="report"></div>
+        </div>
+      </div>
+      <details style="margin-top:1rem">
+        <summary class="mono small muted" style="cursor:pointer">Full specification</summary>
+        <pre class="small mono wrap" id="spec" style="color:var(--muted);margin-top:.6rem"></pre>
+      </details>
     </div>
   </section>
 </main>
 
-<script>
-const $ = (id) => document.getElementById(id);
-
-async function health() {
-  try {
-    const h = await (await fetch("/api/health")).json();
-    $("mode-badge").textContent = `${h.mode} · ${h.model.split("/").pop()}`;
-  } catch { $("mode-badge").textContent = "offline"; }
-}
-
-async function loadSample() {
-  const d = await (await fetch("/api/sample")).json();
-  $("f-title").value = d.title;
-  $("f-class").value = d.technology_class;
-  $("f-inventors").value = d.inventors.join(", ");
-  $("f-summary").value = d.summary;
-  $("f-details").value = d.details;
-}
-
-function list(el, items, empty) {
-  el.innerHTML = "";
-  if (!items.length) { el.innerHTML = `<li class="muted">${empty}</li>`; return; }
-  for (const it of items) {
-    const li = document.createElement("li");
-    li.textContent = it;
-    el.appendChild(li);
-  }
-}
-
-async function draft() {
-  const disclosure = {
-    id: "ui-" + Date.now(),
-    title: $("f-title").value,
-    technology_class: $("f-class").value,
-    inventors: $("f-inventors").value.split(",").map(s => s.trim()).filter(Boolean),
-    summary: $("f-summary").value,
-    details: $("f-details").value,
-  };
-  $("btn-draft").disabled = true;
-  $("status").textContent = "Drafting…";
-  try {
-    const res = await fetch("/api/draft", {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(disclosure),
-    });
-    if (!res.ok) throw new Error(await res.text());
-    const { draft, report } = await res.json();
-
-    const claims = $("claims"); claims.innerHTML = "";
-    draft.claims.forEach((c, i) => {
-      const d = document.createElement("div");
-      d.className = "claim";
-      d.innerHTML = `<div class="n">Claim ${i + 1}</div>`;
-      const t = document.createElement("textarea");
-      t.value = c;
-      d.appendChild(t);
-      claims.appendChild(d);
-    });
-
-    $("spec").textContent = draft.specification;
-    list($("smart"), report.smart_catches, "no self-critique findings");
-    list($("closed"), report.loopholes_closed, "no loopholes retrieved from memory (empty store)");
-
-    const sec = $("security");
-    if (!report.security_scanning) {
-      sec.innerHTML = `<div class="note">Runtime security scanning is off (stub / HL disabled). With HiddenLayer on, ingested-document injections and exfil attempts appear here.</div>`;
-    } else if (!report.security_findings.length) {
-      sec.innerHTML = `<div class="muted">Scanned — no threats detected.</div>`;
-    } else {
-      const ul = document.createElement("ul");
-      report.security_findings.forEach(f => {
-        const li = document.createElement("li");
-        li.textContent = `${f.action.toUpperCase()} on ${f.hop}` +
-          (f.source ? ` (${f.source})` : "") +
-          (f.categories.length ? ` — ${f.categories.join(", ")}` : "");
-        ul.appendChild(li);
-      });
-      sec.innerHTML = ""; sec.appendChild(ul);
-    }
-
-    $("studio").classList.remove("hidden");
-    $("grant").classList.remove("hidden");
-    $("status").textContent = "";
-    $("grant").scrollIntoView({ behavior: "smooth", block: "start" });
-  } catch (e) {
-    $("status").textContent = "Error: " + e.message;
-  } finally {
-    $("btn-draft").disabled = false;
-  }
-}
-
-$("btn-sample").addEventListener("click", loadSample);
-$("btn-draft").addEventListener("click", draft);
-health();
-loadSample();
-</script>
+<script src="/static/intake.js"></script>
 </body>
 </html>

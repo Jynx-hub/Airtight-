@@ -20,9 +20,16 @@ What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.m
 | **Inference** | ✅ first half | Nemotron on vLLM/Modal, `INFERENCE_BACKEND=modal\|nim`, 10.67× batching on record |
 | **Agent** | ◐ built, deepening | loop now self-corrects (revise turn) and compounds (episodic write, isolated from the ablation); retrieval is statute-diversified and BM25-ranked, and ingest writes into it. B, C and D all done offline — **every quality gain is still unmeasured live** |
 | **Containment** | ⚠️ simulated | `policy.py` decision logic is real, and now so is an escalation client — but enforcement is still a `print()`. No OpenShell exists |
-| **Surface** | ◐ starter | idea → draft → patent works; edit boxes discard input; no chart view |
+| **Surface** | ✅ two frames | intake (retrieval → live pipeline → grant) + engine panel over every committed artifact; D3's dishonest edit boxes replaced with a labelled seam |
 
-Suite: `.venv/bin/pytest tests/` → **137 passed**, 0 skipped, stub mode, no network.
+Suite: `.venv/bin/pytest tests/` → **169 passed**, 0 skipped, stub mode, no network.
+
+📌 **Unrecorded on this board:** `main` gained live USPTO prior-art search
+(`agent/prior_art.py`) and an MPEP statute reference grounding the draft/critique/revise
+loop (`agent/statute_reference.py`) at `5e5f9eb`/`f85faa7`, +11 tests, with no lane entry.
+Both claim product-path-only isolation from the M4 ablation. Noted here so it isn't lost —
+**not verified by the Surface lane**; the author should grade it against the notation above.
+The statute reference now has a currency monitor keeping it fresh — see block **SC** below.
 
 **The two headline numbers, stated honestly:**
 
@@ -50,8 +57,9 @@ Suite: `.venv/bin/pytest tests/` → **137 passed**, 0 skipped, stub mode, no ne
 
 ## The focus now
 
-Four blocks, in dependency order. **C and D are done (2026-07-18).** A3 and B remain
-unblocked and can start today; only A1/A2/A4/A5 wait on hosted hardware.
+Four blocks, in dependency order. **B, C and D are done (2026-07-18)** — B landed in a
+separate tree and merged at `d899e26`, which surfaced the collision closed by `201e8f8`.
+A3 remains unblocked and can start today; only A1/A2/A4/A5 wait on hosted hardware.
 
 **The single highest-leverage item is still the GPU re-run** — C1 and now C2 both changed
 retrieval, so neither live ablation number is quotable until it lands. Retrieval is sound
@@ -410,8 +418,47 @@ SC1/SC2 built; SC3 Fed. Register verified LIVE; SC4 recurring workflow committed
   evidence isn't literally in the claims. Stub mode has zero delta by construction, so a
   green suite proves plumbing, not effect. Doorway timeout and `--deadline-min` landed
   after the `--n 10` run hung on a call with no timeout and burned GPU credit.
-- **Surface (D1, D2, D4)** — idea → draft → patent, wired to the real agent loop, not
-  mocked. One static HTML file, no build step.
+- **Surface (D1–D5)** — two frames, static HTML/CSS/JS, no build step, one `uvicorn`.
+  *Intake* (`/`): disclosure → retrieved context → live pipeline → grant. Retrieval runs
+  as you type (BM25 only, no model call), and drafting goes through a job + poll so the
+  loop's turns are visible instead of a multi-minute spinner — polling, not streaming,
+  which sidesteps the upstream `reasoning_content` bug. *Engine* (`/admin`, the old D5):
+  corpus facets, a retrieval inspector that shows which higher-ranked records
+  diversification passed over, the ablation, the guardrail bus, the throughput curve, and
+  the four containment tiers. Read-side logic is in `surface/sources.py` +
+  `surface/explain.py`; neither touches `agent/memory.py` or `agent/loop.py`.
+  - **Two engine bugs fixed on the way.** `POST /api/draft` never passed `guardrails`, so
+    every UI draft silently ran the ablation's *control* arm and reported it as the
+    product — `loopholes_closed` was structurally always `[]`. And `g.AUDIT_LOG` was read
+    whole after each draft, so every request re-reported every earlier request's findings.
+    Both now have regression tests that were confirmed to fail against the old code.
+  - **`◐` D3 is still `◐`, deliberately.** Claims render read-only behind an
+    `EDITING NOT WIRED` seam naming `PATCH /api/draft/{job_id}`. The textareas that
+    silently ate every edit are gone; real editing is still unbuilt.
+  - **Ten defects found by review and fixed, with regression tests.** The offset fix
+    above was only correct for *sequential* requests — two overlapping drafts interleave
+    in `AUDIT_LOG` and cross-attribute, which is worse than the original bug because it is
+    wrong *and* plausible. Drafts are now serialized process-wide (`jobs.exclusive_draft`);
+    per-job attribution would have to come from the guardrails bus, which this lane does
+    not touch. Confirmed failing with the lock removed. The rest were the read layer
+    breaking its own "nothing raises" contract on plausible on-disk shapes — malformed
+    YAML (`yaml.YAMLError` is not a `ValueError`), null-valued keys (`.get(k, {})` returns
+    `None`, not `{}`), a `results.json` holding a bare list, a null `ts` breaking
+    `sorted()`, a one-level sweep dividing by zero in the chart. Worst of them:
+    `_load_store` wrapped the whole directory load, so **one truncated record emptied the
+    corpus** — and an empty corpus does not fail loudly, it silently drafts every patent
+    in the control arm. Loading is now per-file with a skipped-record seam.
+  - **Two panels were stating things that were not true** and now compute them: the
+    retrieval inspector asserted the passed-over rows had out-scored a pick (only true
+    when diversification actually cost something), and the score column could contradict
+    its own rank column because `_rank` sorts on class-match *before* BM25.
+  - **Found, not fixed:** `guardrails._persist()` writes unconditionally, so `pytest`
+    appends to the same `results/security/*.jsonl` the demo reads. All 130 audited hops in
+    the current log are fixtures (`e`, `evt-test`, `fake-*`) — **zero** carry a real AIDR
+    UUID, including the live run documented on 2026-07-18. The bus panel splits live from
+    synthetic and says so rather than showing 77 test-suite blocks as agent activity.
+    `tests/test_surface.py` redirects `_SECURITY_DIR` to `tmp_path`; the other suites
+    that write there do not.
 
 ---
 
