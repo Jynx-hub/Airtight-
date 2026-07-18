@@ -12,7 +12,17 @@
 # nemotron_v3) — the case block sets the right one per profile.
 set -euo pipefail
 cd "$(dirname "$0")"
-[[ -f .env ]] && set -a && . ./.env && set +a || true   # HF_TOKEN etc. (optional if already exported)
+# HF_TOKEN etc. Loads .env WITHOUT clobbering the environment, so "already exported"
+# actually wins — a bare `set -a; . ./.env` overwrote exports and made that claim false.
+# Matches python-dotenv's default in inference_local.py.
+if [[ -f .env ]]; then
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    [[ "$line" =~ ^[[:space:]]*(#|$) ]] && continue
+    key="${line%%=*}"; val="${line#*=}"
+    [[ "$key" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] || continue
+    [[ -n "${!key-}" ]] || export "$key=$val"
+  done < .env
+fi
 
 PROFILE="${SERVE_PROFILE:-nano-1xh100}"
 SERVED_NAME="${INFERENCE_MODEL:-nemotron}"               # backend-agnostic alias the client pins to

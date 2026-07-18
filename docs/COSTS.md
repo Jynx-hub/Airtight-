@@ -79,6 +79,15 @@ spend approaches $0 with headroom to spare.
   `nano_v3` is **not** built-in for the pinned vLLM, so keep `USE_REASONING_PLUGIN=True`.
 - **vLLM version pin** — ✅ resolved: `modal_app.py` pins `vllm==0.12.0` (recipe-recommended;
   0.11.2 is the minimum). Re-check the recipe if you change the checkpoint.
+- **Deploy-time env doesn't reach the Modal container** — latent, currently harmless, will
+  bite. `modal_app.py` bakes `MODAL_GPU_PROFILE` into the image (line ~74) precisely because
+  local env vars don't cross into the container — but `--api-key` and `--served-model-name`
+  still read `os.environ` *inside* the container, where neither is set. So the deployed
+  server always uses the literal defaults `airtight-local` / `nemotron`. That happens to
+  match `runtime/.env` today, which is why nothing is broken. Change either value expecting
+  the server to follow and every client call 401s. Fix with a **Modal Secret**
+  (`modal secret create airtight-inference INFERENCE_API_KEY=…`) rather than an image bake —
+  a bake would write the key into an image layer. Needs a redeploy, so it was deferred.
 - **NIM Nano slug + reasoning toggle** — ✅ resolved (F3, 2026-07-18): the slug
   `nvidia/nemotron-3-nano-30b-a3b` is live, and NIM accepts
   `chat_template_kwargs.enable_thinking` in `extra_body` without a 400 — no `/no_think`

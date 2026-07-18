@@ -12,7 +12,19 @@
 # path:  MODAL_GPU_PROFILE=a100-bf16 bash runtime/modal-deploy.sh
 set -euo pipefail
 cd "$(dirname "$0")"
-[[ -f .env ]] && set -a && . ./.env && set +a || true
+# Load .env WITHOUT clobbering the environment: a pre-exported var must WIN, matching
+# python-dotenv's default in inference_local.py. A bare `set -a; . ./.env` did the
+# OPPOSITE, which silently broke this script's own documented usage above
+# (`MODAL_GPU_PROFILE=a100-bf16 bash modal-deploy.sh`) and the demo keep-warm flow
+# (`MODAL_MIN_CONTAINERS=1 bash modal-deploy.sh` deployed scale-to-zero anyway).
+if [[ -f .env ]]; then
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    [[ "$line" =~ ^[[:space:]]*(#|$) ]] && continue
+    key="${line%%=*}"; val="${line#*=}"
+    [[ "$key" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] || continue
+    [[ -n "${!key-}" ]] || export "$key=$val"
+  done < .env
+fi
 
 command -v modal >/dev/null || { echo "modal CLI not found — pip install modal && modal token new"; exit 1; }
 
