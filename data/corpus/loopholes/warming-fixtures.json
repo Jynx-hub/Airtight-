@@ -1,0 +1,50 @@
+[
+  {
+    "id": "lh-w-001",
+    "pattern": "antecedent-basis gap",
+    "claim_shape": "recites 'the embedding model' in claim 3 without an embedding model first being introduced in claim 1",
+    "technology_class": "G06F",
+    "remedy": "introduce every element with 'a/an' before any 'the/said' reference to it",
+    "source": "FIXTURE — replace with PTAB citation (Person 1, E2)"
+  },
+  {
+    "id": "lh-w-002",
+    "pattern": "means-plus-function overbreadth",
+    "claim_shape": "claims 'means for predicting future access' with no corresponding structure in the specification",
+    "technology_class": "G06F",
+    "remedy": "recite the concrete algorithm or structure performing the prediction, or drop the means-for phrasing",
+    "source": "FIXTURE — replace with PTAB citation (Person 1, E2)"
+  },
+  {
+    "id": "lh-w-003",
+    "pattern": "missing dependent-claim fallback",
+    "claim_shape": "single broad independent claim on learned cache scoring with no narrower dependent claims to survive invalidation",
+    "technology_class": "G06F",
+    "remedy": "layer dependent claims narrowing the model type, window size, and eviction trigger",
+    "source": "FIXTURE — replace with PTAB citation (Person 1, E2)"
+  },
+  {
+    "id": "lh-w-004",
+    "pattern": "unclaimed disclosed embodiment",
+    "claim_shape": "specification describes a confidence-threshold fallback but no claim covers operating below the threshold",
+    "technology_class": "G06F",
+    "remedy": "add a dependent claim reciting the fallback path expressly",
+    "source": "FIXTURE — replace with PTAB citation (Person 1, E2)"
+  },
+  {
+    "id": "lh-w-005",
+    "pattern": "functional claiming at the point of novelty",
+    "claim_shape": "claims 'scheduling wake windows to minimize energy' purely by result rather than by the steps achieving it",
+    "technology_class": "H04W",
+    "remedy": "recite the periodicity-model steps that produce the schedule, not the desired outcome",
+    "source": "FIXTURE — replace with PTAB citation (Person 1, E2)"
+  },
+  {
+    "id": "lh-w-006",
+    "pattern": "indefinite relative term",
+    "claim_shape": "claims a 'substantially overlapping' wake window with no metric or bound defined anywhere",
+    "technology_class": "H04W",
+    "remedy": "define the overlap quantitatively in the claim or specification",
+    "source": "FIXTURE — replace with PTAB citation (Person 1, E2)"
+  }
+]

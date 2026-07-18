@@ -1,0 +1,8 @@
+{
+  "id": "disc-0002",
+  "title": "Adaptive duty-cycling for battery-powered mesh sensor nodes",
+  "inventors": ["B. Example"],
+  "technology_class": "H04W",
+  "summary": "A mesh sensor node that adapts its radio duty cycle from observed traffic patterns of neighboring nodes, extending battery life without a coordinator.",
+  "details": "Each node records inter-arrival times of neighbor transmissions, fits a lightweight periodicity model on-device, and schedules its own wake windows to overlap predicted neighbor activity. Wake windows widen automatically when prediction error rises. Nodes exchange compressed schedule digests during overlap so the mesh converges without central coordination. A guard mode forces full-duty listening when a digest conflict is detected."
+}

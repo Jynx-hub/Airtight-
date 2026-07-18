@@ -1,0 +1,8 @@
+{
+  "id": "disc-0001",
+  "title": "Predictive cache eviction using access-pattern embeddings",
+  "inventors": ["A. Example"],
+  "technology_class": "G06F",
+  "summary": "A cache controller that learns embeddings of recent access patterns and evicts the entry with the furthest predicted next access, outperforming LRU under bursty workloads.",
+  "details": "The controller maintains a sliding window of cache accesses, encodes the window into a fixed-length embedding with a small on-device model, and scores each resident entry by predicted time-to-next-access. On pressure, the highest-scoring entry is evicted. The embedding model is periodically refreshed from access logs without taking the cache offline. Fallback to LRU occurs whenever prediction confidence drops below a threshold."
+}

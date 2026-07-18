@@ -1,13 +1,18 @@
-"""The M1 work loop: plan → draft → self-critique → assemble.
+"""The work loop: plan → draft → self-critique → assemble.
 
 Plain Python on purpose — LangChain Deep Agents is an M3 option, not a day-one
 dependency. Every model turn goes through the doorway; nothing else in this
 repo may talk to a model.
+
+The {guardrails} slot is the M4 ablation's only variable: the template strings
+are byte-identical in both conditions, and only the slot's rendered content
+differs (empty → GUARDRAILS_EMPTY, warmed → retrieved records). Do not add
+condition-dependent text anywhere else.
 """
 
 import re
 
-from airtight import Disclosure, Draft, call_model
+from airtight import Disclosure, Draft, LoopholeRecord, call_model
 
 PLAN_SYSTEM = (
     "You are the planning module of a patent-drafting agent. Given an invention "
@@ -19,47 +24,63 @@ DRAFT_SYSTEM = (
     "You are a patent attorney. Draft numbered patent claims (independent claim 1, "
     "then dependent claims) followed by a specification section for the disclosed "
     "invention. Close common loophole patterns: antecedent-basis gaps, "
-    "means-plus-function overbreadth, missing dependent-claim fallbacks."
+    "means-plus-function overbreadth, missing dependent-claim fallbacks.\n\n"
+    "Loophole guardrails retrieved from memory for this technology class — close "
+    "each one with explicit claim language; if none are listed, draft with "
+    "standard care:\n{guardrails}"
 )
 
 CRITIQUE_SYSTEM = (
     "You are a hostile patent examiner. Attack the draft below: find §112 "
     "indefiniteness, antecedent-basis errors, §102/§103 exposure, and claim "
     "language a competitor could design around. Reply as a bulleted list of "
-    "defects, most severe first."
+    "defects, most severe first.\n\n"
+    "Known loophole patterns retrieved from memory — check each explicitly; if "
+    "none are listed, apply standard scrutiny:\n{guardrails}"
 )
 
+GUARDRAILS_EMPTY = "(none on record)"
 
-def draft_patent(disclosure: Disclosure) -> Draft:
-    plan = call_model(
-        [
-            {"role": "system", "content": PLAN_SYSTEM},
-            {"role": "user", "content": disclosure.model_dump_json()},
-        ],
-        role="tool",
+
+def render_guardrails(records: list[LoopholeRecord]) -> str:
+    if not records:
+        return GUARDRAILS_EMPTY
+    return "\n".join(
+        f"- [{r.id}] pattern: {r.pattern} | risky claim shape: {r.claim_shape} | remedy: {r.remedy}"
+        for r in records
     )
 
-    draft = call_model(
-        [
-            {"role": "system", "content": DRAFT_SYSTEM},
-            {"role": "user", "content": f"Plan:\n{plan.text}\n\nDisclosure:\n{disclosure.model_dump_json()}"},
-        ],
-        role="draft",
-    )
 
-    critique = call_model(
-        [
-            {"role": "system", "content": CRITIQUE_SYSTEM},
-            {"role": "user", "content": draft.text},
-        ],
-        role="draft",
+def draft_patent(
+    disclosure: Disclosure,
+    guardrails: list[LoopholeRecord] | None = None,
+    transcript: list | None = None,
+    **gen_kwargs,
+) -> Draft:
+    slot = render_guardrails(guardrails or [])
+
+    def turn(name: str, system: str, user: str, role: str) -> str:
+        messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
+        reply = call_model(messages, role=role, **gen_kwargs)
+        if transcript is not None:
+            transcript.append({"turn": name, "messages": messages, "reply": reply.text})
+        return reply.text
+
+    plan = turn("plan", PLAN_SYSTEM, disclosure.model_dump_json(), "tool")
+    draft = turn(
+        "draft",
+        DRAFT_SYSTEM.format(guardrails=slot),
+        f"Plan:\n{plan}\n\nDisclosure:\n{disclosure.model_dump_json()}",
+        "draft",
     )
+    critique = turn("critique", CRITIQUE_SYSTEM.format(guardrails=slot), draft, "draft")
 
     return Draft(
         disclosure_id=disclosure.id,
-        claims=_split_claims(draft.text),
-        specification=draft.text,
-        critique_notes=[line for line in critique.text.splitlines() if line.strip()],
+        claims=_split_claims(draft),
+        specification=draft,
+        critique_notes=[line for line in critique.splitlines() if line.strip()],
+        loopholes_closed=[r.id for r in (guardrails or [])],
     )
 
 

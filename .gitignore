@@ -12,6 +12,9 @@
 *.key
 *.pem
 
+# Eval output (re-derivable; transcripts can be large)
+results/
+
 # Python
 .venv/
 __pycache__/
