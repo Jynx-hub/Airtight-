@@ -18,8 +18,8 @@ __pycache__/
 # Eval output (re-derivable; transcripts can be large)
 results/
 
-# Agent-generated episodic memory (re-derivable)
-memory/episodes/*.json
+# Agent-generated episodic memory (re-derivable) — ** matches the <disc_id>/ subdirs record() writes
+memory/episodes/**/*.json
 
 # Env / secrets — but DO track the config template
 .env

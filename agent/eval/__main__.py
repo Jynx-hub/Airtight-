@@ -33,13 +33,15 @@ def main() -> None:
                     help="graded disclosures (pooled: holdout size; fixtures: cap). Bounds a metered run.")
     ap.add_argument("--seed", type=int, default=SPLIT_SEED,
                     help="holdout selection seed — same (seed, n) picks the same disclosures")
+    ap.add_argument("--revise-rounds", type=int, default=1,
+                    help="self-correction rounds per draft (0 = draft only; each round is +1 model call/arm)")
     args = ap.parse_args()
 
     draft_gen = FAST_DRAFT_GEN if args.fast else DRAFT_GEN
     deadline = time.time() + args.deadline_min * 60 if args.deadline_min else None
     results_path = run_ablation(args.data_root, k=args.k, runs=args.runs, out_root=args.out,
                                 draft_gen=draft_gen, layout=args.layout, n=args.n, seed=args.seed,
-                                deadline=deadline)
+                                deadline=deadline, revise_rounds=args.revise_rounds)
     payload = json.loads(results_path.read_text())
 
     print(f"results:  {results_path}")

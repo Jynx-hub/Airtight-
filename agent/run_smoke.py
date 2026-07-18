@@ -37,11 +37,15 @@ def main() -> None:
         guardrails = composite.retrieve(disclosure, k=5)
         sink = episodes
         print(f"retrieved {len(guardrails)} loopholes from corpus + {len(episodes)} past episodes")
+        if not config.EPISODES_ENABLED:
+            print("note: AIRTIGHT_EPISODES_ENABLED is false — retrieving past episodes but "
+                  "NOT writing a new one this run. Set it true to compound.")
 
     draft = draft_patent(disclosure, guardrails=guardrails, fan_out=args.fan_out, episode_sink=sink)
     print(json.dumps(draft.model_dump(), indent=2))
-    if sink is not None:
-        print(f"\nepisode written -> {config.EPISODES_DIR}/ ({len(sink)} total)")
+    if sink is not None and config.EPISODES_ENABLED:
+        print(f"\nepisode written -> {config.EPISODES_DIR}/ ({len(sink)} total) — "
+              "attempt N+1 will retrieve this lesson")
 
 
 if __name__ == "__main__":
