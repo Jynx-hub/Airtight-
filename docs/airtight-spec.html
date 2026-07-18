@@ -431,6 +431,10 @@
         <span class="label">Judge-proofing the delta</span>
         <p style="font-size:.94rem"><strong>Run the ablation live:</strong> same invention, same Nemotron model, memory graph <em>empty</em> vs. <em>warmed on 50 prior patents in that class</em>. If loopholes-caught jumps and defects drop with nothing changed but the retrieved memory, the improvement can't be dismissed as prompt luck or a bigger model. Show the two runs side by side.</p>
       </div>
+      <div class="callout">
+        <span class="label">Ground truth to warm the graph</span>
+        <p style="font-size:.94rem">PTAB inter-partes-review decisions and USPTO office-action rejection histories are the scoring key — for a large set of patents, <em>which claims were invalidated and on what prior art</em> already exists as public data. The specific corpora are in <strong>§09 · Reduction to Practice</strong> below.</p>
+      </div>
     </div>
   </section>
 
@@ -615,6 +619,15 @@ resp = client.interactions.analyze(
         </table>
       </div>
 
+      <h3>Data to pull (free, public, in-domain)</h3>
+      <p style="font-size:.92rem">Scope to <strong>software / electronics</strong> — that's where PTAB invalidation battles concentrate, claims are readable, and the data is richest.</p>
+      <ul class="tight" style="font-size:.9rem">
+        <li><strong>USPTO Open Data Portal</strong> (<code class="inl">data.uspto.gov</code>, where PatentsView now lives) — granted patents + pre-grant publications, full text through Dec 2025.</li>
+        <li><strong>PTAB decisions dataset</strong> (~25.8k decisions, 1993–2024) — the ground truth on <em>which claims were invalidated and on what prior art</em>. Warms the edge-case knowledge graph.</li>
+        <li><strong>USPTO Patent Litigation Dataset</strong> (~97k district-court cases, 1963–2020) — supplementary outcomes.</li>
+        <li><strong>Google Patents / EPO</strong> — read-only prior-art search at draft time (GET-only, on the egress allowlist).</li>
+      </ul>
+
       <h3>The demo — three live moments, one flow</h3>
       <ol class="steps grot" style="font-size:.94rem">
         <li><strong>The speed-run.</strong> Same invention, two runs side by side: empty memory vs. warmed on 50 same-class patents. Loopholes-caught ▲, time ▼, defects ▼. The recursive-intelligence delta, on screen.</li>
@@ -630,16 +643,20 @@ resp = client.interactions.analyze(
 
   <footer>
     <div class="label">Grounding &amp; sources</div>
-    <p style="max-width:var(--measure)">Built from live research (2026-07-17). A few caveats to carry into the build: NemoClaw/OpenShell are <strong>early preview</strong> — verify exact repo paths on clone; the HiddenLayer <code class="inl">/detection/v1</code> vs <code class="inl">/detection/v2</code> endpoint split is real, confirm the current one in the login-gated Developer Portal; and there's no single scalar <code class="inl">verdict</code> in the Interactions response — you derive the action from per-category <code class="inl">detected</code> flags.</p>
+    <p style="max-width:var(--measure)">Built from live research (2026-07-17, re-verified). A few caveats to carry into the build: NemoClaw/OpenShell are <strong>early preview</strong> — verify exact repo paths and CLI verbs on clone; the HiddenLayer <code class="inl">/detection/v1</code> vs <code class="inl">/detection/v2</code> endpoint split is real, confirm the current one in the login-gated Developer Portal; there's no single scalar <code class="inl">verdict</code> in the Interactions response — you derive the action from per-category <code class="inl">detected</code> flags; and Nemotron specs are current (Super ≈ 120.6B / 12.7B active, Nano ≈ 31.6B / 3.2B active, both 1M ctx).</p>
     <div class="srcgrid">
+      <span>hiddenlayer.com — AISec / AIDR</span>
       <span>docs.hiddenlayer.ai — Interactions API</span>
       <span>hiddenlayer-sdk (PyPI)</span>
       <span>github.com/NVIDIA/NemoClaw</span>
       <span>github.com/NVIDIA/OpenShell</span>
-      <span>docs.nvidia.com/openshell/reference/policy-schema</span>
-      <span>docs.nvidia.com/openshell — Policy Advisor</span>
+      <span>docs.nvidia.com/openshell — policy + Policy Advisor</span>
       <span>developer.nvidia.com — Nemotron 3 Super</span>
+      <span>research.nvidia.com — Nemotron 3 Nano</span>
       <span>build.nvidia.com — NIM / Nemotron</span>
+      <span>data.uspto.gov — Open Data Portal</span>
+      <span>data.uspto.gov/ptab — PTAB decisions</span>
+      <span>patentlyo.com — Patent Litigation Dataset</span>
     </div>
   </footer>
 

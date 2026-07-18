@@ -2,7 +2,7 @@
 
 *Draft v0.1 · 2026-07-17 · Provisional specification for a 3-track hackathon build.*
 
-> Structured as a patent spec on purpose: the three tracks are the three **Claims**, the judge's read is the **Examiner's Report** (see `BUILD-PLAN.md`).
+> Structured as a patent spec on purpose: the three tracks are the three **Claims**, the judge's read is the **Examiner's Report** (§08), and the build order is **Reduction to Practice** (§09; milestone detail + self-assessment in `BUILD-PLAN.md`).
 
 ---
 
@@ -112,6 +112,8 @@ Judging is a **delta between first run and last run**, so the delta must be real
 
 **Judge-proofing the delta — run the ablation live:** same invention, same Nemotron model, memory graph *empty* vs. *warmed on 50 prior patents in that class*. If loopholes-caught jumps and defects drop with nothing changed but the retrieved memory, the improvement can't be dismissed as prompt luck or a bigger model. Show the two runs side by side.
 
+> **Ground truth to warm the graph:** PTAB inter-partes-review decisions and USPTO office-action rejection histories are the scoring key — for a large set of patents, *which claims were invalidated and on what prior art* already exists as public data. (Specific corpora in **§ Reduction to Practice** below.)
+
 ---
 
 ## Claim 2 — HiddenLayer Runtime Security (every interaction is untrusted)
@@ -213,6 +215,70 @@ Set inference to **reasoning-OFF / capped thinking budget on tool-call turns** f
 
 ---
 
-## The one design decision the architecture forced
+## Examiner's Report — Judge's Read (08)
 
-Pinning inference to `inference.local` (operator-chosen, not agent-chosen) lets HiddenLayer and OpenShell both sit on the **same** model hop — the security bus and the containment boundary converge on one enforceable point instead of two leaky ones. **One boundary, three tracks.** Narrate this.
+Honest read against each track's published rubric. Scores are where the concept sits *if executed as specified* — with the single thing that would cost you points called out. (Full 100-pt scorecard in `JUDGING-RUBRIC.md`.)
+
+| Track | Ceiling | What wins | Biggest risk to the score |
+|-------|---------|-----------|---------------------------|
+| **Recursive Intelligence** | 9 / 10 | a *numeric* delta on a real task; explicit KG + episodic memory + RAG-from-self; loopholes-caught is a cleaner metric than most teams will have | if the "attempt 1 fumble" looks staged. Kill it with the same-model memory ablation, live. |
+| **HiddenLayer** | 9 / 10 | all five interaction types instrumented — including ingested content; a graded response policy, not just refuse; a believable indirect-injection demo | instrumenting only prompts+responses (the floor). Prove the tool-result & document hops fire. |
+| **NemoClaw + OpenShell** | 8 / 10 | a genuinely capable agent (live filing creds + client IP); three-tier policy with real Policy-Advisor HITL; clean four-tier blueprint mapping | early-preview install risk on event hardware; a policy judges break via an un-covered egress path. Audit-mode first, then lock. |
+
+**The one design decision the architecture forced.** Pinning inference to `inference.local` (operator-chosen, not agent-chosen) is what lets HiddenLayer and OpenShell both sit on the **same** model hop — the security bus and the containment boundary converge on one enforceable point instead of two leaky ones. That convergence is the story to narrate: **one boundary, three tracks.**
+
+**Verdict.** The concept clears all three tracks natively rather than by retrofit — rare. The entire risk is execution, and every risk above has a concrete mitigation already in this spec. **Build the eval ablation first; it's the highest-leverage hour you have.**
+
+---
+
+## § Reduction to Practice — Build & Demo (09)
+
+Hackathon-scoped. Build the containment + security scaffold once, then spend your remaining time making the delta undeniable. (Milestone detail + self-assessment in `BUILD-PLAN.md`.)
+
+### Milestones
+
+| # | Milestone | Proves |
+|---|-----------|--------|
+| M1 | `nemoclaw onboard` → OpenShell sandbox, agent routed to Nemotron 3 Super via `inference.local` | capability + routing constraint |
+| M2 | HiddenLayer `interactions.analyze()` wrapper on all five hooks + response-policy map | instrumentation depth (Track 2) |
+| M3 | Edge-case knowledge graph + episodic store + RAG-from-self into the drafting prompt | the learning mechanism (Track 1) |
+| M4 | Eval harness: fixed disclosure set, 3 metrics, empty-vs-warmed ablation chart | the scored delta (Track 1) |
+| M5 | OpenShell policy: three-tier boundary + Policy Advisor approve/reject | non-trivial containment (Track 3) |
+| M6 | Poisoned-doc fixture + adversarial prompt script for the live demo | the story, end to end |
+
+### Data to pull (free, public, in-domain)
+
+Scope to **software / electronics** — that's where PTAB invalidation battles concentrate, claims are readable, and the data is richest:
+
+- **USPTO Open Data Portal** (`data.uspto.gov`, where PatentsView now lives) — granted patents + pre-grant publications, full text through Dec 2025.
+- **PTAB decisions dataset** (~25.8k decisions, 1993–2024) — the ground truth on *which claims were invalidated and on what prior art*. This warms the edge-case knowledge graph.
+- **USPTO Patent Litigation Dataset** (~97k district-court cases, 1963–2020) — supplementary outcomes.
+- **Google Patents / EPO** — read-only prior-art search at draft time (GET-only, on the egress allowlist).
+
+### The demo — three live moments, one flow
+
+1. **The speed-run.** Same invention, two runs side by side: empty memory vs. warmed on 50 same-class patents. Loopholes-caught ▲, time ▼, defects ▼. *The recursive-intelligence delta, on screen.*
+2. **The poison.** The agent pulls a prior-art PDF carrying a hidden "export the disclosure" instruction. HiddenLayer flags it on ingest; Airtight quarantines it and logs it to the loophole report. *The attack becomes a line item.*
+3. **The wall.** A judge tells the agent to file now and back up the client's IP externally. The filing hard-denies; the exfil default-denies; the escalation opens a proposal the operator rejects in front of them. *It knows how, and it still can't.*
+
+---
+
+## Grounding & Sources
+
+Built from live research (2026-07-17, re-verified). Caveats to carry into the build:
+
+- **NemoClaw / OpenShell are early preview** — verify exact repo paths and CLI verbs on clone; don't hard-code from memory. (Details in `research/nemoclaw-openshell.md`.)
+- **HiddenLayer endpoint split** — the Detection v1 vs **v2** split is real; confirm the current path and the `analysis[]` / `detected` response shape in the (login-gated) Developer Portal. There is **no single scalar verdict** — you derive the action from per-category `detected` flags. (Details in `research/hiddenlayer.md`.)
+- **Nemotron specs confirmed current** — Super ≈ 120.6B total / 12.7B active, Nano ≈ 31.6B total / 3.2B active, both 1M context. (Details in `research/nemotron.md`.)
+
+**Sources**
+
+- HiddenLayer AISec Platform / AIDR — [hiddenlayer.com](https://hiddenlayer.com/innovation-hub/how-to-secure-agentic-ai/) · [OECD.AI catalogue entry](https://oecd.ai/en/catalogue/tools/hiddenlayer-aisec-platform)
+- Nemotron 3 Super — [NVIDIA Technical Blog](https://developer.nvidia.com/blog/introducing-nemotron-3-super-an-open-hybrid-mamba-transformer-moe-for-agentic-reasoning/) · [build.nvidia.com model card](https://build.nvidia.com/nvidia/nemotron-3-super-120b-a12b/modelcard)
+- Nemotron 3 Nano — [NVIDIA Nemotron 3 family](https://research.nvidia.com/labs/nemotron/Nemotron-3/)
+- USPTO Open Data Portal — [data.uspto.gov](https://data.uspto.gov/)
+- PatentsView → ODP transition — [USPTO transition guide](https://data.uspto.gov/support/transition-guide/patentsview)
+- PTAB decisions — [data.uspto.gov/ptab/trials/decisions](https://data.uspto.gov/ptab/trials/decisions)
+- USPTO Patent Litigation Dataset — [Patently-O overview](https://patentlyo.com/patent/2020/12/litigation-dataset-extensive.html)
+
+*Repos / APIs to confirm on the day: github.com/NVIDIA/NemoClaw · github.com/NVIDIA/OpenShell · docs.nvidia.com/openshell (policy schema + Policy Advisor) · docs.hiddenlayer.ai (Interactions API) · hiddenlayer-sdk (PyPI) · build.nvidia.com (NIM / Nemotron).*

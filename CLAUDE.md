@@ -30,3 +30,5 @@ Inference is **pinned to `inference.local`** and chosen by operator policy, not 
 ## Current status
 
 **Architecture / planning phase — nothing built.** Build order and the winning demo are in `docs/BUILD-PLAN.md`. Start with the eval-harness ablation (M4): same invention, same Nemotron model, memory graph empty vs. warmed — it's the Track-1 proof and the strongest demo moment.
+
+The official 100-point judging rubric — and how each Airtight decision maps to a scoring line — is in `docs/JUDGING-RUBRIC.md`. Optimize build effort against it; M4 scores on four lines at once.

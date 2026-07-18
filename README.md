@@ -37,8 +37,9 @@ Airtight/
 ├── README.md                         ← you are here (overview + index)
 ├── CLAUDE.md                         ← context for Claude Code sessions in this repo
 ├── docs/
-│   ├── ARCHITECTURE.md               ← full spec: concept, layers, FIG.1, 3 claims, model
-│   ├── BUILD-PLAN.md                 ← milestones M1–M6, demo script, judge's scorecard
+│   ├── ARCHITECTURE.md               ← full spec: concept, layers, FIG.1, 3 claims, model, judge's read, build & demo, sources
+│   ├── BUILD-PLAN.md                 ← milestones M1–M6, demo script, self-assessment
+│   ├── JUDGING-RUBRIC.md             ← official 100-pt scorecard + how Airtight maps to it
 │   └── airtight-spec.html            ← the shareable artifact (patent-spec styled)
 └── research/                         ← grounded briefings (verified 2026-07-17)
     ├── hiddenlayer.md                ← AIDR Interactions API: endpoints, payloads, auth, SDK
