@@ -44,3 +44,17 @@
 | **Performance** (10) | Empty-vs-warmed ablation quantifies the speedup; audit→enforce policy tuning for a clean judged run | M4; policy dev |
 
 **Highest-leverage move against this rubric:** the M4 eval ablation (same invention, same Nemotron model, memory empty vs. warmed). It is the single deliverable that scores directly on Technical Depth, Insight Quality, Creativity, *and* Performance at once — build it first and protect it.
+
+---
+
+## Bounty — Best Use of vLLM ($500, cross-cutting)
+
+Separate from the 100-pt scorecard. How Airtight maps to its criteria:
+
+| Criterion | Airtight's answer |
+|---|---|
+| **Efficiency under concurrent load** | The heartbeat fans out concurrent prior-art retrieval sub-agents — exactly vLLM's continuous-batching workload. Throughput matters in the loop; it is not decorative. |
+| **Small-model punch** | Nemotron 3 Nano (~3.2B active) sub-agent tier does cheap concurrent retrieval on vLLM while Super handles heavy drafting. |
+| **Real integration** | vLLM is the engine behind the operator-pinned `inference.local` hop — the same hop HiddenLayer analyzes and OpenShell contains. One boundary, four prizes. Verified at M1b. |
+
+Detail in `research/vllm.md`.

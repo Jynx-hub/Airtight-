@@ -37,6 +37,12 @@ The demo the judges click is thin. The system the tracks reward is thick and sit
 - **Grant** — filing-ready patent delivered, with a loophole report attached.
 - Deliberately unremarkable surface (autoinvent-comparable) so the engine is the story.
 
+#### Opportunity Mode (gap-mode — a demo funnel, not the benchmark)
+
+The recursive engine is the *same organ* run in two directions — a compounding prior-art matcher. Point it at an existing patent → report **hits** → loophole/invalidity report (measurable against PTAB ground truth). Point it at a news-derived idea → report **gaps** → whitespace/patentability report. Whitespace is the same prior-art muscle run in "find the hole" mode, so it costs almost nothing to add.
+
+**The benchmark stays on the loophole side.** "Worth patenting" and "not patented yet" have no ground truth you can score in a weekend; benchmarking gap-mode would wreck the Track-1 delta. Demo scope is one scripted headline beat — no news pipeline.
+
 ### Layer 2 · Examiner Engine (what the tracks reward)
 - **Learns** — ingests patent corpora + examiner rejections into an edge-case knowledge graph.
 - **Compounds** — every draft, correction, and outcome becomes retrievable episodic memory.
@@ -59,9 +65,9 @@ Read top to bottom as a request. Every arrow crosses the HiddenLayer bus; the en
 ╚══════════════════════════════╤═══════════════════════════════════════╝
                                ▼
 ┌╌ OPENSHELL SANDBOX · NemoClaw blueprint ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┐
-┊  Reasoner (inference pinned by policy → inference.local):            ┊
-┊    [04] Drafting Agent  — Nemotron 3 Super · plans/drafts/self-crit  ┊
-┊    [05] Sub-agents      — Nemotron 3 Nano · retrieval, summarization ┊
+┊  Reasoner (inference pinned by policy → inference.local → vLLM):     ┊
+┊    [04] Drafting Agent  — Nemotron 3 Super · vLLM-served             ┊
+┊    [05] Sub-agents      — Nemotron 3 Nano · vLLM-served, concurrent  ┊
 ┊  Tools (network egress allow-listed per binary):                    ┊
 ┊    [06] Prior-art Search — USPTO/EPO/Google Patents (GET, auto)      ┊
 ┊    [07] Filing API       — IRREVERSIBLE · HITL-gated                 ┊
@@ -78,7 +84,7 @@ Read top to bottom as a request. Every arrow crosses the HiddenLayer bus; the en
 
 **Callout legend**
 - `01–03` Layer 1, untrusted user I/O — first thing the HiddenLayer bus sees.
-- `04–05` NemoClaw *reasoner* tier; model chosen by operator policy, not the agent.
+- `04–05` NemoClaw *reasoner* tier; model chosen by operator policy, not the agent; served by **vLLM** (OpenAI-compatible, continuous batching) behind `inference.local`.
 - `06` Read egress — auto-allowed to a fixed allowlist of patent sources.
 - `07` Irreversible action — hard-denied without operator approval (Policy Advisor).
 - `08` Sensitive data — readable in-sandbox, egress off-box blocked.
@@ -211,7 +217,9 @@ The track requires routing to Nemotron / open models. Not a compromise — the 1
 | Sub-agent (retrieval / summarize) | **Nemotron 3 Nano** 31.6B-A3.6B · 1M ctx | cheap, fast; routes prior-art retrieval, compresses sources into the KG |
 | Fallback (flaky endpoint) | **Llama-3.3-Nemotron-Super-49B v1.5** · 128K | explicit tool-calling post-training, single H100, hosted everywhere — stable safety net, still Nemotron |
 
-Set inference to **reasoning-OFF / capped thinking budget on tool-call turns** for deterministic function calling; deep reasoning ON for claim drafting and loophole analysis. All open-weight, served from build.nvidia.com / NIM. Full rationale in `research/nemotron.md`.
+Set inference to **reasoning-OFF / capped thinking budget on tool-call turns** for deterministic function calling; deep reasoning ON for claim drafting and loophole analysis. All open-weight. Full rationale in `research/nemotron.md`.
+
+All three models are **served via vLLM** (OpenAI-compatible endpoint behind `inference.local`) on a rented Brev GPU — day-0 Nemotron 3 support is confirmed. **VRAM caveat:** even at ~12.7B active, Super's 120B MoE must hold all params in memory, which can be tight on event hardware — serve **Nano on vLLM as the guaranteed path** and bring up Super only if the GPU allows. Serving detail in `research/vllm.md`.
 
 ---
 
@@ -240,6 +248,7 @@ Hackathon-scoped. Build the containment + security scaffold once, then spend you
 | # | Milestone | Proves |
 |---|-----------|--------|
 | M1 | `nemoclaw onboard` → OpenShell sandbox, agent routed to Nemotron 3 Super via `inference.local` | capability + routing constraint |
+| M1b | Stand up vLLM behind `inference.local`; verify OpenAI-compatible + concurrent batching under the heartbeat | serving + vLLM bounty |
 | M2 | HiddenLayer `interactions.analyze()` wrapper on all five hooks + response-policy map | instrumentation depth (Track 2) |
 | M3 | Edge-case knowledge graph + episodic store + RAG-from-self into the drafting prompt | the learning mechanism (Track 1) |
 | M4 | Eval harness: fixed disclosure set, 3 metrics, empty-vs-warmed ablation chart | the scored delta (Track 1) |

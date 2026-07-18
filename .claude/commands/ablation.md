@@ -1,0 +1,1 @@
+Run the M4 ablation: empty vs warmed knowledge graph on the fixed disclosure set. Report loopholes-caught, drafting time, and correctness for both, and render the side-by-side chart. Same model, same prompt — only the retrieved memory differs.

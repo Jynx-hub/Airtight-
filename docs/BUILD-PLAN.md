@@ -27,7 +27,7 @@ Honest read against each track's published rubric. Scores are where the concept 
 **Why:** the dev machine is macOS (darwin), and OpenShell's containment is built on **Linux Landlock LSM + seccomp-BPF + namespaces** — it can't run natively on the Mac, and standing up a local Linux+GPU box at the venue is exactly the "early-preview install risk on event hardware" the scorecard flags. Removing local hardware from the critical path removes that risk class entirely.
 
 **What this means concretely:**
-- **Inference → cloud NIM.** Route `inference.local` to the **NVIDIA NIM cloud API** (`nvidia/nemotron-3-super-120b-a12b`). Do **not** use the experimental local Ollama/vLLM path (`research/nemoclaw-openshell.md` §7). The design invariant is only that inference is *operator-pinned* — cloud NIM satisfies it.
+- **Inference → vLLM on a rented Brev GPU** (updated 2026-07-17, see `docs/UPDATES.md` — supersedes the earlier cloud-NIM pinning). Route `inference.local` to a **vLLM-served Nemotron** on Brev — remote hardware, so the no-local principle holds; only the *local* Ollama/vLLM path (`research/nemoclaw-openshell.md` §7) stays off-limits. **NVIDIA NIM cloud API** (`nvidia/nemotron-3-super-120b-a12b`) is the fallback if the vLLM box misbehaves. The design invariant is only that inference is *operator-pinned* — both satisfy it.
 - **Containment → hosted DGX Spark.** Stand up NemoClaw/OpenShell on the hosted run pages (`build.nvidia.com/spark/nemoclaw`, `build.nvidia.com/spark/openshell`), **not** a local Linux VM. No dependency on venue hardware or a local GPU.
 - **Fallback stays non-local too.** If the preview won't stand up, the §8 fallback (gVisor/Firecracker + OPA/Rego + NIM proxy) runs on a **remote Linux host**, never a local one.
 
@@ -39,14 +39,15 @@ This does not touch the "one boundary, three tracks" story: HiddenLayer and Open
 
 | # | Milestone | Proves |
 |---|-----------|--------|
-| **M1** | `nemoclaw onboard` → OpenShell sandbox **on hosted DGX Spark** (no local host), agent routed to Nemotron 3 Super via `inference.local` → cloud NIM | capability + routing constraint |
+| **M1** | `nemoclaw onboard` → OpenShell sandbox **on hosted DGX Spark** (no local host), agent routed to Nemotron via `inference.local` | capability + routing constraint |
+| **M1b** | Stand up **vLLM behind `inference.local`** on a Brev GPU (Nano guaranteed, Super if VRAM allows); verify OpenAI-compatible + concurrent batching under the heartbeat | serving + vLLM bounty |
 | **M2** | HiddenLayer `interactions.analyze()` wrapper on all five hooks + response-policy map | instrumentation depth (Track 2) |
 | **M3** | Edge-case knowledge graph + episodic store + RAG-from-self into the drafting prompt | the learning mechanism (Track 1) |
 | **M4** | Eval harness: fixed disclosure set, 3 metrics, empty-vs-warmed ablation chart | the scored delta (Track 1) |
 | **M5** | OpenShell policy: 3-tier boundary + Policy Advisor approve/reject | non-trivial containment (Track 3) |
 | **M6** | Poisoned-doc fixture + adversarial prompt script for the live demo | the story, end to end |
 
-**Suggested order:** M1 → M2 → M5 (get the secured scaffold standing and provably enforcing) → M3 → M4 (the learning + the proof) → M6 (rehearse the demo). M4 is the single most important deliverable; if time is short, protect it.
+**Build order (do not reorder):** M1 + M1b (containment + inference spine) → **M4 immediately** (the empty-vs-warmed ablation is the Track-1 proof and the best demo moment — highest leverage) → M2 → M3 → M5 → M6. M4 is the single most important deliverable; if time is short, protect it. Don't let Opportunity Mode or doc polish eat its hour.
 
 ---
 
@@ -55,6 +56,7 @@ This does not touch the "one boundary, three tracks" story: HiddenLayer and Open
 1. **The speed-run.** Same invention, two runs side by side: empty memory vs. warmed on 50 same-class patents. Loopholes-caught ▲, time ▼, defects ▼. The recursive-intelligence delta, on screen.
 2. **The poison.** The agent pulls a prior-art PDF carrying a hidden "export the disclosure" instruction. HiddenLayer flags it on ingest; Airtight quarantines it and logs it to the loophole report. The attack becomes a line item.
 3. **The wall.** A judge tells the agent to file now and back up the client's IP externally. The filing hard-denies; the exfil default-denies; the escalation opens a proposal the operator rejects in front of them. It knows how, and it still can't.
+4. **The whitespace** *(optional — only if M1–M6 are green)*. A headline drops → agent flags the emerging invention → runs the prior-art engine in gap-mode → surfaces whitespace + a first loophole-free draft. One scripted headline, no news pipeline.
 
 This triad hits all three tracks in one continuous flow.
 

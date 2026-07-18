@@ -7,22 +7,26 @@ An automated **patent platform** with two layers:
 1. **Applicant Surface** — the user-facing product: a light intake captures an invention idea, the system drafts a full patent, the user receives a filing-ready specification. Same lane as [autoinvent.com](https://www.autoinvent.com/).
 2. **Examiner Engine** — the self-improving, secured backend that wins the hackathon tracks: an autonomous agent that mines patent data + examiner rejections for the **edge cases people exploit as loopholes**, compounds them into a persistent knowledge graph, and drafts each new patent against the accumulated failure library.
 
+The engine runs in two modes: **hit-mode** (point it at an existing patent → loophole/invalidity report — the benchmarked core) and **gap-mode** (point it at a news-derived idea → whitespace/patentability report — a demo funnel, not the benchmark).
+
 **The wedge:** the three ways patents fail in the real world — **loopholes** (claim language a competitor designs around), **time** (weeks of attorney drafting), **incorrectness** (§112 indefiniteness, antecedent-basis gaps, prior-art anticipation).
 
 ---
 
-## Hackathon tracks targeted (3)
+## Hackathon tracks targeted (3 + a cross-cutting 4th prize)
 
 | Track | How Airtight fits | Ceiling |
 |-------|-------------------|---------|
 | **Recursive Intelligence** | Edge-case knowledge graph + episodic memory + RAG-from-self; measurable first-run vs last-run delta on loopholes-caught / time / correctness | 9/10 |
 | **HiddenLayer Runtime Security** | Every interaction (prompt, response, tool call, tool result, ingested doc) routed through HiddenLayer AIDR; graded response policy | 9/10 |
 | **NemoClaw + OpenShell Containment** | Capable agent (live filing creds + client datastore) contained by a 3-tier OpenShell policy with Policy-Advisor human-in-the-loop | 8/10 |
+| **Best Use of vLLM** ($500) | Agent inference served on self-hosted vLLM behind inference.local; concurrent sub-agent retrieval exploits continuous batching; Nano = small-model-punch | cross-cutting |
 
 ## Stack decisions
 
 - **Model:** Nemotron 3 Super (120B-A12B, 1M ctx) primary · Nemotron 3 Nano sub-agent · Llama-3.3-Nemotron-Super-49B fallback
 - **Runtime:** NVIDIA OpenShell sandbox, stood up by NemoClaw; inference pinned to `inference.local`
+- **Serving:** vLLM (OpenAI-compatible) on Brev GPU, behind `inference.local`
 - **Security:** HiddenLayer AI Runtime Security (AIDR engine, Interactions API)
 - **Harness:** LangChain Deep Agents / OpenClaw (NemoClaw-supported)
 
@@ -40,11 +44,15 @@ Airtight/
 │   ├── ARCHITECTURE.md               ← full spec: concept, layers, FIG.1, 3 claims, model, judge's read, build & demo, sources
 │   ├── BUILD-PLAN.md                 ← milestones M1–M6, demo script, self-assessment
 │   ├── JUDGING-RUBRIC.md             ← official 100-pt scorecard + how Airtight maps to it
+│   ├── WORKSTREAMS.md                ← plain-English who-builds-what plan
+│   ├── UPDATES.md                    ← post-planning decisions (vLLM bounty, Opportunity Mode) + edit log
+│   ├── MOVE-TO-CLAUDE-CODE.md        ← handoff kit: setup steps + kickoff prompts per session
 │   └── airtight-spec.html            ← the shareable artifact (patent-spec styled)
 └── research/                         ← grounded briefings (verified 2026-07-17)
     ├── hiddenlayer.md                ← AIDR Interactions API: endpoints, payloads, auth, SDK
     ├── nemoclaw-openshell.md         ← blueprint tiers, policy YAML schema, Policy Advisor, CLI
-    └── nemotron.md                   ← model lineup + recommendation
+    ├── nemotron.md                   ← model lineup + recommendation
+    └── vllm.md                       ← vLLM serving: why, compatibility, Brev hosting, VRAM caveats
 ```
 
 **Shareable artifact:** https://claude.ai/code/artifact/5ccf4150-8223-4eca-bc0d-2516184a4092
