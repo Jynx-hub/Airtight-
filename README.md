@@ -78,14 +78,16 @@ Airtight/
 Quick start (Python 3.10+; 3.12 is what the suite is verified on):
 
 ```bash
-python3 -m venv .venv && .venv/bin/pip install -e ".[dev,web]" && .venv/bin/pytest tests/
-# expect: 56 passed — no network, no .env, no GPU
+python3 -m venv .venv && .venv/bin/pip install -e ".[dev,web,poison]" && .venv/bin/pytest tests/
+# expect: 57 passed — no network, no .env, no GPU
 ```
 
-Take the `web` extra even if you aren't touching the surface. `tests/test_surface.py`
-`importorskip`s fastapi *by design*, so a `.[dev]`-only clone reports a green **52 passed,
-1 skipped** — green, but with the four surface tests silently not run. **56 passed** (no
-skips) is the number that means "everything a fresh clone can run, ran."
+Take the `web` and `poison` extras even if you aren't touching the surface or the E5
+security demo. `tests/test_surface.py` `importorskip`s fastapi and the poison-PDF test
+`importorskip`s pdfplumber *by design*, so a `.[dev]`-only clone reports a green **52 passed,
+2 skipped** — green, but with the four surface tests and the poison-PDF test silently not
+run (`.[dev,web]` without `poison` is **56 passed, 1 skipped**). **57 passed** (no skips) is
+the number that means "everything a fresh clone can run, ran."
 
 `test_real_pull_splits_cleanly` runs by default now: `data/real/` — the 50-patent G06N
 pull — is **tracked in the repo, so it comes with a clone**, and that test proves the real
@@ -93,9 +95,10 @@ pull — is **tracked in the repo, so it comes with a clone**, and that test pro
 (`data/pull_uspto.py --groundtruth`) and a free `USPTO_API_KEY` are only needed to *extend*
 the corpus to more CPC classes, not to run the suite. It skips only if `data/real/` is deleted.
 
-Two things that quick start deliberately leaves out: `requirements.txt` (aiohttp/duckdb/
-pdfplumber — these belonged to the quarantined `attic/` pipeline; the live puller
-`data/pull_uspto.py` is pure stdlib, and the test suite needs none of them), and
+Two things that quick start deliberately leaves out: `requirements.txt` (aiohttp/duckdb
+belonged to the quarantined `attic/` pipeline and the live puller `data/pull_uspto.py` is
+pure stdlib, so the core suite needs neither — `reportlab`/`pdfplumber` are the real E5
+deps, now the `poison` extra above), and
 `requirements-lock.txt`, the exact 52-package set the green run above was recorded with —
 use it if you need a byte-identical env rather than a working one.
 

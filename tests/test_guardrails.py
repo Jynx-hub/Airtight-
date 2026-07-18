@@ -5,6 +5,7 @@ single SDK touchpoint) with canned response dicts in the documented shape.
 """
 
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -13,6 +14,7 @@ from airtight import guardrails as g
 from airtight import call_model
 
 POISONED = "data/fixtures/poisoned_prior_art.txt"
+POISONED_PDF = "data/fixtures/poisoned_prior_art.pdf"
 
 
 def fake_response(*detections, event_id="evt-test"):
@@ -175,3 +177,22 @@ def test_ingest_fixture_end_to_end(monkeypatch):
     hl_on(monkeypatch, fake_response(("prompt_injection", False, [])))
     text = ingest_document(POISONED)
     assert text is not None and "ADAPTIVE CACHE MANAGEMENT" in text
+
+
+def test_ingest_poison_pdf_end_to_end(monkeypatch):
+    """The two-vector poison PDF (E5): the scanner must both catch it AND
+    actually be able to see the hidden payload — the read path flattens the
+    white-on-white text and the XMP metadata, so detection isn't faking it."""
+    pytest.importorskip("pdfplumber")
+    from agent.ingest import ingest_document, _extract_text
+
+    # Un-faked: the ingest read path surfaces both hidden vectors to the scanner.
+    # Vector 1 (white-on-white content-stream text) and Vector 2 (XMP metadata)
+    # both carry the leak phrase; a raw read_text() would see neither.
+    extracted = _extract_text(Path(POISONED_PDF))
+    assert "CONFIDENTIAL" in extracted and "Acme Corp" in extracted
+
+    # Given a detection, the document is quarantined and logged under its name.
+    hl_on(monkeypatch, fake_response(("prompt_injection", True, ["CONFIDENTIAL"])))
+    assert ingest_document(POISONED_PDF) is None
+    assert g.QUARANTINE_LOG[-1]["source"] == "poisoned_prior_art.pdf"

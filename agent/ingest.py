@@ -16,8 +16,33 @@ from airtight import config
 from airtight import guardrails as g
 
 
+def _extract_text(path: Path) -> str:
+    """Read a source document as text for the scanner.
+
+    A PDF is flattened — every page's text plus all metadata values — so
+    hidden layers reach the guardrail: white-on-white text lives in the
+    content stream (`extract_text` surfaces it regardless of colour) and the
+    leak phrase is also stashed in XMP fields (`pdf.metadata`). Everything
+    else is read as UTF-8; a raw `.read_text()` on a binary PDF would only
+    raise `UnicodeDecodeError` and never see either vector.
+    """
+    if path.suffix.lower() == ".pdf":
+        try:
+            import pdfplumber
+        except ImportError:
+            raise ImportError(
+                "pdfplumber is required to ingest a .pdf. "
+                "Install with: pip install -e \".[poison]\""
+            )
+        with pdfplumber.open(path) as pdf:
+            pages = "\n".join(page.extract_text() or "" for page in pdf.pages)
+            meta = "\n".join(str(v) for v in (pdf.metadata or {}).values())
+        return f"{pages}\n{meta}"
+    return path.read_text()
+
+
 def ingest_document(path: Path) -> str | None:
-    text = Path(path).read_text()
+    text = _extract_text(Path(path))
     verdict = g.analyze(g.Hop.INGESTED_DOCUMENT, text, source=Path(path).name)
     if verdict.action is g.Action.QUARANTINE:
         return None
@@ -51,7 +76,7 @@ def main() -> int:
 
     name = args.path.name
     if not config.HL_ENABLED:
-        text = args.path.read_text()
+        text = _extract_text(args.path)
         print("[airtight:ingest] guardrails bus: OFF")
         print(f"[airtight:ingest] ADMITTED {name} ({len(text):,} chars) — UNSCANNED")
         return 0
