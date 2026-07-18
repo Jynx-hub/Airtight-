@@ -229,20 +229,22 @@ from a flat JSON directory (`:25`, `:29-35`) — no index, no embeddings.
   mechanism behind the backwards run.
   **What's left is measurement, not code:** neither corpus has been re-run live, so the
   delta itself is still unproven. Tracked as a risk below.
-- [ ] **C2 · Normalize the overlap score.** Overlap is a raw unnormalized count against
-  `pattern + claim_shape + remedy`, and real records carry 600+ char `claim_shape` fields
-  (full amended claim text). Longest record mechanically wins. Normalize by length or
-  weight by IDF.
-- [ ] **C3 · Give the store a write API.** `LoopholeStore` has no `add()` and no `save()` —
-  it is read-only by construction, which is precisely why D exists as a separate block.
-- [ ] **C4 · Decide the knowledge graph question, and say so.** There is **no graph in
-  code** — no `networkx`, no node/edge types, no traversal. The "graph" is one boolean
-  equality on `technology_class`. `README.md:8` and `docs/ARCHITECTURE.md:80,105-110`
-  assert a persistent knowledge graph as fact. Either build edges (statute ↔ claim shape ↔
-  CPC class) or change the prose. Do not walk a judge into that gap.
-  Note `db/schema.sql` already designed the richer shape — `statutory_defect_category`,
-  `cpc_class`, confidence and provenance columns — before it was abandoned for flat JSON.
-  It is dead (`duckdb` is still an unused dependency), but it is a good spec for C1.
+- [x] **C2 · Normalize the overlap score — done 2026-07-18.** `agent/memory.py::_rank` now
+  **IDF-weights the overlap** instead of a raw token count: common tokens (claim, method,
+  device, system) count for almost nothing, rare distinctive ones carry the match, so a
+  short record sharing the disclosure's specific vocabulary outranks a long one that merely
+  overlaps on boilerplate. Deterministic. Tested (`test_c2_idf_overlap_beats_raw_length`).
+- [x] **C3 · Give the store a write API — done 2026-07-18.** `LoopholeStore` now has
+  `add()` (dedup by id), `add_all()`, and `save()` (flat `<id>.json`, the layout `load()`
+  reads). This is what block D writes through. Tested (`test_c3_write_api_add_dedups_and_saves`).
+- [x] **C4 · Decided (and said so) — 2026-07-18: no graph; it's retrieval over a flat store.**
+  There is no `networkx`, no node/edge types, no traversal, and building one is not worth it —
+  the mechanism that actually moves the ablation is **statute-diversified, IDF-ranked
+  retrieval over an episodic record set** (C1 + C2 + block B), not graph traversal. The prose
+  is corrected to match: `README.md` no longer asserts a "persistent knowledge graph" (now
+  "persistent, statute-indexed failure library … a flat record set, not a graph");
+  `docs/ARCHITECTURE.md:7` already flags the graph sections as design-not-code. `db/schema.sql`
+  and the unused `duckdb` dep remain the abandoned richer shape — a future upgrade, not a claim.
 
 ### D · Ingest → memory — close the circuit
 

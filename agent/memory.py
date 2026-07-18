@@ -6,6 +6,7 @@ this interface.
 """
 
 import json
+import math
 import re
 from pathlib import Path
 from typing import Sequence
@@ -41,6 +42,26 @@ class LoopholeStore:
     def retrieve(self, disclosure: Disclosure, k: int = 5) -> list[LoopholeRecord]:
         return _retrieve(self.records, disclosure, k)
 
+    # C3: the write API. The store used to be read-only by construction — which is exactly
+    # why block D (ingest → memory) had no path to land records. add()/save() give it one;
+    # dedup-by-id keeps a re-ingested document from duplicating records.
+    def add(self, record: LoopholeRecord) -> bool:
+        if any(r.id == record.id for r in self.records):
+            return False
+        self.records.append(record)
+        return True
+
+    def add_all(self, records: Sequence[LoopholeRecord]) -> int:
+        return sum(self.add(r) for r in records)
+
+    def save(self, directory: Path | str) -> Path:
+        """Persist each record as <id>.json — the flat layout `load()` reads back."""
+        directory = Path(directory)
+        directory.mkdir(parents=True, exist_ok=True)
+        for rec in self.records:
+            (directory / f"{rec.id}.json").write_text(rec.model_dump_json(indent=2))
+        return directory
+
     def __len__(self) -> int:
         return len(self.records)
 
@@ -48,11 +69,29 @@ class LoopholeStore:
 def _rank(records: list[LoopholeRecord], disclosure: Disclosure) -> list[LoopholeRecord]:
     disc_tokens = tokens(f"{disclosure.title} {disclosure.summary} {disclosure.details}")
 
-    def rank_key(rec: LoopholeRecord):
-        overlap = len(tokens(f"{rec.pattern} {rec.claim_shape} {rec.remedy}") & disc_tokens)
-        return (rec.technology_class == disclosure.technology_class, overlap, rec.id)
+    # C2: IDF-weight the overlap instead of a raw token count. Real records carry 600+ char
+    # `claim_shape` fields, so a raw count let the longest record win mechanically. IDF makes
+    # common tokens (claim, method, device, system) count for almost nothing and rare,
+    # distinctive tokens carry the match — so a short record sharing the disclosure's specific
+    # vocabulary outranks a long one that merely overlaps on boilerplate. Deterministic.
+    toks = [(rec, tokens(f"{rec.pattern} {rec.claim_shape} {rec.remedy}")) for rec in records]
+    n = max(len(records), 1)
+    df: dict[str, int] = {}
+    for _, rt in toks:
+        for t in rt:
+            df[t] = df.get(t, 0) + 1
 
-    return sorted(records, key=rank_key, reverse=True)
+    def idf(t: str) -> float:
+        return math.log(1 + n / df.get(t, 1))
+
+    scored = {id(rec): sum(idf(t) for t in (rt & disc_tokens)) for rec, rt in toks}
+
+    return sorted(
+        records,
+        key=lambda rec: (rec.technology_class == disclosure.technology_class,
+                         scored[id(rec)], rec.id),
+        reverse=True,
+    )
 
 
 def diversify_by_statute(ranked: list[LoopholeRecord], k: int) -> list[LoopholeRecord]:

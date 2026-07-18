@@ -5,11 +5,11 @@
 An automated **patent platform** with two layers:
 
 1. **Applicant Surface** — the user-facing product: a light intake captures an invention idea, the system drafts a full patent, the user receives a filing-ready specification. Same lane as [autoinvent.com](https://www.autoinvent.com/).
-2. **Examiner Engine** — the self-improving, secured backend that wins the hackathon tracks: an autonomous agent that mines patent data + examiner rejections for the **edge cases people exploit as loopholes**, compounds them into a persistent knowledge graph, and drafts each new patent against the accumulated failure library.
+2. **Examiner Engine** — the self-improving, secured backend that wins the hackathon tracks: an autonomous agent that mines patent data + examiner rejections for the **edge cases people exploit as loopholes**, compounds them into a **persistent, statute-indexed failure library** (statute-diversified, IDF-ranked retrieval over an episodic store — a flat record set, not a graph; C4), and drafts each new patent against the accumulated library.
 
 The engine runs in two modes: **hit-mode** (point it at an existing patent → loophole/invalidity report — the benchmarked core) and **gap-mode** (point it at a news-derived idea → whitespace/patentability report — a demo funnel, not the benchmark).
 
-**Domain:** the inventions are **software & electronics** patents. The whole pipeline — prior-art search, claim drafting, the edge-case knowledge graph, and the correctness checks — is scoped to that space; §101 eligibility (Alice/Mayo) and §112(f) means-plus-function are first-class failure modes here, and mechanical/chemical/biotech patent conventions don't apply.
+**Domain:** the inventions are **software & electronics** patents. The whole pipeline — prior-art search, claim drafting, the edge-case failure library, and the correctness checks — is scoped to that space; §101 eligibility (Alice/Mayo) and §112(f) means-plus-function are first-class failure modes here, and mechanical/chemical/biotech patent conventions don't apply.
 
 **The wedge:** the three ways patents fail in the real world — **loopholes** (claim language a competitor designs around), **time** (weeks of attorney drafting), **incorrectness** (§101 subject-matter eligibility, §112 indefiniteness, antecedent-basis gaps, prior-art anticipation).
 
@@ -19,7 +19,7 @@ The engine runs in two modes: **hit-mode** (point it at an existing patent → l
 
 | Track | How Airtight fits | Ceiling |
 |-------|-------------------|---------|
-| **Recursive Intelligence** | Edge-case knowledge graph + episodic memory + RAG-from-self; measurable first-run vs last-run delta on loopholes-caught / time / correctness | 9/10 |
+| **Recursive Intelligence** | Edge-case failure library (statute-diversified retrieval) + episodic memory + RAG-from-self; measurable first-run vs last-run delta on loopholes-caught / time / correctness | 9/10 |
 | **HiddenLayer Runtime Security** | Every interaction (prompt, response, tool call, tool result, ingested doc) routed through HiddenLayer AIDR; graded response policy | 9/10 |
 | **NemoClaw + OpenShell Containment** | Capable agent (live filing creds + client datastore) contained by a 3-tier OpenShell policy with Policy-Advisor human-in-the-loop | 8/10 |
 | **Best Use of vLLM** ($500) | Agent inference served on self-hosted vLLM behind inference.local; concurrent sub-agent retrieval exploits continuous batching; Nano = small-model-punch | cross-cutting |
