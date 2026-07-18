@@ -12,7 +12,7 @@ load_dotenv()
 
 MODE = os.getenv("AIRTIGHT_MODE", "stub")  # "stub" | "live"
 
-# dev: Person 2's Brev vLLM URL · in-sandbox: https://inference.local/v1 · fallback: NIM cloud
+# dev: Person 2's Modal vLLM URL · in-sandbox: https://inference.local/v1 · fallback: NIM cloud
 BASE_URL = os.getenv("AIRTIGHT_BASE_URL", "")
 
 API_KEY = os.getenv("AIRTIGHT_API_KEY", "dummy")  # vLLM ignores it; NIM requires a real key

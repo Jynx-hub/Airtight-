@@ -26,7 +26,7 @@ The engine runs in two modes: **hit-mode** (point it at an existing patent → l
 
 - **Model:** Nemotron 3 Super (120B-A12B, 1M ctx) primary · Nemotron 3 Nano sub-agent · Llama-3.3-Nemotron-Super-49B fallback
 - **Runtime:** NVIDIA OpenShell sandbox, stood up by NemoClaw; inference pinned to `inference.local`
-- **Serving:** vLLM (OpenAI-compatible) on Brev GPU, behind `inference.local`
+- **Serving:** vLLM (OpenAI-compatible) on Modal serverless GPU, behind `inference.local`
 - **Security:** HiddenLayer AI Runtime Security (AIDR engine, Interactions API)
 - **Harness:** LangChain Deep Agents / OpenClaw (NemoClaw-supported)
 
@@ -57,13 +57,13 @@ Airtight/
     ├── hiddenlayer.md                ← AIDR Interactions API: endpoints, payloads, auth, SDK
     ├── nemoclaw-openshell.md         ← blueprint tiers, policy YAML schema, Policy Advisor, CLI
     ├── nemotron.md                   ← model lineup + recommendation
-    └── vllm.md                       ← vLLM serving: why, compatibility, Brev hosting, VRAM caveats
+    └── vllm.md                       ← vLLM serving: why, compatibility, Modal hosting, VRAM caveats
 ```
 
 **Shareable artifact:** https://claude.ai/code/artifact/5ccf4150-8223-4eca-bc0d-2516184a4092
 
 ## Status
 
-**Phase: build.** The shared scaffold is in `main`: doorway + shapes (`airtight/`), a stub-mode agent loop (`agent/`), and Person 2's vLLM/OpenShell handoff (`inference/`). Everything runs green with `pytest tests/` and `python -m agent.run_smoke` — no network needed. Next: Person 2 stands up vLLM on Brev (M1b), then the eval-harness ablation (`docs/BUILD-PLAN.md` → M4) — the Track-1 proof and the best demo moment.
+**Phase: build.** The shared scaffold is in `main`: doorway + shapes (`airtight/`), a stub-mode agent loop (`agent/`), and Person 2's vLLM/OpenShell handoff (`inference/`). Everything runs green with `pytest tests/` and `python -m agent.run_smoke` — no network needed. Next: Person 2 deploys vLLM on Modal (M1b, template in `inference/vllm_modal.py`), then the eval-harness ablation (`docs/BUILD-PLAN.md` → M4) — the Track-1 proof and the best demo moment.
 
 Quick start: `python3 -m venv .venv && .venv/bin/pip install -e ".[dev]" && .venv/bin/pytest tests/`

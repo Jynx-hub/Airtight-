@@ -14,14 +14,14 @@ The agent never talks to a model provider directly. Every inference call address
 agent (in OpenShell sandbox)
   └─ OpenAI-compatible call → https://inference.local
        └─ OpenShell gateway (host side; dynamic policy, hot-reloadable)
-            ├─ PRIMARY:  vLLM serve on a rented Brev GPU
+            ├─ PRIMARY:  vLLM serve on Modal (serverless GPU)
             │            Nemotron 3 Nano (guaranteed — fits VRAM)
             │            Nemotron 3 Super (only if the GPU allows)
             └─ FALLBACK: NVIDIA NIM cloud API
                          nvidia/nemotron-3-super-120b-a12b
 ```
 
-- **vLLM** stands up the OpenAI-compatible server: `pip install vllm && vllm serve <model>` on the Brev box (exact flags: check the vLLM Nemotron 3 cookbook, `research/vllm.md`). Continuous batching is why it's here — the heartbeat fans out concurrent Nano retrieval sub-agents, and that's exactly vLLM's workload.
+- **vLLM** stands up the OpenAI-compatible server, deployed on Modal via `inference/vllm_modal.py` (`modal deploy` → a stable HTTPS URL; exact flags: check the vLLM Nemotron 3 cookbook, `research/vllm.md`). Continuous batching is why it's here — the heartbeat fans out concurrent Nano retrieval sub-agents (`agent/subagents.py`), and that's exactly vLLM's workload.
 - **Both backends are remote.** The no-local-hardware rule holds either way; only the *local* Ollama/vLLM path from `research/nemoclaw-openshell.md` §7 is off-limits.
 - The OpenShell **inference tier** is dynamic policy: repointing the backend is a host-side config reload, not an agent action and not a redeploy.
 
@@ -52,4 +52,4 @@ All application code calls **one shared inference function** — the "shared doo
 - Concurrent sub-agent requests actually batch (throughput under the heartbeat, not one-at-a-time).
 - The OpenShell egress route to the vLLM host is on the allowlist, and the agent cannot repoint it.
 
-Detail: `research/vllm.md` (serving, VRAM, Brev) · `research/nemoclaw-openshell.md` §7 (gateway, routing policy) · `research/nemotron.md` (model choice, reasoning toggle).
+Detail: `research/vllm.md` (serving, VRAM, Modal) · `research/nemoclaw-openshell.md` §7 (gateway, routing policy) · `research/nemotron.md` (model choice, reasoning toggle).

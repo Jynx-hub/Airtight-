@@ -219,7 +219,7 @@ The track requires routing to Nemotron / open models. Not a compromise — the 1
 
 Set inference to **reasoning-OFF / capped thinking budget on tool-call turns** for deterministic function calling; deep reasoning ON for claim drafting and loophole analysis. All open-weight. Full rationale in `research/nemotron.md`.
 
-All three models are **served via vLLM** (OpenAI-compatible endpoint behind `inference.local`) on a rented Brev GPU — day-0 Nemotron 3 support is confirmed. **VRAM caveat:** even at ~12.7B active, Super's 120B MoE must hold all params in memory, which can be tight on event hardware — serve **Nano on vLLM as the guaranteed path** and bring up Super only if the GPU allows. Serving detail in `research/vllm.md`.
+All three models are **served via vLLM** (OpenAI-compatible endpoint behind `inference.local`) on **Modal serverless GPU** — day-0 Nemotron 3 support is confirmed. **VRAM caveat:** even at ~12.7B active, Super's 120B MoE must hold all params in memory, which can be tight — serve **Nano on vLLM as the guaranteed path** and bring up Super only if the GPU allows. Serving detail in `research/vllm.md`; deploy template in `inference/vllm_modal.py`.
 
 ---
 

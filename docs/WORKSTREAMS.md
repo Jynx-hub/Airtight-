@@ -19,7 +19,7 @@ Airtight is a **robot patent lawyer**. You tell it your invention, and it writes
 | Person | Their part | Branch | In one sentence |
 |--------|-----------|--------|-----------------|
 | **1 — Data** | The library | `lane/data` | Finds the patents, rejections, and ground truth the robot learns from — and the test set that proves it learned. |
-| **2 — Inference** | The brain hosting | `lane/inference` | Rents the Brev GPU, serves Nemotron on vLLM, and hands everyone one endpoint behind `inference.local`. Then moves onto the locked doors. |
+| **2 — Inference** | The brain hosting | `lane/inference` | Deploys Nemotron on vLLM via Modal serverless GPU, and hands everyone one endpoint behind `inference.local`. Then moves onto the locked doors. |
 | **3 — Surface** | The screen + the show | `lane/surface` | Builds what people click, and runs the live demo for the judges. |
 | **4 — Anudeep** | The robot itself | `lane/agent` | The agent loop, the security bus, the memory, and the "it got smarter" proof. The critical path. |
 
@@ -52,7 +52,7 @@ main   ← the shared, always-working copy
 1. **One doorway for the AI brain.** Every model call goes through *one* shared function (Person 4 builds it, stubbed to return "all clear" at first). Persons 1–3 build against the stub from minute one. Full contract: `docs/INFERENCE-LOCAL.md`.
 2. **A folder for each person** so nobody's files collide.
 3. **Agreed data shapes** — what a "Disclosure," a "Draft," a "LoopholeRecord," and an "EvalResult" look like — written down once so all four parts speak the same language. Person 1 and Person 4 co-own this; it's the contract between the data and the harness.
-4. **A secrets file** listing the keys each part needs (Brev/vLLM URL, HiddenLayer key, NIM fallback key, USPTO endpoints). Check they all work on day one.
+4. **A secrets file** listing the keys each part needs (Modal token + vLLM URL, HiddenLayer key, NIM fallback key, USPTO endpoints). Check they all work on day one.
 5. **The one rule nobody breaks:** *the operator chooses the AI model, never the robot.* Everything runs remote — nothing on a laptop. (`docs/INFERENCE-LOCAL.md`.)
 
 ---
@@ -76,7 +76,7 @@ main   ← the shared, always-working copy
 **Your job:** Stand up the AI brain everyone else calls, then help lock the doors. Your first job (F1-F4) is **M1b** and the **$500 vLLM bounty** — it's front-loaded, so plan to finish it early and roll onto the second half. Serving detail: `research/vllm.md` · wiring: `docs/INFERENCE-LOCAL.md`.
 
 ### First: the endpoint (M1b + the bounty)
-- [ ] **F1** `feat/inference-vllm` — Rent the Brev GPU ($100 credits per team member), `pip install vllm`, `vllm serve` **Nemotron 3 Nano** (the guaranteed path — it fits). Try **Super** only if the VRAM allows; don't burn hours on it.
+- [ ] **F1** `feat/inference-vllm` — `modal deploy inference/vllm_modal.py` to serve **Nemotron 3 Nano** on Modal serverless GPU (the guaranteed path — it fits). Try **Super** only if the VRAM allows; don't burn hours on it.
 - [ ] **F2** `feat/inference-verify` — Prove the endpoint is OpenAI-compatible (chat + streaming), then **load-test it with concurrent requests** and write down the throughput numbers. Continuous batching under concurrent load is exactly what the bounty judges — a real before/after number is gold.
 - [ ] **F3** `feat/inference-routing` — Wire `inference.local` → your vLLM URL (creds host-side, never in the sandbox), and configure the **NIM cloud fallback** so one config flip swaps backends if the box dies.
 - [ ] **F4** `feat/inference-runbook` — Hand the team one base URL + model name via the secrets file. Write the 5-line "box died, bring it back" runbook, and own keeping the GPU alive through judging.
@@ -128,7 +128,7 @@ main   ← the shared, always-working copy
 ```
 Step 0  →  The 2-hour shared setup (everyone, together). Doorway stub in main.
 Step 1  →  All four lanes run in parallel:
-           P1 pulls data · P2 stands up vLLM/Brev · P3 builds screens on mocks
+           P1 pulls data · P2 deploys vLLM on Modal · P3 builds screens on mocks
            P4 builds the agent loop against the stub
 Step 2  →  Swap the fakes for the real thing: doorway → real vLLM endpoint (P2),
            mocks → real robot (P3), stub scanner → real HiddenLayer (P4).
@@ -146,7 +146,7 @@ Step 3  →  P1's fixtures + P4's harness = the ablation run. P3 wires the chart
 | Person | The worry | The plan |
 |--------|-----------|----------|
 | 1 | Rejection/PTAB data is messier than expected, or the checklist leaks into the warming set | Confirm the datasets download **on day one** (C0b-style spike); keep checklist and warming corpus in separate files with an overlap check |
-| 2 | Super doesn't fit the GPU, or the Brev box dies mid-demo | Nano is the guaranteed path — serve it first; NIM fallback is one config flip; the runbook brings the box back in minutes |
+| 2 | Super doesn't fit the GPU, or the Modal deploy fails mid-demo | Nano is the guaranteed path — serve it first; NIM fallback is one config flip; Modal is serverless so `modal deploy` brings it back in minutes (and `min_containers=1` avoids cold starts on stage) |
 | 3 | A live internet call glitches mid-demo | Every moment has a pre-recorded backup; rehearse twice |
 | 4 | One person owning agent + memory + security + eval is too much | The stub-first doorway means nothing blocks on you; P2 takes the OpenShell locks; if still tight, P1 co-owns eval scoring (they built the checklist) and M6 polish gets cut before M4 does |
 

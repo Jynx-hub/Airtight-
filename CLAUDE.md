@@ -15,7 +15,7 @@ The four files in `research/` were produced from live web research on **2026-07-
 - **HiddenLayer** — there is no product literally called "Runtime Security API." It's **AI Runtime Security**, powered by the **AIDR** engine, called through the **Interactions** API (`client.interactions.analyze(...)`). The response has **no scalar `verdict`** — derive the action from per-category `detected` flags in `analysis[]`. See `research/hiddenlayer.md`.
 - **NemoClaw + OpenShell** are **real, shipping NVIDIA projects** (early preview, March 2026), not conceptual. OpenShell has **no `require_approval:` YAML key** — the human-in-the-loop boundary is a separate **Policy Advisor** flow (default-deny → agent proposes `addRule` → operator approves out-of-band → hot-reload → agent retries). The blueprint is graded as **four enforcement tiers** (filesystem / process / network / inference). See `research/nemoclaw-openshell.md`.
 - **Model** — primary is **Nemotron 3 Super** (120B-A12B, **1M context**). Use reasoning-OFF / capped thinking budget on tool-call turns for deterministic function calling; reasoning-ON for claim drafting. See `research/nemotron.md`.
-- **Serving** — Nemotron is served by **vLLM** (OpenAI-compatible) on a rented Brev GPU behind `inference.local`; day-0 Nemotron 3 support confirmed. Nano is the guaranteed path (VRAM); NIM cloud API is the fallback. See `research/vllm.md`.
+- **Serving** — Nemotron is served by **vLLM** (OpenAI-compatible) on **Modal** serverless GPU behind `inference.local`; template in `inference/vllm_modal.py`. Nano is the guaranteed path (VRAM); NIM cloud API is the reliability fallback (but NIM is hosted, so it doesn't count toward the vLLM bounty). See `research/vllm.md`.
 
 ## Design invariant (do not break)
 
@@ -38,6 +38,6 @@ Benchmark stays on loophole-finding (PTAB ground truth). Opportunity/whitespace 
 
 ## Current status
 
-**Build phase — shared scaffold landed (Session A).** `airtight/` holds the doorway (`call_model`, the only legal model hop — HiddenLayer's M2 slot is `_analyze`, the reasoning toggle lives in `_reasoning_params`) and the four cross-lane shapes; `agent/loop.py` is the M1 work loop; `inference/` has Person 2's Brev/vLLM runbook + the OpenShell policy draft (audit mode). Verify anytime: `.venv/bin/pytest tests/` + `python -m agent.run_smoke` (stub mode, no network). Next per build order: Person 2 lands M1b, then M4 — same invention, same Nemotron model, memory graph empty vs. warmed.
+**Build phase — shared scaffold landed (Session A).** `airtight/` holds the doorway (`call_model`, the only legal model hop — HiddenLayer's M2 slot is `_analyze`, the reasoning toggle lives in `_reasoning_params`) and the four cross-lane shapes; `agent/loop.py` is the M1 work loop; `inference/` has Person 2's Modal/vLLM runbook + serving template + the OpenShell policy draft (audit mode). Verify anytime: `.venv/bin/pytest tests/` + `python -m agent.run_smoke` (stub mode, no network). Next per build order: Person 2 lands M1b, then M4 — same invention, same Nemotron model, memory graph empty vs. warmed.
 
 The official 100-point judging rubric — and how each Airtight decision maps to a scoring line — is in `docs/JUDGING-RUBRIC.md`. Optimize build effort against it; M4 scores on four lines at once.
