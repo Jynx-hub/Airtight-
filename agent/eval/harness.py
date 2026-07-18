@@ -160,7 +160,7 @@ def run_condition(
 
 
 def run_ablation(data_root: Path, k: int = 5, runs: int = 1, out_root: Path = Path("results/ablation"),
-                 draft_gen: dict = DRAFT_GEN) -> Path:
+                 draft_gen: dict = DRAFT_GEN, deadline: float | None = None) -> Path:
     data_root = Path(data_root)
     disclosures = load_disclosures(data_root / "fixtures" / "disclosures")
     warmed = LoopholeStore.load(data_root / "corpus" / "loopholes")
@@ -174,8 +174,15 @@ def run_ablation(data_root: Path, k: int = 5, runs: int = 1, out_root: Path = Pa
 
     guard_reports = {}
     results: list[EvalResult] = []
+    stopped_early = False
     for run_idx in range(runs):
         for disclosure in disclosures:
+            # Deadline check at the DISCLOSURE boundary keeps every empty/warmed
+            # pair complete, and stops the run cold instead of firing calls past
+            # the GPU window (which cold-starts a scaled-down endpoint and bills).
+            if deadline is not None and time.time() >= deadline:
+                stopped_early = True
+                break
             checklist = load_checklist(data_root / "groundtruth" / "checklists", disclosure.id)
             if disclosure.id not in guard_reports:
                 guard_reports[disclosure.id] = assert_no_overlap(warmed, checklist)
@@ -185,6 +192,8 @@ def run_ablation(data_root: Path, k: int = 5, runs: int = 1, out_root: Path = Pa
                     run_condition(disclosure, store, checklist, condition, k, transcript_dir,
                                   run_idx, draft_gen)
                 )
+        if stopped_early:
+            break
 
     pairs = _pair_deltas(results)
     payload = {
@@ -193,6 +202,8 @@ def run_ablation(data_root: Path, k: int = 5, runs: int = 1, out_root: Path = Pa
         "overlap_guard": guard_reports,
         "results": [r.model_dump() for r in results],
         "pairs": pairs,
+        "stopped_early": stopped_early,  # True if the deadline cut the run short
+        "disclosures_completed": len(pairs),
     }
     results_path = out_dir / "results.json"
     results_path.write_text(json.dumps(payload, indent=2))

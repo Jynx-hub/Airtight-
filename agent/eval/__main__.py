@@ -9,6 +9,7 @@ AIRTIGHT_MODE=live for the real ablation.
 
 import argparse
 import json
+import time
 from pathlib import Path
 
 from agent.eval.harness import DRAFT_GEN, FAST_DRAFT_GEN, run_ablation
@@ -22,11 +23,15 @@ def main() -> None:
     ap.add_argument("--out", type=Path, default=Path("results/ablation"))
     ap.add_argument("--fast", action="store_true",
                     help="reasoning-off + capped drafts — quicker, shallower (same setting both arms)")
+    ap.add_argument("--deadline-min", type=float, default=None,
+                    help="stop cleanly after N minutes (finalizes a partial chart) — "
+                         "keeps a windowed run from firing calls past the GPU window")
     args = ap.parse_args()
 
     draft_gen = FAST_DRAFT_GEN if args.fast else DRAFT_GEN
+    deadline = time.time() + args.deadline_min * 60 if args.deadline_min else None
     results_path = run_ablation(args.data_root, k=args.k, runs=args.runs, out_root=args.out,
-                                draft_gen=draft_gen)
+                                draft_gen=draft_gen, deadline=deadline)
     payload = json.loads(results_path.read_text())
 
     print(f"results:  {results_path}")
