@@ -133,6 +133,37 @@ def test_fake_source_is_relevant_and_admissible():
 
 def test_keyless_sources_skip_cleanly_without_creds(monkeypatch):
     monkeypatch.delenv("COURTLISTENER_API_TOKEN", raising=False)
+    monkeypatch.delenv("LEGISCAN_API_KEY", raising=False)
     monkeypatch.delenv("CONGRESS_API_KEY", raising=False)
     assert sm.fetch_courtlistener() == []          # no key, no pull — no network hit
+    assert sm.fetch_legiscan() == []
     assert sm.fetch_congress() == []
+
+
+# A real LegiScan getSearch payload shape (summary + numeric-keyed hits).
+_LEGISCAN_PAYLOAD = {
+    "status": "OK",
+    "searchresult": {
+        "summary": {"page": "1 of 1", "count": 2},
+        "0": {"relevance": 99, "state": "US", "bill_number": "HR9999",
+              "title": "Patent Eligibility Restoration Act — software subject matter",
+              "last_action": "Referred to Committee on the Judiciary",
+              "last_action_date": "2026-05-01",
+              "url": "https://legiscan.com/US/bill/HR9999/2026"},
+        "1": {"relevance": 40, "state": "CA", "bill_number": "AB100",
+              "title": "State highway maintenance appropriations",  # off-domain
+              "last_action": "Chaptered", "last_action_date": "2026-04-01",
+              "url": "https://legiscan.com/CA/bill/AB100/2026"},
+    },
+}
+
+
+def test_legiscan_parses_getsearch_and_scope_gates(monkeypatch):
+    monkeypatch.setenv("LEGISCAN_API_KEY", "test-key")
+    monkeypatch.setattr(sm, "_fetch", lambda url, headers=None: json.dumps(_LEGISCAN_PAYLOAD).encode())
+    props = sm.fetch_legiscan()
+    assert len(props) == 1                          # the highway bill is scope-gated out
+    assert props[0].source_type == "bill"
+    assert props[0].statute == "101"                # "eligibility" + "software"
+    assert "HR9999" in props[0].citation
+    assert "summary" not in [p.title for p in props]  # the summary object never becomes a hit

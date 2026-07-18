@@ -336,10 +336,11 @@ current — and for this domain "current" is mostly **case law** (Alice/KSR/Naut
 are all judicial) and **USPTO guidance**, not statute. `agent/statute_monitor.py` watches
 those and proposes updates.
 
-- ◐ **SC1 · Monitor + proposal queue — code done, gating verified offline 2026-07-18.**
-  `agent/statute_monitor.py` pulls from three sources — **Federal Register** (USPTO
+- ◐ **SC1 · Monitor + proposal queue — code done, Fed. Register verified LIVE 2026-07-18.**
+  `agent/statute_monitor.py` pulls from four sources — **Federal Register** (USPTO
   guidance, keyless), **CourtListener** (precedential CAFC opinions, `COURTLISTENER_API_TOKEN`),
-  and **Congress.gov** (Title-35 bills, `CONGRESS_API_KEY`) — filters each candidate through
+  **LegiScan** (state + federal bills, `LEGISCAN_API_KEY`), and **Congress.gov** (federal
+  Title-35 bills, `CONGRESS_API_KEY`) — filters each candidate through
   a software/electronics scope gate (`_is_relevant`) and a statutory-basis classifier
   (`_classify_statute`, 112 split into a/b/f), and appends survivors to a jsonl proposal
   queue (`agent/statute_proposals.jsonl`, gitignored runtime state). Carries `pull_uspto`'s
@@ -353,12 +354,14 @@ those and proposes updates.
   deterministic prompt-template hash the M4 ablation proof depends on
   (`test_reference_is_constant_across_ablation_arms`), so a live auto-write would corrupt it.
   Auto-commit was considered and rejected against that named cost, not overlooked.
-- [ ] **SC3 · Live source pull unverified.** The scope gate, classifier, dedup, review render
-  and offline rehearsal (`--fake`) are observed end-to-end, stub mode, no network. The three
-  real feeds have **not** been run against the live APIs — field mappings for
-  CourtListener/Congress are coded from their published shapes, not verified against a live
-  response the way `pull_uspto`'s USPTO mappings were. First live pull should confirm the
-  mappings and hand-check the first batch of proposals before trusting the queue.
+- ◐ **SC3 · Live pull — Fed. Register verified LIVE; keyed sources pending a key.**
+  `--fetch --source fedreg` was run against the **live** Federal Register API 2026-07-18 and
+  surfaced a real, correctly-classified §101 proposal — the *2024 Guidance Update on Patent
+  Subject Matter Eligibility, Including on AI* (`Fed. Reg. 2024-15377`) — and the escaped
+  paste block parses. That closes the highest-signal channel (guidance) live. **Still open:**
+  CourtListener / LegiScan / Congress need free API keys, so their field mappings are coded
+  from published shapes and unit-tested against fixtures but not yet confirmed against a live
+  response. Drop a key in the env and re-run `--fetch --source <name>` to close each.
 
 **Done when:** a real §101/§103/§112 development (a precedential CAFC opinion or a USPTO SME
 update) surfaces as a reviewed proposal, an operator verifies the citation, and it lands in

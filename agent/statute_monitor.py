@@ -8,7 +8,8 @@ updates, MPEP revisions). So this monitor watches those first; Congress bills ar
 a thin "what's coming" flag, not the main signal.
 
     export COURTLISTENER_API_TOKEN=...   # free at courtlistener.com
-    export CONGRESS_API_KEY=...          # free at api.congress.gov  (bills only)
+    export LEGISCAN_API_KEY=...          # free at legiscan.com/legiscan  (state + federal bills)
+    export CONGRESS_API_KEY=...          # free at api.congress.gov       (federal bills only)
     python -m agent.statute_monitor --fetch                 # Fed. Register (keyless) + any keyed source
     python -m agent.statute_monitor --fetch --source fedreg
     python -m agent.statute_monitor --fake                  # offline rehearsal, no network/keys
@@ -341,8 +342,46 @@ def fetch_congress(query: str = "patent", congress: int = 119,
     return out
 
 
+def fetch_legiscan(query: str = "patent AND (software OR eligibility OR semiconductor)",
+                   state: str = "ALL", max_results: int = 30) -> list[StatuteProposal]:
+    """State + federal legislation via LegiScan's getSearch op. no key, no pull.
+
+    LegiScan (legiscan.com/legiscan — free key) tracks all 50 states + Congress, so
+    it catches state-level tech legislation Congress.gov misses. Like any bill source
+    it's a 'what's coming' flag: not operative until enacted. getSearch returns a
+    title + last action per hit, so no second getBill call is needed to build a
+    proposal. `state='ALL'` searches every state and Congress; pass 'US' for federal
+    only, or a postal code (e.g. 'CA') for one state."""
+    key = os.environ.get("LEGISCAN_API_KEY")
+    if not key:
+        print("    LEGISCAN_API_KEY unset — skipping LegiScan (no key, no pull)",
+              file=sys.stderr)
+        return []
+    params = {"key": key, "op": "getSearch", "state": state, "query": query}
+    url = "https://api.legiscan.com/?" + urllib.parse.urlencode(params)
+    data = json.loads(_fetch(url))
+    result = data.get("searchresult", {})
+    out = []
+    # getSearch keys hits as "0","1",… alongside a "summary" object — skip summary.
+    hits = [v for k, v in result.items() if k != "summary" and isinstance(v, dict)]
+    for h in hits[:max_results]:
+        action = h.get("last_action", "")
+        p = to_proposal(
+            title=h.get("title", h.get("bill_number", "")),
+            holding=f"{h.get('title', '')} — {action}".strip(" —"),
+            citation=f"{h.get('bill_number', '?')} "
+                     f"({h.get('last_action_date') or h.get('state', '?')})",
+            source_url=h.get("url", ""),
+            source_type="bill",
+            date=h.get("last_action_date", ""),
+        )
+        if p:
+            out.append(p)
+    return out
+
+
 SOURCES = {"fedreg": fetch_fedreg, "courtlistener": fetch_courtlistener,
-           "congress": fetch_congress}
+           "legiscan": fetch_legiscan, "congress": fetch_congress}
 
 
 # One offline candidate for rehearsing --fetch with no network/keys (mirrors
