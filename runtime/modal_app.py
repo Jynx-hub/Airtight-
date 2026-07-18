@@ -3,7 +3,7 @@
 This is the PRIMARY inference backend (replaces the retired Brev plan). It stands up
 ONE OpenAI-compatible vLLM server for Nemotron 3 Nano and exposes it as a web endpoint
 — the single pinned `inference.local` hop the whole system routes through. Both
-HiddenLayer (Lane B) and OpenShell (Lane C) enforce on this one URL.
+HiddenLayer (Lane B) and OpenShell enforce on this one URL.
 
 Why Modal: serverless GPU with scale-to-zero. You pay per-second only while a request
 is running, so a hackathon fits inside the free monthly credit. It is still SELF-HOSTED

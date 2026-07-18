@@ -206,7 +206,7 @@ works; omitting it, or `{"thinking": false}`, leaves reasoning on). This is pure
 **delta-routing** bug in the streaming path.
 
 **Who this bites:** anything that streams and reads `delta.content` gets an empty string
-against a server that is generating fine — Lane C's streaming UI most directly.
+against a server that is generating fine — the Surface lane's streaming UI most directly.
 `bench.py` counts `content or reasoning_content` and is unaffected. Non-streaming callers,
 including the doorway's current `chat()`, are unaffected.
 

@@ -3,7 +3,7 @@
 This is where the robot's brain lives. It stands up **Nemotron** on **Modal's free tier**,
 served by **vLLM** as one OpenAI-compatible endpoint on `:8000`. That endpoint *is*
 `inference.local` — the single, operator-pinned model hop that HiddenLayer (Lane B) and
-OpenShell (Lane C) both enforce on. **One boundary, three tracks.** Nothing in Airtight
+OpenShell both enforce on. **One boundary, three tracks.** Nothing in Airtight
 talks to the model except through this hop.
 
 The **guaranteed path is Nemotron 3 Nano on one GPU** (fits VRAM; Modal scale-to-zero
@@ -97,8 +97,8 @@ INFERENCE_BACKEND=nim bash verify.sh    # exported vars win over .env
 ## 3. Keep it warm for the demo / stop the meter
 
 ```bash
-MODAL_MIN_CONTAINERS=1 modal deploy modal_app.py   # pin one warm replica for the judged run
-MODAL_MIN_CONTAINERS=0 modal deploy modal_app.py   # back to scale-to-zero (stops idle billing)
+MODAL_MIN_CONTAINERS=1 bash modal-deploy.sh   # pin one warm replica for the judged run
+MODAL_MIN_CONTAINERS=0 bash modal-deploy.sh   # back to scale-to-zero (stops idle billing)
 ```
 
 Cold start is **~1–2 min on `a100-bf16`** (the default) and **~12 min on `l40s-fp8`** —
