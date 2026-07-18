@@ -1,0 +1,1646 @@
+[
+  {
+    "proceeding": "IPR2025-00153",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "IPR",
+    "decision_date": "2026-07-13",
+    "application": "17306776",
+    "grant_date": "2023-04-18",
+    "raw": {
+      "trialNumber": "IPR2025-00153",
+      "lastModifiedDateTime": "2026-07-14T03:15:13",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2025-07-14",
+        "accordedFilingDate": "2024-11-08",
+        "petitionFilingDate": "2024-11-08",
+        "trialLastModifiedDateTime": "2026-07-13T18:17:53",
+        "trialLastModifiedDate": "2026-07-13",
+        "terminationDate": "2026-07-13",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-07-13",
+        "trialTypeCode": "IPR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "17306776",
+        "counselName": "Liddle, Bradleyet al",
+        "grantDate": "2023-04-18",
+        "groupArtUnitNumber": "3649",
+        "inventorName": "Jeffrey R. Ambroziak et al",
+        "realPartyInInterestName": "Charge Fusion Technologies, LLC",
+        "patentNumber": "11631987",
+        "technologyCenterNumber": "3600"
+      },
+      "regularPetitionerData": {
+        "counselName": "Bailey, Jenniferet al",
+        "realPartyInInterestName": "Tesla Inc."
+      },
+      "documentData": {
+        "documentCategory": "FINAL",
+        "documentFilingDate": "2026-07-13",
+        "documentIdentifier": "171351997",
+        "documentName": "IPR2025-00153 FWD.pdf",
+        "documentNumber": 25,
+        "documentSizeQuantity": 627973,
+        "documentTitleText": "JUDGMENT Final Written Decision Determining All Challenged Claims Unpatentable 35 U.S.C. \u00a7 318(a)",
+        "documentTypeDescriptionText": "Final Written Decision:  original",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/IPR/2025/00153/171351997.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "Tesla further contends that vehicles including an \n\non-board display were well known and that Ferro describes hardware and \n\n<b><span style='background-color: yellow;'>software</span></b> for communicating with a remote server via a wireless <b><span style='background-color: yellow;'>network</span></b> \n\nincluding the internet.  Id. at 64 (citing Ex. 1003 \u00b6\u00b6 248\u2013250)."
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "37 CFR 42.100",
+          "37 CFR 42.73",
+          "35 USC 318"
+        ],
+        "decisionIssueDate": "2026-07-13",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "112",
+          "103"
+        ],
+        "trialOutcomeCategory": "Final Written Decision"
+      }
+    }
+  },
+  {
+    "proceeding": "IPR2025-00147",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "IPR",
+    "decision_date": "2026-07-10",
+    "application": "17013348",
+    "grant_date": "2021-11-30",
+    "raw": {
+      "trialNumber": "IPR2025-00147",
+      "lastModifiedDateTime": "2026-07-10T19:18:53",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2025-08-13",
+        "accordedFilingDate": "2025-01-23",
+        "petitionFilingDate": "2025-01-23",
+        "trialLastModifiedDateTime": "2026-07-10T13:09:22",
+        "trialLastModifiedDate": "2026-07-10",
+        "terminationDate": "2026-07-10",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-07-10",
+        "trialTypeCode": "IPR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "17013348",
+        "counselName": "Vidwan, Jasjitet al",
+        "grantDate": "2021-11-30",
+        "groupArtUnitNumber": "2689",
+        "inventorName": "Curt C. von BADINSKI et al",
+        "realPartyInInterestName": "Ouraring, Inc.  et al.",
+        "patentNumber": "11188124",
+        "technologyCenterNumber": "2600"
+      },
+      "regularPetitionerData": {
+        "counselName": "Fink, Williamet al",
+        "realPartyInInterestName": "Samsung Electronics Co., Ltd. et al."
+      },
+      "documentData": {
+        "documentCategory": "FINAL",
+        "documentFilingDate": "2026-07-10",
+        "documentIdentifier": "171350979",
+        "documentName": "IPR2025-00147 FWD final1.pdf",
+        "documentNumber": 44,
+        "documentSizeQuantity": 1511272,
+        "documentTitleText": "Final Written Decision:  original",
+        "documentTypeDescriptionText": "Final Written Decision:  original",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/IPR/2025/00147/171350979.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "Even were \n\nwe to agree with Patent Owner that the preamble is limiting and the claims \n\nare limited to a finger-worn ring wearable <b><span style='background-color: yellow;'>computer</span></b> device, Petitioner has \n\nrelied on Schr\u00f6der in each ground to disclose a \u201cwearable computing device \n\n\n\nIPR2025-00147 \nPatent 11,188,124 B2 \n\n12 \n\nconfigured to be worn around a finger of a wearer.\u201d"
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "37 CFR 42.100",
+          "35 USC 328",
+          "37 CFR 42.5"
+        ],
+        "decisionIssueDate": "2026-07-10",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "102",
+          "103"
+        ],
+        "trialOutcomeCategory": "Final Written Decision"
+      }
+    }
+  },
+  {
+    "proceeding": "PGR2022-00006",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "PGR",
+    "decision_date": "2026-07-08",
+    "application": "17079208",
+    "grant_date": "2021-05-25",
+    "raw": {
+      "trialNumber": "PGR2022-00006",
+      "lastModifiedDateTime": "2026-07-09T01:17:17",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2022-06-10",
+        "accordedFilingDate": "2021-11-20",
+        "petitionFilingDate": "2021-11-20",
+        "trialLastModifiedDateTime": "2026-07-08T18:27:57",
+        "trialLastModifiedDate": "2026-07-08",
+        "terminationDate": "2026-07-08",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-07-08",
+        "trialTypeCode": "PGR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "17079208",
+        "counselName": "Hayes, Jenniferet al",
+        "grantDate": "2021-05-25",
+        "groupArtUnitNumber": "2164",
+        "inventorName": "Christopher J. Desmond et al",
+        "realPartyInInterestName": "MemoryWeb, LLC",
+        "patentNumber": "11017020",
+        "technologyCenterNumber": "2100"
+      },
+      "regularPetitionerData": {
+        "counselName": "Kushan, Jeffreyet al",
+        "realPartyInInterestName": "Apple Inc."
+      },
+      "documentData": {
+        "documentCategory": "FINAL",
+        "documentFilingDate": "2026-07-08",
+        "documentIdentifier": "171350063",
+        "documentName": "PGR2022-00006 Remand FINAL.pdf",
+        "documentNumber": 51,
+        "documentSizeQuantity": 388447,
+        "documentTitleText": "Final Written Decision: On remand from the CAFC",
+        "documentTypeDescriptionText": "Final Written Decision: On remand from the CAFC",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/PGR/2022/00006/171350063.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "Level of Ordinary Skill in the Art \n\nAccording to Petitioner,  \n\nA person of ordinary skill in the art in 2011 would have \nhad (1) at least a bachelor\u2019s degree in <b><span style='background-color: yellow;'>computer</span></b> science, \n<b><span style='background-color: yellow;'>computer</span></b> engineering, or electrical engineering, and (2) at least \none year of experience designing graphical user interfaces for \napplications such as photo management systems. \n\nPet. 12 (citing Ex. 1003 \u00b6\u00b6 44\u201346)."
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "37 CFR 42.221",
+          "35 USC 328",
+          "37 CFR 42.200",
+          "35 USC 318"
+        ],
+        "decisionIssueDate": "2026-07-08",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "103"
+        ],
+        "trialOutcomeCategory": "Final Written Decision On CAFC Remand"
+      }
+    }
+  },
+  {
+    "proceeding": "IPR2025-00221",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "IPR",
+    "decision_date": "2026-07-06",
+    "application": "17870425",
+    "grant_date": "2023-05-30",
+    "raw": {
+      "trialNumber": "IPR2025-00221",
+      "lastModifiedDateTime": "2026-07-06T21:47:09",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2025-07-07",
+        "accordedFilingDate": "2024-11-25",
+        "petitionFilingDate": "2024-11-25",
+        "trialLastModifiedDateTime": "2026-07-06T10:39:14",
+        "trialLastModifiedDate": "2026-07-06",
+        "terminationDate": "2026-07-06",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-07-06",
+        "trialTypeCode": "IPR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "17870425",
+        "counselName": "Theiss, Brandonet al",
+        "grantDate": "2023-05-30",
+        "groupArtUnitNumber": "2476",
+        "inventorName": "Paul Howard",
+        "realPartyInInterestName": "Intellectual Ventures II",
+        "patentNumber": "11664889",
+        "technologyCenterNumber": "2400"
+      },
+      "regularPetitionerData": {
+        "counselName": "Jarratt, Scottet al",
+        "realPartyInInterestName": "Tesla, Inc."
+      },
+      "documentData": {
+        "documentCategory": "FINAL",
+        "documentFilingDate": "2026-07-06",
+        "documentIdentifier": "171349117",
+        "documentName": "IPR2025-00221 FD ready to mail.pdf",
+        "documentNumber": 29,
+        "documentSizeQuantity": 1078748,
+        "documentTitleText": "Final Written Decision",
+        "documentTypeDescriptionText": "Final Written Decision:  original",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/IPR/2025/00221/171349117.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "That person would have a bachelor\u2019s degree in electrical \nengineering, <b><span style='background-color: yellow;'>computer</span></b> engineering, <b><span style='background-color: yellow;'>computer</span></b> science, or \nequivalent training, and approximately two years of experience \nworking in the field of wireless communication systems or \ndesign of similar communication systems. \n\nPet. 18\u201319 (citing Ex. 1003 \u00b6 25).  Patent Owner does not dispute \n\nPetitioner\u2019s contention as to the level of ordinary skill in the art.  See \n\ngenerally, PO Resp."
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "37 CFR 42.100",
+          "35 USC 312",
+          "35 USC 318"
+        ],
+        "decisionIssueDate": "2026-07-06",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "103"
+        ],
+        "trialOutcomeCategory": "Final Written Decision"
+      }
+    }
+  },
+  {
+    "proceeding": "IPR2025-00222",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "IPR",
+    "decision_date": "2026-07-01",
+    "application": "14063236",
+    "grant_date": "2016-01-05",
+    "raw": {
+      "trialNumber": "IPR2025-00222",
+      "lastModifiedDateTime": "2026-07-01T19:27:20",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2025-07-08",
+        "accordedFilingDate": "2024-11-26",
+        "petitionFilingDate": "2024-11-26",
+        "trialLastModifiedDateTime": "2026-07-01T12:23:14",
+        "trialLastModifiedDate": "2026-07-01",
+        "terminationDate": "2026-07-01",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-07-01",
+        "trialTypeCode": "IPR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "14063236",
+        "counselName": "Theiss, Brandonet al",
+        "grantDate": "2016-01-05",
+        "groupArtUnitNumber": "2878",
+        "inventorName": "Richard Ian Olsen et al",
+        "realPartyInInterestName": "Intellectual Ventures II",
+        "patentNumber": "9232158",
+        "technologyCenterNumber": "2800"
+      },
+      "regularPetitionerData": {
+        "counselName": "Bowser, Jonathanet al",
+        "realPartyInInterestName": "Tesla, Inc."
+      },
+      "documentData": {
+        "documentCategory": "FINAL",
+        "documentFilingDate": "2026-07-01",
+        "documentIdentifier": "171348393",
+        "documentName": "IPR2025-00222 FWD FINAL for Mailing1.pdf",
+        "documentNumber": 27,
+        "documentSizeQuantity": 373911,
+        "documentTitleText": "Final Written Decision:  original",
+        "documentTypeDescriptionText": "Final Written Decision:  original",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/IPR/2025/00222/171348393.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "Petitioner contends that a person of ordinary skill in the art \u201cat, and \n\nbefore, the earliest claimed priority date of the \u2019158 patent . . . would have \n\nhad a bachelor\u2019s degree in electrical engineering, <b><span style='background-color: yellow;'>computer</span></b> engineering, \n\n<b><span style='background-color: yellow;'>computer</span></b> science, or a related field and 2\u20133 years of experience in digital \n\nimaging systems,\u201d adding that \u201c[l]ess experience may be sufficient with \n\nadditional education, and likewise, less education may be sufficient with \n\nadditional work experience.\u201d"
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "37 CFR 42.100",
+          "37 CFR 42.73",
+          "35 USC 312",
+          "35 USC 318"
+        ],
+        "decisionIssueDate": "2026-07-01",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "103"
+        ],
+        "trialOutcomeCategory": "Final Written Decision"
+      }
+    }
+  },
+  {
+    "proceeding": "IPR2025-00169",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "IPR",
+    "decision_date": "2026-06-30",
+    "application": "14691649",
+    "grant_date": "2016-04-26",
+    "raw": {
+      "trialNumber": "IPR2025-00169",
+      "lastModifiedDateTime": "2026-06-30T20:44:47",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2025-06-10",
+        "accordedFilingDate": "2024-11-15",
+        "petitionFilingDate": "2024-11-15",
+        "trialLastModifiedDateTime": "2026-06-30T13:28:37",
+        "trialLastModifiedDate": "2026-06-30",
+        "terminationDate": "2026-06-08",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-06-30",
+        "trialTypeCode": "IPR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "14691649",
+        "counselName": "Brophy, Richardet al",
+        "grantDate": "2016-04-26",
+        "groupArtUnitNumber": "3652",
+        "inventorName": "Brad Thomas et al",
+        "realPartyInInterestName": "Vermeer Manufacturing Company",
+        "patentNumber": "9321386",
+        "technologyCenterNumber": "3600"
+      },
+      "regularPetitionerData": {
+        "counselName": "O'Dell, Davidet al",
+        "realPartyInInterestName": "Kubota North America Corporation  et al."
+      },
+      "documentData": {
+        "documentCategory": "FINAL",
+        "documentFilingDate": "2026-06-30",
+        "documentIdentifier": "171347839",
+        "documentName": "IPR2025-00169 FWD mailing public.pdf",
+        "documentNumber": 65,
+        "documentSizeQuantity": 1662729,
+        "documentTitleText": "Judgment Final Written Decision ",
+        "documentTypeDescriptionText": "Final Written Decision:  original",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/IPR/2025/00169/171347839.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "DISH <b><span style='background-color: yellow;'>Network</span></b> LLC, 929 F.3d 1350, 1357 (Fed. Cir. 2019).  The \n\ncomplete record developed at trial supports understanding the term \u201cframe\u201d \n\nin \u201cmainframe\u201d as a supporting structure.  On this issue, Patent Owner \n\nprovides an excerpt of a dictionary defining \u201cframe\u201d as a \u201crigid supporting \n\nstructure.\u201d  PO Resp. 27 (citing Ex. 2007 (excerpts of the Concise Oxford \n\nEnglish Dictionary, tenth edition) at 3); see also Pet. Init."
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "37 CFR 42.100",
+          "37 CFR 42.73",
+          "35 USC 318"
+        ],
+        "decisionIssueDate": "2026-06-30",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "103"
+        ],
+        "trialOutcomeCategory": "Final Written Decision"
+      }
+    }
+  },
+  {
+    "proceeding": "IPR2025-00170",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "IPR",
+    "decision_date": "2026-06-30",
+    "application": "15062801",
+    "grant_date": "2018-05-22",
+    "raw": {
+      "trialNumber": "IPR2025-00170",
+      "lastModifiedDateTime": "2026-06-30T20:44:47",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2025-06-10",
+        "accordedFilingDate": "2024-11-15",
+        "petitionFilingDate": "2024-11-15",
+        "trialLastModifiedDateTime": "2026-06-30T16:05:11",
+        "trialLastModifiedDate": "2026-06-30",
+        "terminationDate": "2026-06-08",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-06-30",
+        "trialTypeCode": "IPR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "15062801",
+        "counselName": "Brophy, Richardet al",
+        "grantDate": "2018-05-22",
+        "groupArtUnitNumber": "3652",
+        "inventorName": "Brad Thomas et al",
+        "realPartyInInterestName": "Vermeer Manufacturing Company",
+        "patentNumber": "9975750",
+        "technologyCenterNumber": "3600"
+      },
+      "regularPetitionerData": {
+        "counselName": "O'Dell, Davidet al",
+        "realPartyInInterestName": "Kubota North America Corporation  et al."
+      },
+      "documentData": {
+        "documentCategory": "FINAL",
+        "documentFilingDate": "2026-06-30",
+        "documentIdentifier": "171347803",
+        "documentName": "IPR2025-00170 FD - FOR MAILING - PUBLIC.pdf",
+        "documentNumber": 63,
+        "documentSizeQuantity": 1806921,
+        "documentTitleText": "Final Written Decision:  JUDGMENT Final Written Decision Determining Some Challenged Claims Unpatentable Granting in Part Petitioner\u2019s Motion to Exclude Denying Patent Owner\u2019s Motion to Exclude 35 U.S.C. \u00a7 318(a)",
+        "documentTypeDescriptionText": "Final Written Decision:  original",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/IPR/2025/00170/171347803.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "Velinsky allegedly \u201chas no experience or capabilities \n\nwith CAD or finite element analysis <b><span style='background-color: yellow;'>software</span></b>\u2014basic tools that would be \n\nknown to [one of ordinary skill in the art] and used for designing machines \n\n\n\nPUBLIC VERSION \nIPR2025-00170 \nPatent 9,975,750 B2 \n\n12 \n\nin the industry during the critical timeframe at issue in this proceeding.\u201d  Id. \n\n(citing Ex. 2021, 13:2\u201314:11).  At the oral hearing, counsel clarified that, \n\nwith this argument, Patent Owner takes the position that Dr."
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "37 CFR 42.100",
+          "37 CFR 42.73",
+          "35 USC 318"
+        ],
+        "decisionIssueDate": "2026-06-30",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "102"
+        ],
+        "trialOutcomeCategory": "Final Written Decision"
+      }
+    }
+  },
+  {
+    "proceeding": "IPR2025-00168",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "IPR",
+    "decision_date": "2026-06-30",
+    "application": "14691649",
+    "grant_date": "2016-04-26",
+    "raw": {
+      "trialNumber": "IPR2025-00168",
+      "lastModifiedDateTime": "2026-06-30T20:44:47",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2025-06-10",
+        "accordedFilingDate": "2024-11-15",
+        "petitionFilingDate": "2024-11-15",
+        "trialLastModifiedDateTime": "2026-06-30T16:03:06",
+        "trialLastModifiedDate": "2026-06-30",
+        "terminationDate": "2026-06-08",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-06-30",
+        "trialTypeCode": "IPR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "14691649",
+        "counselName": "Brophy, Richardet al",
+        "grantDate": "2016-04-26",
+        "groupArtUnitNumber": "3652",
+        "inventorName": "Brad Thomas et al",
+        "realPartyInInterestName": "Vermeer Manufacturing Company",
+        "patentNumber": "9321386",
+        "technologyCenterNumber": "3600"
+      },
+      "regularPetitionerData": {
+        "counselName": "O'Dell, Davidet al",
+        "realPartyInInterestName": "Kubota North America Corporation  et al."
+      },
+      "documentData": {
+        "documentCategory": "FINAL",
+        "documentFilingDate": "2026-06-30",
+        "documentIdentifier": "171347829",
+        "documentName": "IPR2025-00168 FWD mailing public.pdf",
+        "documentNumber": 64,
+        "documentSizeQuantity": 1681464,
+        "documentTitleText": "Judgment Final Written Decision ",
+        "documentTypeDescriptionText": "Final Written Decision:  original",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/IPR/2025/00168/171347829.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "Velinsky allegedly \u201chas no experience or capabilities \n\nwith CAD or finite element analysis <b><span style='background-color: yellow;'>software</span></b>\u2014basic tools that would be \n\n \n9 For the page numbering of Exhibit 2021, like Patent Owner, we cite to \nthe native pagination (in the upper right corner) rather than the page \nnumbered added for this proceeding (in the lower right corner)."
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "37 CFR 42.100",
+          "37 CFR 42.73",
+          "35 USC 318"
+        ],
+        "decisionIssueDate": "2026-06-30",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "103"
+        ],
+        "trialOutcomeCategory": "Final Written Decision"
+      }
+    }
+  },
+  {
+    "proceeding": "IPR2025-00171",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "IPR",
+    "decision_date": "2026-06-30",
+    "application": "15704685",
+    "grant_date": "2019-02-12",
+    "raw": {
+      "trialNumber": "IPR2025-00171",
+      "lastModifiedDateTime": "2026-06-30T20:44:47",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2025-06-10",
+        "accordedFilingDate": "2024-11-15",
+        "petitionFilingDate": "2024-11-15",
+        "trialLastModifiedDateTime": "2026-06-30T16:06:05",
+        "trialLastModifiedDate": "2026-06-30",
+        "terminationDate": "2026-06-08",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-06-30",
+        "trialTypeCode": "IPR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "15704685",
+        "counselName": "Brophy, Richardet al",
+        "grantDate": "2019-02-12",
+        "groupArtUnitNumber": "3652",
+        "inventorName": "Brad Thomas et al",
+        "realPartyInInterestName": "Vermeer Manufacturing Company",
+        "patentNumber": "10202266",
+        "technologyCenterNumber": "3600"
+      },
+      "regularPetitionerData": {
+        "counselName": "O'Dell, Davidet al",
+        "realPartyInInterestName": "Kubota North America Corporation  et al."
+      },
+      "documentData": {
+        "documentCategory": "FINAL",
+        "documentFilingDate": "2026-06-30",
+        "documentIdentifier": "171347805",
+        "documentName": "IPR2025-00171 FD - FOR MAILING - Public.pdf",
+        "documentNumber": 62,
+        "documentSizeQuantity": 1649076,
+        "documentTitleText": "Final Written Decision:  JUDGMENT  Final Written Decision Determining Some Challenged Claims Unpatentable  Granting in Part Petitioner\u2019s Motion to Exclude  Denying Patent Owner\u2019s Motion to Exclude 35 U.S.C. \u00a7 318(a)",
+        "documentTypeDescriptionText": "Final Written Decision:  original",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/IPR/2025/00171/171347805.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "DISH <b><span style='background-color: yellow;'>Network</span></b> LLC, 929 F.3d 1350, 1357 (Fed. Cir. 2019).  The \n\ncomplete record developed at trial supports understanding the term \u201cframe\u201d \n\nin \u201cmainframe\u201d as a supporting structure.  On this issue, Patent Owner \n\nprovides an excerpt of a dictionary defining \u201cframe\u201d as a \u201crigid supporting \n\nstructure.\u201d  PO Resp. 27 (citing Ex. 2007 (excerpts of the Concise Oxford \n\nEnglish Dictionary, tenth edition) at 3); see also Pet. Init."
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "37 CFR 42.100",
+          "37 CFR 42.73",
+          "35 USC 318"
+        ],
+        "decisionIssueDate": "2026-06-30",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "102"
+        ],
+        "trialOutcomeCategory": "Final Written Decision"
+      }
+    }
+  },
+  {
+    "proceeding": "IPR2025-00167",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "IPR",
+    "decision_date": "2026-06-30",
+    "application": "14691649",
+    "grant_date": "2016-04-26",
+    "raw": {
+      "trialNumber": "IPR2025-00167",
+      "lastModifiedDateTime": "2026-06-30T20:44:47",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2025-06-10",
+        "accordedFilingDate": "2024-11-15",
+        "petitionFilingDate": "2024-11-15",
+        "trialLastModifiedDateTime": "2026-06-30T16:02:09",
+        "trialLastModifiedDate": "2026-06-30",
+        "terminationDate": "2026-06-08",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-06-30",
+        "trialTypeCode": "IPR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "14691649",
+        "counselName": "Brophy, Richardet al",
+        "grantDate": "2016-04-26",
+        "groupArtUnitNumber": "3652",
+        "inventorName": "Brad Thomas et al",
+        "realPartyInInterestName": "Vermeer Manufacturing Company",
+        "patentNumber": "9321386",
+        "technologyCenterNumber": "3600"
+      },
+      "regularPetitionerData": {
+        "counselName": "O'Dell, Davidet al",
+        "realPartyInInterestName": "Kubota North America Corporation  et al."
+      },
+      "documentData": {
+        "documentCategory": "FINAL",
+        "documentFilingDate": "2026-06-30",
+        "documentIdentifier": "171347827",
+        "documentName": "IPR2025-00167 FWD mailing public.pdf",
+        "documentNumber": 64,
+        "documentSizeQuantity": 1473131,
+        "documentTitleText": "Judgment Final Written Decision ",
+        "documentTypeDescriptionText": "Final Written Decision:  original",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/IPR/2025/00167/171347827.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "DISH <b><span style='background-color: yellow;'>Network</span></b> LLC, 929 F.3d 1350, 1357 (Fed. Cir. 2019).  The \n\ncomplete record developed at trial supports understanding the term \u201cframe\u201d \n\nin \u201cmainframe\u201d as a supporting structure.  On this issue, Patent Owner \n\nprovides an excerpt of a dictionary defining \u201cframe\u201d as a \u201crigid supporting \n\n\n\nPUBLIC VERSION \nIPR2025-00167 \nPatent 9,321,386 B1 \n \n\n31 \n\nstructure.\u201d  PO Resp. 26\u201327 (citing Ex. 2007 (excerpts of the Concise \n\nOxford English Dictionary, tenth edition) at 3); see also Pet. Init."
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "37 CFR 42.100",
+          "37 CFR 42.73",
+          "35 USC 318"
+        ],
+        "decisionIssueDate": "2026-06-30",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "103"
+        ],
+        "trialOutcomeCategory": "Final Written Decision"
+      }
+    }
+  },
+  {
+    "proceeding": "IPR2025-00381",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "IPR",
+    "decision_date": "2026-06-30",
+    "application": "17397200",
+    "grant_date": "2022-10-11",
+    "raw": {
+      "trialNumber": "IPR2025-00381",
+      "lastModifiedDateTime": "2026-06-30T20:44:47",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2025-06-23",
+        "accordedFilingDate": "2025-01-07",
+        "petitionFilingDate": "2025-01-07",
+        "trialLastModifiedDateTime": "2026-06-30T16:07:10",
+        "trialLastModifiedDate": "2026-06-30",
+        "terminationDate": "2026-06-08",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-06-30",
+        "trialTypeCode": "IPR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "17397200",
+        "counselName": "Brophy, Richardet al",
+        "grantDate": "2022-10-11",
+        "groupArtUnitNumber": "3651",
+        "inventorName": "Brad Thomas et al",
+        "realPartyInInterestName": "Vermeer Manufacturing Company",
+        "patentNumber": "11465891",
+        "technologyCenterNumber": "3600"
+      },
+      "regularPetitionerData": {
+        "counselName": "O'Dell, Davidet al",
+        "realPartyInInterestName": "Kubota North America Corporation  et al."
+      },
+      "documentData": {
+        "documentCategory": "FINAL",
+        "documentFilingDate": "2026-06-30",
+        "documentIdentifier": "171347807",
+        "documentName": "IPR2025-00381 FD - FOR MAILING - PUBLIC.pdf",
+        "documentNumber": 50,
+        "documentSizeQuantity": 1624434,
+        "documentTitleText": "Final Written Decision:  JUDGMENT Final Written Decision Determining All Challenged Claims Unpatentable  Granting in Part Petitioner\u2019s Motion to Exclude  Denying Patent Owner\u2019s Motion to Exclude 35 U.S.C. \u00a7 318(a)  ",
+        "documentTypeDescriptionText": "Final Written Decision:  original",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/IPR/2025/00381/171347807.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "Velinsky allegedly \u201chas no experience or \n\ncapabilities with CAD or finite element analysis <b><span style='background-color: yellow;'>software</span></b>\u2014basic tools that \n\nwould be known to [one of ordinary skill in the art] and used for designing \n\nmachines in the industry during the critical timeframe at issue in this \n\nproceeding.\u201d  Id. at 32 (citing Ex. 2020, 13:2\u201314:11).  At the oral hearing, \n\ncounsel clarified that, with this argument, Patent Owner takes the position \n\nthat Dr."
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "37 CFR 42.100",
+          "37 CFR 42.73",
+          "35 USC 318"
+        ],
+        "decisionIssueDate": "2026-06-30",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "102"
+        ],
+        "trialOutcomeCategory": "Final Written Decision"
+      }
+    }
+  },
+  {
+    "proceeding": "PGR2025-00016",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "PGR",
+    "decision_date": "2026-06-30",
+    "application": "17961868",
+    "grant_date": "2024-09-24",
+    "raw": {
+      "trialNumber": "PGR2025-00016",
+      "lastModifiedDateTime": "2026-06-30T20:44:47",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2025-06-23",
+        "accordedFilingDate": "2025-01-07",
+        "petitionFilingDate": "2025-01-07",
+        "trialLastModifiedDateTime": "2026-06-30T16:08:15",
+        "trialLastModifiedDate": "2026-06-30",
+        "terminationDate": "2026-06-08",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-06-30",
+        "trialTypeCode": "PGR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "17961868",
+        "counselName": "Brophy, Richardet al",
+        "grantDate": "2024-09-24",
+        "groupArtUnitNumber": "3651",
+        "inventorName": "Brad Thomas et al",
+        "realPartyInInterestName": "Vermeer Manufacturing Company",
+        "patentNumber": "12098063",
+        "technologyCenterNumber": "3600"
+      },
+      "regularPetitionerData": {
+        "counselName": "O'Dell, Davidet al",
+        "realPartyInInterestName": "Kubota North America Corporation  et al."
+      },
+      "documentData": {
+        "documentCategory": "FINAL",
+        "documentFilingDate": "2026-06-30",
+        "documentIdentifier": "171347811",
+        "documentName": "PGR2025-00016 FD - FOR MAILING - PUBLIC.pdf",
+        "documentNumber": 52,
+        "documentSizeQuantity": 1543851,
+        "documentTitleText": "Final Written Decision:  JUDGMENT Final Written Decision Determining All Challenged Claims Unpatentable Granting in Part Petitioner\u2019s Motion to Exclude Denying Patent Owner\u2019s Motion to Exclude 35 U.S.C. \u00a7 328(a)",
+        "documentTypeDescriptionText": "Final Written Decision:  original",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/PGR/2025/00016/171347811.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "DISH <b><span style='background-color: yellow;'>Network</span></b> LLC, 929 F.3d 1350, 1357 (Fed. Cir. 2019).  The \n\ncomplete record developed at trial supports understanding the term \u201cframe\u201d \n\nin \u201cmainframe\u201d as a supporting structure.  On this issue, Patent Owner \n\nprovides an excerpt of a dictionary defining \u201cframe\u201d as a \u201crigid supporting \n\nstructure.\u201d  PO Resp. 27 (citing Ex. 2009 (excerpts of the Concise Oxford \n\nEnglish Dictionary, tenth edition) at 3); see also Pet. Init."
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "37 CFR 42.100",
+          "37 CFR 42.73",
+          "37 CFR 42.202",
+          "35 USC 321",
+          "37 CFR 42.204",
+          "35 USC 318",
+          "35 USC 328"
+        ],
+        "decisionIssueDate": "2026-06-30",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "102"
+        ],
+        "trialOutcomeCategory": "Final Written Decision"
+      }
+    }
+  },
+  {
+    "proceeding": "IPR2025-00472",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "IPR",
+    "decision_date": "2026-06-30",
+    "application": "16422106",
+    "grant_date": "2022-08-16",
+    "raw": {
+      "trialNumber": "IPR2025-00472",
+      "lastModifiedDateTime": "2026-06-30T21:44:57",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2025-07-24",
+        "accordedFilingDate": "2025-01-17",
+        "petitionFilingDate": "2025-01-17",
+        "trialLastModifiedDateTime": "2026-06-30T15:03:57",
+        "trialLastModifiedDate": "2026-06-30",
+        "terminationDate": "2026-06-30",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-06-30",
+        "trialTypeCode": "IPR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "16422106",
+        "counselName": "Cremen, Timothyet al",
+        "grantDate": "2022-08-16",
+        "groupArtUnitNumber": "3688",
+        "inventorName": "John E. DeTitta",
+        "realPartyInInterestName": "BrodTi Inc.",
+        "patentNumber": "11416898",
+        "technologyCenterNumber": "3600"
+      },
+      "regularPetitionerData": {
+        "counselName": "Keefe, Heidiet al",
+        "realPartyInInterestName": "Google LLC"
+      },
+      "documentData": {
+        "documentCategory": "FINAL",
+        "documentFilingDate": "2026-06-30",
+        "documentIdentifier": "171347931",
+        "documentName": "IPR2025-00472 FD.pdf",
+        "documentNumber": 49,
+        "documentSizeQuantity": 970919,
+        "documentTitleText": "JUDGMENT Final Written Decision Determining All Challenged Claims Unpatentable 35 U.S.C. \u00a7 318(a)",
+        "documentTypeDescriptionText": "Final Written Decision:  original",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/IPR/2025/00472/171347931.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "Patent Owner contends that the relevant artisan: \n\nwould have had at least a bachelor\u2019s degree, or the equivalent \ndegree, in electrical engineering, <b><span style='background-color: yellow;'>computer</span></b> science, <b><span style='background-color: yellow;'>computer</span></b> \nengineering, or a related field, and at least two years of \nexperience in internet-based technologies, including web \ninterfaces and web-based media, or a related field, and with \nrelated systems, hardware, <b><span style='background-color: yellow;'>software</span></b>, and firmware, or equivalent \nexperience."
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "37 CFR 42.100",
+          "37 CFR 42.73",
+          "35 USC 312",
+          "35 USC 318"
+        ],
+        "decisionIssueDate": "2026-06-30",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "102",
+          "103"
+        ],
+        "trialOutcomeCategory": "Final Written Decision"
+      }
+    }
+  },
+  {
+    "proceeding": "IPR2025-00247",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "IPR",
+    "decision_date": "2026-06-29",
+    "application": "18105277",
+    "grant_date": "2024-01-16",
+    "raw": {
+      "trialNumber": "IPR2025-00247",
+      "lastModifiedDateTime": "2026-06-29T21:17:48",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2025-07-30",
+        "accordedFilingDate": "2025-01-10",
+        "petitionFilingDate": "2025-01-10",
+        "trialLastModifiedDateTime": "2026-06-29T11:55:16",
+        "trialLastModifiedDate": "2026-06-29",
+        "terminationDate": "2026-06-29",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-06-29",
+        "trialTypeCode": "IPR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "18105277",
+        "counselName": "Hannah, Jameset al",
+        "grantDate": "2024-01-16",
+        "groupArtUnitNumber": "3791",
+        "inventorName": "Hani Kayyali et al",
+        "realPartyInInterestName": "Cleveland Medical Devices, Inc.",
+        "patentNumber": "11872029",
+        "technologyCenterNumber": "3700"
+      },
+      "regularPetitionerData": {
+        "counselName": "Nguyen, Lisaet al",
+        "realPartyInInterestName": "ResMed Corp."
+      },
+      "documentData": {
+        "documentCategory": "FINAL",
+        "documentFilingDate": "2026-06-29",
+        "documentIdentifier": "171346323",
+        "documentName": "IPR2025-00247 FD ResMed v CleveMed CIRC.pdf",
+        "documentNumber": 44,
+        "documentSizeQuantity": 631942,
+        "documentTitleText": "Final Written Decision:  JUDGMENT Final Written Decision Determining No Challenged Claim Unpatentable 35 U.S.C. \u00a7 318(a)",
+        "documentTypeDescriptionText": "Final Written Decision:  original",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/IPR/2025/00247/171346323.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "A positive airway pressure (PAP) sleep disorder treatment \nsystem comprising: \n[1.a] a non-transitory <b><span style='background-color: yellow;'>computer</span></b> readable medium comprising a \nfirst <b><span style='background-color: yellow;'>software</span></b>, the first <b><span style='background-color: yellow;'>software</span></b> adapted to be downloaded to a \ncell phone and executable by a first processor on the cell phone \nto display to a subject for viewing on the cell phone an index of \ntreatment efficacy of the subject using a PAP device, the index \nbased in whole or in part on a data of severity of sleep disorder \nsymptoms of the subject and/or"
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "37 CFR 42.100",
+          "35 USC 312",
+          "35 USC 318"
+        ],
+        "decisionIssueDate": "2026-06-29",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "103"
+        ],
+        "trialOutcomeCategory": "Final Written Decision"
+      }
+    }
+  },
+  {
+    "proceeding": "IPR2025-00246",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "IPR",
+    "decision_date": "2026-06-29",
+    "application": "15641715",
+    "grant_date": "2024-01-02",
+    "raw": {
+      "trialNumber": "IPR2025-00246",
+      "lastModifiedDateTime": "2026-06-29T21:17:48",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2025-07-30",
+        "accordedFilingDate": "2025-01-10",
+        "petitionFilingDate": "2025-01-10",
+        "trialLastModifiedDateTime": "2026-06-29T12:08:24",
+        "trialLastModifiedDate": "2026-06-29",
+        "terminationDate": "2026-06-29",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-06-29",
+        "trialTypeCode": "IPR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "15641715",
+        "counselName": "PRICE, JEFFREYet al",
+        "grantDate": "2024-01-02",
+        "groupArtUnitNumber": "3791",
+        "inventorName": "Hani Kayyali et al",
+        "realPartyInInterestName": "Cleveland Medical Devices, Inc.",
+        "patentNumber": "11857333",
+        "technologyCenterNumber": "3700"
+      },
+      "regularPetitionerData": {
+        "counselName": "Nguyen, Lisaet al",
+        "realPartyInInterestName": "ResMed Corp."
+      },
+      "documentData": {
+        "documentCategory": "FINAL",
+        "documentFilingDate": "2026-06-29",
+        "documentIdentifier": "171346325",
+        "documentName": "IPR2025-00246 FD ResMed v CleveMed - CIRC.pdf",
+        "documentNumber": 55,
+        "documentSizeQuantity": 947137,
+        "documentTitleText": "Final Written Decision:  JUDGMENT Final Written Decision Determining All Challenged Claims Unpatentable Denying Patent Owner\u2019s Contingent Motion to Amend 35 U.S.C. \u00a7 318(a) ",
+        "documentTypeDescriptionText": "Final Written Decision:  original",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/IPR/2025/00246/171346325.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "Figure 1 depicts a remote telemedicine system that includes positive pressure \n\nartificial respiration assisting device 2, relay device 3, and physician-side \n\nterminal devices, specifically physician-side <b><span style='background-color: yellow;'>computer</span></b> 4 and mobile terminal \n\n\n\nIPR2025-00246  \nPatent 11,857,333 B1 \n \n\n12  \n\n5, which are all connected to communication <b><span style='background-color: yellow;'>network</span></b> 1. Id. \u00b6 8. \n\nCommunication <b><span style='background-color: yellow;'>network</span></b> 1 may be \u201ca public telephone <b><span style='background-color: yellow;'>network</span></b>, the Internet, \n\na mobile communication <b><span style='background-color: yellow;'>network</span></b>, or a dedicated line <b><span style='background-color: yellow;'>network</span></b>.\u201d"
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "37 CFR 42.100",
+          "37 CFR 42.121",
+          "37 CFR 42.104",
+          "35 USC 312",
+          "35 USC 318"
+        ],
+        "decisionIssueDate": "2026-06-29",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "112",
+          "120",
+          "103"
+        ],
+        "trialOutcomeCategory": "Final Written Decision"
+      }
+    }
+  },
+  {
+    "proceeding": "IPR2025-00220",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "IPR",
+    "decision_date": "2026-06-26",
+    "application": "17184127",
+    "grant_date": "2021-12-21",
+    "raw": {
+      "trialNumber": "IPR2025-00220",
+      "lastModifiedDateTime": "2026-06-26T19:18:05",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2025-07-07",
+        "accordedFilingDate": "2024-11-25",
+        "petitionFilingDate": "2024-11-25",
+        "trialLastModifiedDateTime": "2026-06-26T12:11:09",
+        "trialLastModifiedDate": "2026-06-26",
+        "terminationDate": "2026-06-26",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-06-26",
+        "trialTypeCode": "IPR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "17184127",
+        "counselName": "Theiss, Brandonet al",
+        "grantDate": "2021-12-21",
+        "groupArtUnitNumber": "2415",
+        "inventorName": "Philip Young",
+        "realPartyInInterestName": "Intellectual Ventures II",
+        "patentNumber": "11206670",
+        "technologyCenterNumber": "2400"
+      },
+      "regularPetitionerData": {
+        "counselName": "Jarratt, Scottet al",
+        "realPartyInInterestName": "Tesla, Inc."
+      },
+      "documentData": {
+        "documentCategory": "FINAL",
+        "documentFilingDate": "2026-06-26",
+        "documentIdentifier": "171346017",
+        "documentName": "IPR2025-00220 FD.pdf",
+        "documentNumber": 30,
+        "documentSizeQuantity": 753979,
+        "documentTitleText": "Final Written Decision:  JUDGMENT Final Written Decision  Determining All Challenged Claims Unpatentable 35 U.S.C. \u00a7 318(a)",
+        "documentTypeDescriptionText": "Final Written Decision:  original",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/IPR/2025/00220/171346017.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "Level of Ordinary Skill in the Art \n\nPetitioner asserts that a person of ordinary skill in the art (\u201cPOSITA\u201d) \n\n\u201cwould have had a bachelor\u2019s degree from an accredited program in \n\nelectrical engineering, <b><span style='background-color: yellow;'>computer</span></b> engineering, <b><span style='background-color: yellow;'>computer</span></b> science, or \n\nequivalent training, and at least two years of professional experience relating \n\nto wireless communication technology\u201d and \u201c[l]ack of professional \n\nexperience can be remedied by additional education, and vice versa.\u201d"
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "37 CFR 42.100",
+          "37 CFR 42.73",
+          "35 USC 318"
+        ],
+        "decisionIssueDate": "2026-06-26",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "102",
+          "103"
+        ],
+        "trialOutcomeCategory": "Final Written Decision"
+      }
+    }
+  },
+  {
+    "proceeding": "IPR2022-00584",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "IPR",
+    "decision_date": "2026-06-25",
+    "application": "11453868",
+    "grant_date": "2009-11-24",
+    "raw": {
+      "trialNumber": "IPR2022-00584",
+      "lastModifiedDateTime": "2026-06-25T23:14:41",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2022-10-11",
+        "accordedFilingDate": "2022-02-11",
+        "petitionFilingDate": "2022-02-11",
+        "trialLastModifiedDateTime": "2026-06-25T15:27:00",
+        "trialLastModifiedDate": "2026-06-25",
+        "terminationDate": "2023-10-06",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-06-25",
+        "trialTypeCode": "IPR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "11453868",
+        "counselName": "Berkowitz, Jeffreyet al",
+        "grantDate": "2009-11-24",
+        "groupArtUnitNumber": "2612",
+        "inventorName": "Miley Ainsworth et al",
+        "realPartyInInterestName": "FedEx Corporate Services, Inc.",
+        "patentNumber": "7623033",
+        "technologyCenterNumber": "2600"
+      },
+      "regularPetitionerData": {
+        "counselName": "Robinson, Eagleet al",
+        "realPartyInInterestName": "Qualcomm Incorporated"
+      },
+      "documentData": {
+        "documentCategory": "OTHER",
+        "documentFilingDate": "2026-06-25",
+        "documentIdentifier": "171345759",
+        "documentName": "IPR2022-00584 opinion.pdf",
+        "documentNumber": 90,
+        "documentSizeQuantity": 137965,
+        "documentTitleText": "Other: Fed Circuit mandate",
+        "documentTypeDescriptionText": "Other: Fed Circuit mandate",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/IPR/2022/00584/171345759.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "The Board stated that FedEx improperly argued \nfor a narrower construction than a change in function, \u201ci.e., \nrequir[ing] a change in how a <b><span style='background-color: yellow;'>computer</span></b> receives, stores, \nprocesses, and/or delivers information.\u201d  Decision at 87 (in-\nternal quotation and citation omitted).  The Board then an-\nalyzed Hashimoto under this construction.  Id.  However, \nas both parties note, FedEx never argued for this narrower \nconstruction.  Appellant\u2019s Br. 58\u201359; Appellee\u2019s Br. 47\u201348 \n& n.15."
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "35 USC 312"
+        ],
+        "decisionIssueDate": "2026-06-25",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "103"
+        ],
+        "trialOutcomeCategory": "Reversed"
+      }
+    }
+  },
+  {
+    "proceeding": "PGR2025-00009",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "PGR",
+    "decision_date": "2026-06-24",
+    "application": "18068327",
+    "grant_date": "2024-10-22",
+    "raw": {
+      "trialNumber": "PGR2025-00009",
+      "lastModifiedDateTime": "2026-06-24T23:14:41",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2025-07-11",
+        "accordedFilingDate": "2024-12-27",
+        "petitionFilingDate": "2024-12-27",
+        "trialLastModifiedDateTime": "2026-06-24T16:57:46",
+        "trialLastModifiedDate": "2026-06-24",
+        "terminationDate": "2026-06-24",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-06-24",
+        "trialTypeCode": "PGR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "18068327",
+        "counselName": "Ellison, Eldoraet al",
+        "grantDate": "2024-10-22",
+        "groupArtUnitNumber": "1656",
+        "inventorName": "Ge Wei et al",
+        "realPartyInInterestName": "Halozyme, Inc. et al.",
+        "patentNumber": "12123035",
+        "technologyCenterNumber": "1600"
+      },
+      "regularPetitionerData": {
+        "counselName": "Kushan, Jeffreyet al",
+        "realPartyInInterestName": "Merck Sharp & Dohme LLC"
+      },
+      "documentData": {
+        "documentCategory": "FINAL",
+        "documentFilingDate": "2026-06-24",
+        "documentIdentifier": "171345457",
+        "documentName": "PGR2025-00009 FWD FINAL.pdf",
+        "documentNumber": 135,
+        "documentSizeQuantity": 1224534,
+        "documentTitleText": "Final Written Decision:  original",
+        "documentTypeDescriptionText": "Final Written Decision:  original",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/PGR/2025/00009/171345457.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "Based on the evidence of record, we find that an ordinary artisan \n\nwould have been able to align and <b><span style='background-color: yellow;'>computer</span></b> model the PH20 sequence in \n\n\n\nPGR2025-00009 \nPatent 12,123,035 B2 \n \n\n92 \n\ncombination with other known hyaluronidase sequences to identify amino \n\nacids implicated in structure and function."
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "35 USC 328",
+          "37 CFR 42.200",
+          "35 USC 324"
+        ],
+        "decisionIssueDate": "2026-06-24",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "112",
+          "103"
+        ],
+        "trialOutcomeCategory": "Final Written Decision"
+      }
+    }
+  },
+  {
+    "proceeding": "IPR2025-00219",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "IPR",
+    "decision_date": "2026-06-23",
+    "application": "15229906",
+    "grant_date": "2017-07-11",
+    "raw": {
+      "trialNumber": "IPR2025-00219",
+      "lastModifiedDateTime": "2026-06-23T19:21:02",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2025-06-26",
+        "accordedFilingDate": "2024-11-26",
+        "petitionFilingDate": "2024-11-26",
+        "trialLastModifiedDateTime": "2026-06-23T10:56:40",
+        "trialLastModifiedDate": "2026-06-23",
+        "terminationDate": "2026-06-23",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-06-23",
+        "trialTypeCode": "IPR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "15229906",
+        "counselName": "Theiss, Brandonet al",
+        "grantDate": "2017-07-11",
+        "groupArtUnitNumber": "2647",
+        "inventorName": "Nicholas W. Anderson",
+        "realPartyInInterestName": "Intellectual Ventures II",
+        "patentNumber": "9706500",
+        "technologyCenterNumber": "2600"
+      },
+      "regularPetitionerData": {
+        "counselName": "Jarratt, Scottet al",
+        "realPartyInInterestName": "Tesla, Inc."
+      },
+      "documentData": {
+        "documentCategory": "FINAL",
+        "documentFilingDate": "2026-06-23",
+        "documentIdentifier": "171345219",
+        "documentName": "IPR2025-00219  FWD - Final for Mailing.pdf",
+        "documentNumber": 27,
+        "documentSizeQuantity": 359459,
+        "documentTitleText": "JUDGMENT Final Written Decision  Determining No Challenged Claims Unpatentable Denying Petitioner\u2019s Motion to Strike 35 U.S.C. \u00a7 318(a); 37 C.F.R \u00a7 42.64(c)",
+        "documentTypeDescriptionText": "Final Written Decision:  original",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/IPR/2025/00219/171345219.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "Level of Ordinary Skill in the Art \n\nPetitioner asserts that ordinarily skilled artisans \u201cwould have a \n\nbachelor\u2019s degree in electrical engineering, <b><span style='background-color: yellow;'>computer</span></b> engineering, <b><span style='background-color: yellow;'>computer</span></b> \n\nscience, or equivalent training, and approximately two years of experience \n\nworking in the field of wireless communication systems or design of similar \n\ncommunication systems.\u201d  Pet. 14."
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "37 CFR 42.100",
+          "37 CFR 42.73",
+          "35 USC 312",
+          "35 USC 318"
+        ],
+        "decisionIssueDate": "2026-06-23",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "102",
+          "103"
+        ],
+        "trialOutcomeCategory": "Final Written Decision"
+      }
+    }
+  },
+  {
+    "proceeding": "IPR2025-00217",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "IPR",
+    "decision_date": "2026-06-22",
+    "application": "16410614",
+    "grant_date": "2021-03-16",
+    "raw": {
+      "trialNumber": "IPR2025-00217",
+      "lastModifiedDateTime": "2026-06-22T23:14:54",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2025-06-26",
+        "accordedFilingDate": "2024-11-26",
+        "petitionFilingDate": "2024-11-26",
+        "trialLastModifiedDateTime": "2026-06-22T15:04:13",
+        "trialLastModifiedDate": "2026-06-22",
+        "terminationDate": "2026-06-22",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-06-22",
+        "trialTypeCode": "IPR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "16410614",
+        "counselName": "Theiss, Brandonet al",
+        "grantDate": "2021-03-16",
+        "groupArtUnitNumber": "2648",
+        "inventorName": "Nicholas W. Anderson",
+        "realPartyInInterestName": "Intellectual Ventures II",
+        "patentNumber": "10952153",
+        "technologyCenterNumber": "2600"
+      },
+      "regularPetitionerData": {
+        "counselName": "Jarratt, Scottet al",
+        "realPartyInInterestName": "Tesla, Inc."
+      },
+      "documentData": {
+        "documentCategory": "FINAL",
+        "documentFilingDate": "2026-06-22",
+        "documentIdentifier": "171344631",
+        "documentName": "IPR2025-00217--FWD  FINAL for Mailing1.pdf",
+        "documentNumber": 25,
+        "documentSizeQuantity": 415299,
+        "documentTitleText": "Final Written Decision:  original",
+        "documentTypeDescriptionText": "Final Written Decision:  original",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/IPR/2025/00217/171344631.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "Level of Ordinary Skill in the Art \n\nPetitioner asserts that ordinarily skilled artisans \u201cwould have a \n\nbachelor\u2019s degree in electrical engineering, <b><span style='background-color: yellow;'>computer</span></b> engineering, <b><span style='background-color: yellow;'>computer</span></b> \n\nscience, or equivalent training, and approximately two years of experience \n\nworking in the field of wireless communication systems or design of similar \n\ncommunication systems.\u201d  Pet. 15."
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "37 CFR 42.100",
+          "37 CFR 42.73",
+          "35 USC 312",
+          "35 USC 318"
+        ],
+        "decisionIssueDate": "2026-06-22",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "102",
+          "103"
+        ],
+        "trialOutcomeCategory": "Final Written Decision"
+      }
+    }
+  },
+  {
+    "proceeding": "IPR2025-00255",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "IPR",
+    "decision_date": "2026-06-18",
+    "application": "14507519",
+    "grant_date": "2017-04-25",
+    "raw": {
+      "trialNumber": "IPR2025-00255",
+      "lastModifiedDateTime": "2026-06-18T19:30:23",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2025-07-22",
+        "accordedFilingDate": "2024-12-20",
+        "petitionFilingDate": "2024-12-20",
+        "trialLastModifiedDateTime": "2026-06-18T13:20:57",
+        "trialLastModifiedDate": "2026-06-18",
+        "terminationDate": "2026-06-18",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-06-18",
+        "trialTypeCode": "IPR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "14507519",
+        "counselName": "Dutta, Sanjeetet al",
+        "grantDate": "2017-04-25",
+        "groupArtUnitNumber": "2168",
+        "inventorName": "William Gross et al",
+        "realPartyInInterestName": "X1 Discovery, Inc.",
+        "patentNumber": "9633139",
+        "technologyCenterNumber": "2100"
+      },
+      "regularPetitionerData": {
+        "counselName": "Siegel, Toddet al",
+        "realPartyInInterestName": "Microsoft Corporation et al."
+      },
+      "documentData": {
+        "documentCategory": "FINAL",
+        "documentFilingDate": "2026-06-18",
+        "documentIdentifier": "171343645",
+        "documentName": "IPR2025-00255 FD.pdf",
+        "documentNumber": 47,
+        "documentSizeQuantity": 2936902,
+        "documentTitleText": "JUDGMENT Final Written Decision Determining No Challenged Claims Unpatentable 35 U.S.C. \u00a7 318(a)",
+        "documentTypeDescriptionText": "Final Written Decision:  original",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/IPR/2025/00255/171343645.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "Lotus Notes is a \n\n\u201cgroupware\u201d <b><span style='background-color: yellow;'>software</span></b> product that is designed to allow groups of users to \n\ncommunicate and share information.  Ex. 1059, 2; Ex. 1061, 6.  Both \n\nversions of Lotus Notes store documents in a central database that resides on \n\na <b><span style='background-color: yellow;'>network</span></b>, rather than on the computers of individual users.  Ex. 1059, 2\u20133; \n\nEx. 1061, 12.  Both versions of Lotus Notes contain an electronic mail \n\n<b><span style='background-color: yellow;'>software</span></b>.  Ex. 1059, 5, Ex. 1061, 11."
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "37 CFR 42.100",
+          "35 USC 312",
+          "35 USC 314",
+          "35 USC 318"
+        ],
+        "decisionIssueDate": "2026-06-18",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "103"
+        ],
+        "trialOutcomeCategory": "Final Written Decision"
+      }
+    }
+  },
+  {
+    "proceeding": "IPR2025-00253",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "IPR",
+    "decision_date": "2026-06-18",
+    "application": "10654588",
+    "grant_date": "2008-05-06",
+    "raw": {
+      "trialNumber": "IPR2025-00253",
+      "lastModifiedDateTime": "2026-06-18T21:14:44",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2025-07-22",
+        "accordedFilingDate": "2024-12-19",
+        "petitionFilingDate": "2024-12-19",
+        "trialLastModifiedDateTime": "2026-06-18T13:54:18",
+        "trialLastModifiedDate": "2026-06-18",
+        "terminationDate": "2026-06-18",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-06-18",
+        "trialTypeCode": "IPR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "10654588",
+        "counselName": "Dutta, Sanjeetet al",
+        "grantDate": "2008-05-06",
+        "groupArtUnitNumber": "2166",
+        "inventorName": "William Gross et al",
+        "realPartyInInterestName": "X1 Discovery, Inc.",
+        "patentNumber": "7370035",
+        "technologyCenterNumber": "2100"
+      },
+      "regularPetitionerData": {
+        "counselName": "Siegel, Toddet al",
+        "realPartyInInterestName": "Microsoft Corporation et al."
+      },
+      "documentData": {
+        "documentCategory": "FINAL",
+        "documentFilingDate": "2026-06-18",
+        "documentIdentifier": "171343669",
+        "documentName": "IPR2025-00253 FWD.pdf",
+        "documentNumber": 47,
+        "documentSizeQuantity": 1645623,
+        "documentTitleText": "JUDGMENT  Final Written Decision  Determining No Challenged Claims Unpatentable  35 U.S.C. \u00a7\u00bf318(a) ",
+        "documentTypeDescriptionText": "Final Written Decision:  original",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/IPR/2025/00253/171343669.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "Wilcox and Londergan explain that Lotus Notes is a so-called \n\n\u201cgroupware\u201d <b><span style='background-color: yellow;'>software</span></b> product that is designed to allow groups of users to \n\ncommunicate and share information.  Ex. 1059, 2; Ex. 1061, 6.  Both \n\nversions of Lotus Notes store documents in a central database that resides on \n\na <b><span style='background-color: yellow;'>network</span></b>, rather than on the computers of individual users.  Ex. 1059, 2\u20133; \n\nEx. 1061, 12.  Both versions of Lotus Notes contain an electronic mail \n\n<b><span style='background-color: yellow;'>software</span></b>.  Ex. 1059, 5, Ex. 1061, 11."
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "37 CFR 42.100",
+          "35 USC 318"
+        ],
+        "decisionIssueDate": "2026-06-18",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "103"
+        ],
+        "trialOutcomeCategory": "Final Written Decision"
+      }
+    }
+  },
+  {
+    "proceeding": "IPR2025-00254",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "IPR",
+    "decision_date": "2026-06-18",
+    "application": "15495507",
+    "grant_date": "2020-02-04",
+    "raw": {
+      "trialNumber": "IPR2025-00254",
+      "lastModifiedDateTime": "2026-06-18T21:14:44",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2025-07-22",
+        "accordedFilingDate": "2024-12-20",
+        "petitionFilingDate": "2024-12-20",
+        "trialLastModifiedDateTime": "2026-06-18T13:27:19",
+        "trialLastModifiedDate": "2026-06-18",
+        "terminationDate": "2026-06-18",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-06-18",
+        "trialTypeCode": "IPR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "15495507",
+        "counselName": "Dutta, Sanjeetet al",
+        "grantDate": "2020-02-04",
+        "groupArtUnitNumber": "2168",
+        "inventorName": "William Gross et al",
+        "realPartyInInterestName": "X1 Discovery, Inc.",
+        "patentNumber": "10552490",
+        "technologyCenterNumber": "2100"
+      },
+      "regularPetitionerData": {
+        "counselName": "Siegel, Toddet al",
+        "realPartyInInterestName": "Microsoft Corporation et al."
+      },
+      "documentData": {
+        "documentCategory": "FINAL",
+        "documentFilingDate": "2026-06-18",
+        "documentIdentifier": "171343651",
+        "documentName": "IPR2025-00254 FD - FOR MAILING.pdf",
+        "documentNumber": 48,
+        "documentSizeQuantity": 1126134,
+        "documentTitleText": "JUDGMENT Final Written Decision Determining That No Challenged Claims Are Unpatentable 35 U.S.C. \u00a7 318(a)",
+        "documentTypeDescriptionText": "Final Written Decision:  original",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/IPR/2025/00254/171343651.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "IPR2025-00254 \nPatent 10,552,490 B2 \n\n14 \n\nLotus Notes is a \u201cgroupware\u201d <b><span style='background-color: yellow;'>software</span></b> product that is designed to \n\nallow groups of users to communicate and share information. Ex. 1059, 2; \n\nEx. 1061, 6. Both versions of Lotus Notes store documents in a central \n\ndatabase that resides on a <b><span style='background-color: yellow;'>network</span></b>, rather than on the computers of \n\nindividual users. Ex. 1059, 2\u20133; Ex. 1061, 12. Both versions of Lotus Notes \n\ncontain electronic mail <b><span style='background-color: yellow;'>software</span></b>. Ex. 1059, 5, Ex. 1061, 11."
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "37 CFR 42.100",
+          "37 CFR 42.73",
+          "37 CFR 42.108",
+          "35 USC 314",
+          "35 USC 312",
+          "35 USC 318"
+        ],
+        "decisionIssueDate": "2026-06-18",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "103"
+        ],
+        "trialOutcomeCategory": "Final Written Decision"
+      }
+    }
+  },
+  {
+    "proceeding": "IPR2025-00108",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "IPR",
+    "decision_date": "2026-06-17",
+    "application": "17004412",
+    "grant_date": "2023-07-04",
+    "raw": {
+      "trialNumber": "IPR2025-00108",
+      "lastModifiedDateTime": "2026-06-17T21:27:04",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2025-06-09",
+        "accordedFilingDate": "2024-11-07",
+        "petitionFilingDate": "2024-11-07",
+        "trialLastModifiedDateTime": "2026-06-17T14:23:11",
+        "trialLastModifiedDate": "2026-06-17",
+        "terminationDate": "2026-06-04",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-06-17",
+        "trialTypeCode": "IPR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "17004412",
+        "counselName": "Goldberg, Joshuaet al",
+        "grantDate": "2023-07-04",
+        "groupArtUnitNumber": "2494",
+        "inventorName": "Kevin Alan Tussy",
+        "realPartyInInterestName": "FaceTec, Inc.",
+        "patentNumber": "11693938",
+        "technologyCenterNumber": "2400"
+      },
+      "regularPetitionerData": {
+        "counselName": "Yap, Alexet al",
+        "realPartyInInterestName": "Jumio Corporation"
+      },
+      "documentData": {
+        "documentCategory": "FINAL",
+        "documentFilingDate": "2026-06-17",
+        "documentIdentifier": "171343045",
+        "documentName": "Paper No. 86 - 2026.06.02 Final Written Decision 938 108 - PUBLIC.pdf",
+        "documentNumber": 88,
+        "documentSizeQuantity": 997876,
+        "documentTitleText": "DECISION Final Written Decision Determining No Challenged Claims Unpatentable 35 U.S.C. \u00a7 318(a)",
+        "documentTypeDescriptionText": "Final Written Decision:  original",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/IPR/2025/00108/171343045.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "Petitioner asserts a  \n\nperson of ordinary skill in the art (\u201cPOSITA\u201d) in August 2014 \nwould have had a Bachelor\u2019s degree in electrical engineering, \n<b><span style='background-color: yellow;'>computer</span></b> engineering, <b><span style='background-color: yellow;'>computer</span></b> science, physics, or a related \nfield, and two years\u2019 work experience related to biometrics, \nfacial authentication, <b><span style='background-color: yellow;'>computer</span></b> vision, and/or optics, such that \nthey would have had significant academic and/or work \nexperience in both <b><span style='background-color: yellow;'>software</span></b> development and optics."
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "37 CFR 42.100",
+          "35 USC 318"
+        ],
+        "decisionIssueDate": "2026-06-17",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "103"
+        ],
+        "trialOutcomeCategory": "Final Written Decision"
+      }
+    }
+  },
+  {
+    "proceeding": "IPR2025-00106",
+    "document_category": "Decision",
+    "status": "Final Written Decision",
+    "trial_type": "IPR",
+    "decision_date": "2026-06-17",
+    "application": "16357205",
+    "grant_date": "2020-09-15",
+    "raw": {
+      "trialNumber": "IPR2025-00106",
+      "lastModifiedDateTime": "2026-06-17T21:27:04",
+      "trialDocumentCategory": "Decision",
+      "trialMetaData": {
+        "institutionDecisionDate": "2025-06-06",
+        "accordedFilingDate": "2024-11-07",
+        "petitionFilingDate": "2024-11-07",
+        "trialLastModifiedDateTime": "2026-06-17T14:21:01",
+        "trialLastModifiedDate": "2026-06-17",
+        "terminationDate": "2026-06-02",
+        "trialStatusCategory": "Final Written Decision",
+        "latestDecisionDate": "2026-06-17",
+        "trialTypeCode": "IPR"
+      },
+      "patentOwnerData": {
+        "applicationNumberText": "16357205",
+        "counselName": "Goldberg, Joshuaet al",
+        "grantDate": "2020-09-15",
+        "groupArtUnitNumber": "2494",
+        "inventorName": "Kevin Alan Tussy",
+        "realPartyInInterestName": "FaceTec, Inc.",
+        "patentNumber": "10776471",
+        "technologyCenterNumber": "2400"
+      },
+      "regularPetitionerData": {
+        "counselName": "Yap, Alexet al",
+        "realPartyInInterestName": "Jumio Corporation"
+      },
+      "documentData": {
+        "documentCategory": "FINAL",
+        "documentFilingDate": "2026-06-17",
+        "documentIdentifier": "171343041",
+        "documentName": "Paper No. 86 - 2026.06.02 Final Written Decision 471 106 - PUBLIC.pdf",
+        "documentNumber": 88,
+        "documentSizeQuantity": 867300,
+        "documentTitleText": "DECISION Final Written Decision Determining No Challenged Claims Unpatentable 35 U.S.C. \u00a7 318(a)",
+        "documentTypeDescriptionText": "Final Written Decision:  original",
+        "fileDownloadURI": "https://api.uspto.gov/api/v1/patent/ptab-files/IPR/2025/00106/171343041.pdf",
+        "filingPartyCategory": "BOARD",
+        "documentOCRText": "Petitioner asserts a  \n\nperson of ordinary skill in the art (\u201cPOSITA\u201d) in August 2014 \nwould have had a Bachelor\u2019s degree in electrical engineering, \n<b><span style='background-color: yellow;'>computer</span></b> engineering, <b><span style='background-color: yellow;'>computer</span></b> science, physics, or a related \nfield, and two years\u2019 work experience related to biometrics, \nfacial authentication, <b><span style='background-color: yellow;'>computer</span></b> vision, and/or optics, such that \nthey would have had significant academic and/or work \nexperience in both <b><span style='background-color: yellow;'>software</span></b> development and optics."
+      },
+      "decisionData": {
+        "statuteAndRuleBag": [
+          "37 CFR 42.100",
+          "35 USC 318"
+        ],
+        "decisionIssueDate": "2026-06-17",
+        "decisionTypeCategory": "Decision",
+        "issueTypeBag": [
+          "103"
+        ],
+        "trialOutcomeCategory": "Final Written Decision"
+      }
+    }
+  }
+]

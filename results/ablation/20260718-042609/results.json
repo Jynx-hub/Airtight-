@@ -1,0 +1,91 @@
+{
+  "fingerprint": {
+    "timestamp": "2026-07-18T04:30:24-05:00",
+    "mode": "live",
+    "model": "nemotron",
+    "base_url_host": "steven-ortega426--airtight-nemotron-serve.modal.run",
+    "draft_gen": {
+      "temperature": 0.0,
+      "seed": 1234,
+      "max_tokens": 1100,
+      "extra_body": {
+        "chat_template_kwargs": {
+          "enable_thinking": false
+        }
+      }
+    },
+    "judge_gen": {
+      "temperature": 0.0,
+      "seed": 1234
+    },
+    "k": 5,
+    "runs": 1,
+    "git_sha": "6dd02f15a1cbdea7611cbd0c78bb1c835c78b14a",
+    "prompt_sha256": {
+      "PLAN_SYSTEM": "d2a1460f878507a31328c3c5ee8ce74c7fa3efb29b1de00b06ca9ac34417a0fa",
+      "DRAFT_SYSTEM": "9fbd0ceed05a0fe7aaf50bcf12e0ac3d6dd170c96946b96ed62985599f93c730",
+      "CRITIQUE_SYSTEM": "e26413fdbe3544ba02102e5a737f7e26ce2fc7df223ced1214d8ccd649a40d04",
+      "CHECKLIST_SYSTEM": "aee511fea90cec5ff3cef4139eff977fc2499e1ada77e9a6b6cbea97f2ce9c33",
+      "DEFECT_SYSTEM": "518899e6ca9669b83b7bafc60ab4794c530904506b3c4da3cad9c0e476a9e120"
+    }
+  },
+  "corpus_size": 17,
+  "overlap_guard": {
+    "uspto-90016193": {
+      "id_collisions": [],
+      "jaccard_flags": []
+    },
+    "uspto-90016210": {
+      "id_collisions": [],
+      "jaccard_flags": []
+    }
+  },
+  "results": [
+    {
+      "disclosure_id": "uspto-90016193",
+      "condition": "empty",
+      "loopholes_caught": 0,
+      "checklist_size": 6,
+      "drafting_seconds": 23.76,
+      "defect_count": 5
+    },
+    {
+      "disclosure_id": "uspto-90016193",
+      "condition": "warmed",
+      "loopholes_caught": 5,
+      "checklist_size": 6,
+      "drafting_seconds": 21.81,
+      "defect_count": 32
+    },
+    {
+      "disclosure_id": "uspto-90016210",
+      "condition": "empty",
+      "loopholes_caught": 2,
+      "checklist_size": 6,
+      "drafting_seconds": 42.77,
+      "defect_count": 55
+    },
+    {
+      "disclosure_id": "uspto-90016210",
+      "condition": "warmed",
+      "loopholes_caught": 1,
+      "checklist_size": 6,
+      "drafting_seconds": 21.53,
+      "defect_count": 5
+    }
+  ],
+  "pairs": [
+    {
+      "disclosure_id": "uspto-90016193",
+      "loopholes_caught_delta": 5,
+      "drafting_seconds_delta": -1.95,
+      "defect_count_delta": 27
+    },
+    {
+      "disclosure_id": "uspto-90016210",
+      "loopholes_caught_delta": -1,
+      "drafting_seconds_delta": -21.24,
+      "defect_count_delta": -50
+    }
+  ]
+}

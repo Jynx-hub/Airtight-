@@ -1,0 +1,8 @@
+{
+  "id": "ptab-IPR2025-00108",
+  "pattern": "overbroad functional phrasing enabling structural equivalence",
+  "claim_shape": "“computer-implemented system supporting real-time risk-based anomaly detection via derived behavioral vectors”",
+  "technology_class": "TC2400",
+  "remedy": "define detection method with concrete steps and tie every element to an explicit technical structure or transformation",
+  "source": "PTAB IPR2025-00108 FWD, patent 11693938, grounds ['103']"
+}

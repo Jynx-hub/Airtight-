@@ -1,0 +1,8 @@
+{
+  "id": "ptab-IPR2025-00167",
+  "pattern": "method-of-use-of-standard-product",
+  "claim_shape": "claims to a \"method of enhancing network security\" using conventional equipment where all inventive steps merely string together known functions of a standard router",
+  "technology_class": "TC3600",
+  "remedy": "Include the technical mechanism or unexpected result that makes the combination more than the sum of its parts (e.g., specify non‑routine architecture, adaptive algorithms, or measurable technical effects beyond ordinary use of the standard device)",
+  "source": "PTAB IPR2025-00167 FWD, patent 9321386, grounds ['103']"
+}

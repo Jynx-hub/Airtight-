@@ -1,0 +1,8 @@
+{
+  "id": "ptab-PGR2022-00006",
+  "pattern": "Technical-COMBINATION-bridge-gap-with-no-newresult",
+  "claim_shape": "single measurand claim drafted as broad functional layer aggregated with second parameter without structural nexus",
+  "technology_class": "TC2100",
+  "remedy": "define physical interaction limits of aggregate parameter per SPE showing correlated range limitation that produces structural nexus for second parameter",
+  "source": "PTAB PGR2022-00006 FWD, patent 11017020, grounds ['103']"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "ptab-IPR2025-00247",
+  "pattern": "Overbroad generic application pillars",
+  "claim_shape": "Abstract principle or generic data structures applied via standard, non-specific method language and outcome-based objectives without technical integration details",
+  "technology_class": "TC3700",
+  "remedy": "Tie each application claim to a specific technical mechanism via concrete structural elements (e.g., sensor placement, data mapping logic, state-transition architecture) and eliminate broad functional outcomes in favor of unique, tied-to-physical-world procedural steps",
+  "source": "PTAB IPR2025-00247 FWD, patent 11872029, grounds ['103']"
+}

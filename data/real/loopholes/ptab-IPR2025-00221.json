@@ -1,0 +1,8 @@
+{
+  "id": "ptab-IPR2025-00221",
+  "pattern": "broad functional claim language",
+  "claim_shape": "means-plus-function or 'configured to [verb]' without technical specifics",
+  "technology_class": "TC2400",
+  "remedy": "include algorithmic details, hardware constraints, and coordination requirements",
+  "source": "PTAB IPR2025-00221 FWD, patent 11664889, grounds ['103']"
+}

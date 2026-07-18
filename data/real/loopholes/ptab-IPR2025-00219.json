@@ -1,0 +1,8 @@
+{
+  "id": "ptab-IPR2025-00219",
+  "pattern": "semantic overreliance on narrow demonstrative wording without technical measurability anchors",
+  "claim_shape": "structural language that invokes absolute functional outcomes or generic placement descriptors (e.g., “processing unit disposed along a first lateral side” interpreted as structural placement rather than technical arrangement) and fails to quantify spatial dimensions, dependency thresholds, or perfo",
+  "technology_class": "TC2600",
+  "remedy": "conceal qualitative 'disposition' terms behind quantified, technical parameters (e.g., positional tolerances, dimensionless ratios, or activation conditions expressed in numeric ranges or algorithmic triggers) and replace context-free structural clauses with dependency maps tied to measurable techni",
+  "source": "PTAB IPR2025-00219 FWD, patent 9706500, grounds ['102', '103']"
+}

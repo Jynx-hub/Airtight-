@@ -1,0 +1,8 @@
+{
+  "id": "ptab-IPR2025-00106",
+  "pattern": "overly generic functional limitation in independent claim + lack of teaching/application examples in spec",
+  "claim_shape": "A system for monitoring [Jessica-driven phenomenon] comprising sensors configured to detect [biometric Article parameter] and a processor configured to determine [Article behavioral pattern] using threshold values \"selected to minimize false alerts\"",
+  "technology_class": "TC2400",
+  "remedy": "Replace generic thresholds with specific algorithmic detail, include comparative examples against prior art baselines, and define how parameter selection was derived from technical insight rather than routine optimization",
+  "source": "PTAB IPR2025-00106 FWD, patent 10776471, grounds ['103']"
+}
