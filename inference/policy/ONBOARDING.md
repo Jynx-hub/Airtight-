@@ -60,6 +60,22 @@ Stand up the NemoClaw/OpenShell sandbox **remotely** — nothing runs on a lapto
 - That the gateway lets us point `inference.local` at an *external* vLLM host (the Modal endpoint) rather than the default NIM route.
 - The in-sandbox URL shape (`https://inference.local/v1` vs a port variant) — the doorway treats it as an opaque env string, so any shape works.
 
-## Plan B (if the preview won't stand up)
+## Plan B (if the preview won't stand up) — **BUILT & verified, not just described**
 
-Reproduce the same graded architecture on any remote Linux host — gVisor/Firecracker sandbox + OPA/Rego egress gate + a NIM proxy + a manual approve step — and describe it in NemoClaw's four-tier vocabulary (filesystem / process / network / inference). Details: `research/nemoclaw-openshell.md` §8. The judging story survives intact.
+`containment/planb/` is the §8 fallback, implemented and verified end-to-end on a Linux
+kernel (OrbStack locally; **deploy the same compose to a remote Linux host for the judged
+run** — never local/venue). It reproduces the four tiers with stock container primitives:
+
+```bash
+bash containment/planb/run.sh                 # enforce: real 403s + real escalation
+ENFORCE=audit bash containment/planb/run.sh   # the audit→enforce sweep, for real
+```
+
+- **network**: sandbox on a docker `internal` network — no route off-box except the egress gate
+- **process**: non-root (nobody), `cap-drop ALL`, `no-new-privileges` (verified: `CapEff: 0`)
+- **filesystem**: read-only root fs, repo mounted `:ro`, `/tmp` tmpfs (verified: write to `/app` fails)
+- **policy/inference**: the gate runs the real `containment.policy.decide()` → real socket-level 403,
+  wired to the real `agent.policy_advisor` escalation (approve + reject)
+
+Details + honest scope: `containment/planb/README.md`. The judging story survives intact —
+this is real enforcement, just gVisor-class container isolation rather than the gated vendor binary.

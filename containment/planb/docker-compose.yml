@@ -1,0 +1,50 @@
+# §8 Plan B — real containerized enforcement of the four-tier model.
+#
+#  network tier : `internal_net` has NO route off-box. The sandbox sits ONLY on it,
+#                 so its only path out is the gate (which straddles both nets). That
+#                 is egress default-deny by TOPOLOGY, not honor-system.
+#  process tier : sandbox runs as non-root (nobody), cap_drop ALL, no-new-privileges,
+#                 default seccomp profile.
+#  filesystem   : sandbox root fs is read-only; repo mounted read-only; /tmp is tmpfs.
+#  inference    : the gate is the host-side decision point; ALLOWed egress forwards to
+#                 the upstream stub (the A4 gateway plays this role in production).
+
+services:
+  upstream:                      # what ALLOWed egress reaches — external net only
+    image: airtight-planb
+    command: python /app/containment/planb/upstream_stub.py
+    environment: { PORT: "8080" }
+    volumes: [ "../../:/app:ro" ]
+    networks: [ external_net ]
+
+  gate:                          # the real egress gate — runs containment.policy.decide
+    image: airtight-planb
+    command: python /app/containment/planb/egress_gate.py
+    environment:
+      PORT: "8888"
+      POLICY: /app/inference/policy/airtight-sandbox.yaml
+      UPSTREAM: http://upstream:8080
+      ENFORCE: "${ENFORCE:-enforce}"   # A5: `ENFORCE=audit bash run.sh` to observe, default enforces
+    volumes: [ "../../:/app:ro" ]
+    networks: [ external_net, internal_net ]
+    depends_on: [ upstream ]
+
+  sandbox:                       # the adversarial agent — isolated, non-root, read-only
+    image: airtight-planb
+    command: python /app/containment/planb/sandbox_agent.py
+    environment:
+      GATE: http://gate:8888
+      ENFORCE: "${ENFORCE:-enforce}"   # driver asserts audit-observed vs enforce-blocked accordingly
+    volumes: [ "../../:/app:ro" ]
+    networks: [ internal_net ]   # NOTE: internal only — no direct route off-box
+    user: "65534:65534"          # nobody — process tier: never root
+    read_only: true              # filesystem tier: read-only root fs
+    cap_drop: [ ALL ]
+    security_opt: [ "no-new-privileges:true" ]
+    tmpfs: [ /tmp ]
+    depends_on: [ gate ]
+
+networks:
+  external_net: {}
+  internal_net:
+    internal: true               # <- the enforcement: no gateway to the outside world

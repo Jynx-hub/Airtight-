@@ -19,7 +19,7 @@ What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.m
 | **Data** | ✅ done | 134 patents (G06N/G06F/H04L), 94 held-out checklists, 193 real office-action defects, tracked in git |
 | **Inference** | ✅ first half | Nemotron on vLLM/Modal, `INFERENCE_BACKEND=modal\|nim\|gateway`, 10.67× batching on record; `inference.local` gateway injects creds host-side (A4) |
 | **Agent** | ◐ built, shallow | loop + guardrails + eval harness all real and tested; memory is static RAG, nothing compounds |
-| **Containment** | ⚠️ simulated | `policy.py` decision + the escalation client are real and now wired into the demo (A3), and the OpenShell↔HiddenLayer fusion is a live beat (A6) — but the "403" is still a `[SIM]` print, not a socket refusal. No OpenShell binary exists; A1 closes that |
+| **Containment** | ✅ real enforcement (Plan B) | offline: `policy.decide` + escalation wired into the demo (A3), OpenShell↔HiddenLayer fusion live (A6). **Real: `containment/planb/` enforces the four tiers on a Linux kernel — real 403, non-root, read-only fs, no route off-box (A1 Plan B, A5 sweep).** Vendor `nemoclaw` binary still DGX-gated; judged run deploys the same compose to a remote host |
 | **Surface** | ◐ starter | idea → draft → patent works; edit boxes discard input; no chart view |
 
 Suite: `.venv/bin/pytest tests/` → **78 passed**, 0 skipped, stub mode, no network.
@@ -52,11 +52,12 @@ out of the suite so `pytest tests/` stays server-free.)
 
 ## The focus now
 
-Four blocks, in dependency order. **A3, A4 and A6 landed 2026-07-18** (the escalation client
-is wired into the demo, the OpenShell↔HiddenLayer fusion is a live beat, and the
-`inference.local` gateway injects creds host-side — all verifiable offline). **B, C and D
-are unblocked and can start today** — only A1/A2/A5 (and A1's isolation half of A4) wait on
-hosted Linux/DGX hardware.
+Four blocks, in dependency order. **A3, A4 and A6 landed 2026-07-18** (escalation client
+wired into the demo, OpenShell↔HiddenLayer fusion live, `inference.local` gateway injects
+creds host-side — all verifiable offline). **A1 (Plan B) and A5's sweep are now real too**
+— `containment/planb/` enforces the four tiers on a Linux kernel with a real 403, verified
+end-to-end; what remains is the **remote-host deploy** for the judged run and the gated
+NVIDIA binary. **B, C and D are unblocked and can start today.**
 
 ### A · Containment — make OpenShell real
 
@@ -66,12 +67,22 @@ docstring. Every "403" is a `print()` (`:29`, `:36`). `attempt_egress()` never o
 socket. No `openshell` or `nemoclaw` binary is installed anywhere — every occurrence in
 the repo is prose or an f-string.
 
-- [ ] **A1 · Stand up the sandbox.** `nemoclaw onboard` on **hosted DGX Spark**, then
-  `nemoclaw <name> connect`. Binary go/no-go; gates A2, A4, A5 and the sandbox half of B.
-  Steps (all CLI verbs still UNVERIFIED): `inference/policy/ONBOARDING.md`.
-  Fallback if the preview won't stand up: `research/nemoclaw-openshell.md` §8
-  (gVisor/Firecracker + OPA/Rego + a NIM proxy) on a **remote** Linux host — never local,
-  never venue hardware. OpenShell needs Linux Landlock + seccomp-BPF; macOS cannot run it.
+- ◐ **A1 · Stand up the sandbox — Plan B BUILT & verified 2026-07-18; vendor binary still
+  DGX-gated.** Two paths:
+  - **Primary (NVIDIA `nemoclaw`/OpenShell):** still a go/no-go on **hosted DGX Spark** —
+    gated preview, can't be reached from here. Steps (CLI verbs UNVERIFIED): `ONBOARDING.md`.
+  - **Plan B (`research/…` §8) — now REAL, not just described:** `containment/planb/` stands
+    up the four-tier model on a stock Linux kernel and is **verified end-to-end**
+    (`bash containment/planb/run.sh`): a docker `internal` network gives the sandbox **no
+    route off-box** except the egress gate (network tier); the sandbox runs **non-root,
+    cap-drop ALL, no-new-privileges, read-only fs** (process + filesystem tiers, empirically
+    checked — `CapEff: 0` and a write to `/app` fails); the gate runs the **real**
+    `containment.policy.decide()` and returns a **real socket-level 403** (policy tier). The
+    trick prompt is blocked by real 403s with the real approve/reject escalation.
+  **What's left:** deploy the *same* compose to a **remote** Linux host for the judged run
+  (never local/venue), and — if the preview stands up — swap the container gate for the vendor
+  binary. The graded architecture and the real 403 are done; the venue deployment is a `docker
+  compose up` on a remote box.
 - ◐ **A2 · Make the policy YAML enforce — open items recorded 2026-07-18; not autonomously
   flippable.** The three needs from the original spec now resolve as:
   1. **Two inference destinations — RESOLVED by A4, moved layer.** The spec assumed the agent
@@ -82,13 +93,14 @@ the repo is prose or an f-string.
      model endpoint directly — breaking the "operator pins the endpoint" invariant A4 just
      built. So the sandbox enforces the single gateway hop; the destinations live at the
      gateway. Recorded in the YAML comment on `inference_gateway`.
-  2. **`enforce` on the inference endpoint — READY, deliberately not flipped.** The repo rule
-     (CLAUDE.md, A5, risk table) is: flip to enforce *after* the A5 audit sweep observes the
-     real egress set — and A5 needs the running sandbox (A1). Pre-flipping enforces without
-     ever seeing the traffic, exactly the "door nobody knew about" risk A5 exists to catch.
-     It is also cosmetic in the simulator (`containment/policy.py` doesn't read the
-     `enforcement:` field; strictness is the `enforcement_override="enforce"` default). The
-     YAML ships `audit` on purpose; the flip is a one-liner during A5 (`ONBOARDING.md` step 6).
+  2. **`enforce` — now demonstrated for real in Plan B; still deliberately not flipped in the
+     shipped YAML.** `containment/planb/` enforces for real (`ENFORCE=enforce` → real 403;
+     `ENFORCE=audit` → observe + log), so the audit→enforce sweep is no longer cosmetic. The
+     shipped `airtight-sandbox.yaml` still ships `audit` on purpose: the repo rule (CLAUDE.md,
+     A5, risk table) is to flip *after* the sweep observes the real egress set of the **full
+     agent** — pre-flipping is the "door nobody knew about" risk A5 exists to catch. (The
+     offline `containment/policy.py` simulator also ignores the `enforcement:` field; the Plan
+     B gate is what actually reads intent and enforces.) The flip is a one-liner during A5.
   3. **Validation against the live schema — DGX-gated.** The draft follows the *researched*
      schema; validating against the live early-preview schema needs the box (`ONBOARDING.md`
      "Things to confirm").
@@ -124,10 +136,15 @@ the repo is prose or an f-string.
   that a sandboxed process can't reach the host's env by some other path is OpenShell's
   Landlock/seccomp isolation — **A1**, Linux-only. So: the agent now holds no provider
   credential and the gateway is a real hop; the isolation that enforces it is still A1.
-- [ ] **A5 · Audit → enforce sweep.** Run the full agent under `enforcement: audit`,
-  read what it actually tries (`openshell logs <name> --tail --source sandbox`), then flip
-  to `enforce`. This is the pass that catches the door nobody thought of — an un-covered
-  egress path is the named top risk on this track. Needs a runnable agent, so schedule after B.
+- ◐ **A5 · Audit → enforce sweep — demonstrated for real in Plan B 2026-07-18.** The gate
+  honours `ENFORCE=audit|enforce`: `ENFORCE=audit bash containment/planb/run.sh` **logs the
+  real egress set and lets it through** (observe — `[gate:audit] hard_deny POST
+  api.uspto.gov/filings/submit`, …), then default `enforce` turns each into a real 403. That
+  is the literal audit→enforce sweep, on real sockets. **What's left:** run the *full patent
+  agent* inside the sandbox (today the driver is the adversarial trick-prompt probe, not the
+  whole loop — that needs the runnable agent, so still after B) and do the sweep on the real
+  egress set the full agent produces, which is where an un-covered egress path (the named top
+  risk) would surface.
 - [x] **A6 · Fix the dead M2 fusion — done 2026-07-18.** The demo now has a beat where
   policy **ALLOWs** and HiddenLayer **still acts**, on one action: the vault read is allowed
   by `policy.decide`, and the returned disclosure bytes are quarantined by the guarded_tool
@@ -306,7 +323,7 @@ and a poisoned one provably does not.
 | **The ablation headline also rests on a deleted input** | The 5/6 ran on `data/real-eval/`, absent from the tree. Re-derive from the tracked corpus in the same re-run rather than trying to reconstruct it |
 | NemoClaw preview won't stand up (A1) | It's a small binary go/no-go — attempt it **early**, fail fast, fall back to §8 on a remote Linux host in the same four-tier vocabulary |
 | Judges find an egress path the policy never covered | That is exactly what A5 is for. Don't skip it to save time |
-| Docs claim enforcement the code doesn't have | `docs/ARCHITECTURE.md:95,236` assert real Landlock enforcement and real Policy-Advisor HITL. Both collapse under a `grep openshell`. Fix the prose or build the thing — C4 is the same problem for the knowledge graph |
+| Docs claim enforcement the code doesn't have | **Materially reduced 2026-07-18:** `containment/planb/` now *is* real enforcement (real 403, non-root, read-only fs, no route off-box — verified). Real Policy-Advisor HITL is wired (A3). Still audit the prose in `docs/ARCHITECTURE.md:95,236` to say "Plan B container isolation, verified locally; vendor OpenShell binary DGX-gated" rather than implying the NVIDIA product runs today. C4 is the same problem for the knowledge graph |
 | **Two implementations of the one hop** | `airtight/doorway.py` and `runtime/inference_local.py` are parallel clients for the same operator-pinned boundary. Not broken, but "one boundary, three tracks" currently has two doorways. Steven + Anudeep pick the canonical one and delegate the other — see `docs/INTEGRATION-STATUS.md` |
 | Compounding poisons its own corpus | B3 before B2. Non-negotiable ordering |
 | Modal cold start / credits | Keep the app **paused** by default; `min_containers=1` only in the demo window; NIM is one env flip away |
