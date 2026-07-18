@@ -1,0 +1,18 @@
+[
+  {
+    "id": "lh-c-201",
+    "pattern": "coordinator reintroduction",
+    "claim_shape": "competitor adds a lightweight gateway that hints schedules, escaping claims requiring fully coordinator-free convergence",
+    "technology_class": "H04W",
+    "remedy": "claim convergence 'without requiring' a coordinator rather than 'in the absence of' one",
+    "source": "FIXTURE checklist — held out; replace with expert checklist (Person 1, E3)"
+  },
+  {
+    "id": "lh-c-202",
+    "pattern": "digest format substitution",
+    "claim_shape": "competitor exchanges raw timestamps instead of compressed digests, avoiding claims tied to digest exchange",
+    "technology_class": "H04W",
+    "remedy": "claim exchange of 'schedule information' with digests as a dependent narrowing",
+    "source": "FIXTURE checklist — held out; replace with expert checklist (Person 1, E3)"
+  }
+]

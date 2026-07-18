@@ -1,0 +1,80 @@
+# Airtight OpenShell sandbox policy — DRAFT, schema per research/nemoclaw-openshell.md §3/§5.
+# Starts in audit (observe, don't block) per the audit→enforce convention; flip each
+# `enforcement: audit` to `enforce` for the judged run after reviewing the denial log.
+# UNVERIFIED against the live early-preview schema — validate on DGX Spark (ONBOARDING.md).
+
+version: 1
+
+# ---------- STATIC (locked at sandbox creation; recreate to change) ----------
+filesystem_policy:
+  include_workdir: true
+  read_only: [/usr, /etc, /bin, /lib]
+  read_write: [/sandbox, /tmp]          # agent workspace only; disclosures mounted read-only
+landlock:
+  compatibility: best_effort
+process:
+  run_as_user: agent                    # never root
+  run_as_group: agent
+
+# ---------- DYNAMIC (hot-reload via `openshell policy set ... --wait`) ----------
+network_policies:
+  inference_gateway:
+    name: inference_gateway
+    endpoints:
+      - host: inference.local           # gateway forwards to vLLM-on-Brev (NIM fallback); creds host-side
+        port: 443
+        protocol: rest
+        enforcement: audit              # -> enforce for the judged run
+    binaries:
+      - { path: /usr/local/bin/agent }
+
+  patent_sources:                       # Tier 1 reversible: read-only prior-art search
+    name: patent_sources
+    endpoints:
+      - host: data.uspto.gov
+        port: 443
+        protocol: rest
+        enforcement: audit
+        rules:
+          - allow: { method: GET, path: "/**" }
+      - host: patents.google.com
+        port: 443
+        protocol: rest
+        enforcement: audit
+        rules:
+          - allow: { method: GET, path: "/**" }
+      - host: ops.epo.org
+        port: 443
+        protocol: rest
+        enforcement: audit
+        rules:
+          - allow: { method: GET, path: "/**" }
+    binaries:
+      - { path: /usr/local/bin/agent }
+
+  filing_api:                           # Tier 3 irreversible: filing is HARD-denied; search is fine
+    name: filing_api
+    endpoints:
+      - host: api.uspto.gov
+        port: 443
+        protocol: rest
+        enforcement: audit
+        rules:
+          - allow: { method: GET, path: "/search/**" }
+        deny_rules:
+          - { method: POST, path: "/filings/submit" }
+    binaries:
+      - { path: /usr/local/bin/agent }
+
+  client_datastore:                     # sensitive: readable in-sandbox, never writable off-box
+    name: client_datastore
+    endpoints:
+      - host: vault.internal
+        port: 443
+        protocol: rest
+        enforcement: audit
+        access: read-only
+    binaries:
+      - { path: /usr/local/bin/agent }
+    # no rule anywhere permits egress of datastore bytes to any external host;
+    # anything unmatched under `enforce` default-denies into the Policy Advisor flow

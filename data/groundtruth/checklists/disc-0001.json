@@ -1,0 +1,26 @@
+[
+  {
+    "id": "lh-c-101",
+    "pattern": "design-around via retraining locus",
+    "claim_shape": "competitor moves embedding refresh off-device to a server, escaping claims tied to on-device model updates",
+    "technology_class": "G06F",
+    "remedy": "claim the refresh independent of where the computation runs",
+    "source": "FIXTURE checklist — held out; replace with expert checklist (Person 1, E3)"
+  },
+  {
+    "id": "lh-c-102",
+    "pattern": "threshold parameter evasion",
+    "claim_shape": "competitor uses a continuously adapted confidence bound instead of a fixed threshold, avoiding claims reciting a configurable threshold value",
+    "technology_class": "G06F",
+    "remedy": "cover both fixed and adaptive bounds in a dependent claim",
+    "source": "FIXTURE checklist — held out; replace with expert checklist (Person 1, E3)"
+  },
+  {
+    "id": "lh-c-103",
+    "pattern": "granularity shift",
+    "claim_shape": "competitor scores groups of cache lines rather than single entries, sidestepping per-entry eviction language",
+    "technology_class": "G06F",
+    "remedy": "recite eviction of 'one or more entries' selected by the score",
+    "source": "FIXTURE checklist — held out; replace with expert checklist (Person 1, E3)"
+  }
+]
