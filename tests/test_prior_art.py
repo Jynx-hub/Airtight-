@@ -18,6 +18,21 @@ def test_query_drops_stopwords_and_is_stable():
     assert _query(DISC) == q  # deterministic
 
 
+def test_fielded_query_scopes_to_cpc_and_granted_patents():
+    """Free-text `q=<terms>` returns recent unclassified wrappers, not similar art.
+    The query must constrain to granted REGULAR applications in the disclosure's
+    CPC class — verified live to flip the hits from off-domain to in-domain G06F."""
+    from agent.prior_art import _fielded_query
+
+    q = _fielded_query(DISC)
+    assert "cpcClassificationBag:G06F*" in q  # scoped to the disclosure's class
+    assert '"Patented Case"' in q and '"REGULAR"' in q  # real claims behind each hit
+    assert "cache" in q and " OR " in q  # keyword clause, OR for recall
+    # no CPC on the disclosure -> drop the class clause rather than emit a bad filter
+    bare = DISC.model_copy(update={"technology_class": ""})
+    assert "cpcClassificationBag" not in _fielded_query(bare)
+
+
 def test_maps_prior_art_to_distinguish_over_loophole():
     lh = _to_loophole(_RAW, DISC)
     assert lh.id == "priorart-19564989"

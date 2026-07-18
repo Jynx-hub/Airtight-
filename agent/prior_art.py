@@ -32,10 +32,33 @@ _STOP = frozenset("a an the of for to and or with in on at by from as is are be 
 PRIOR_ART_CONFIDENCE = 0.5
 
 
+_MAX_TERMS = 6  # a long AND/OR over ODP returns junk; the CPC scope carries most relevance
+
+
 def _query(disclosure: Disclosure) -> str:
+    """The keyword clause: a few high-signal distinct terms, order-stable."""
     words = [w for w in re.findall(r"[a-z0-9]+", f"{disclosure.title} {disclosure.summary}".lower())
              if w not in _STOP and len(w) > 2]
-    return " ".join(dict.fromkeys(words))[:120] or disclosure.title  # distinct terms, order-stable
+    return " ".join(list(dict.fromkeys(words))[:_MAX_TERMS]) or disclosure.title
+
+
+def _fielded_query(disclosure: Disclosure) -> str:
+    """A fielded query, not free-text `q=<terms>` — mirrors data/pull_uspto.py.
+
+    Plain terms match preexam/reissue/reexam wrappers that carry no CPC and no
+    real claims, and effectively return the most recent filings rather than
+    similar art. Scoping to granted REGULAR applications in the disclosure's CPC
+    class is what makes the hits genuine §103 prior art to distinguish over.
+    """
+    parts = ['applicationMetaData.applicationStatusDescriptionText:"Patented Case"',
+             'applicationMetaData.applicationTypeCategory:"REGULAR"']
+    cpc = (disclosure.technology_class or "").strip()
+    if cpc:
+        parts.insert(0, f"applicationMetaData.cpcClassificationBag:{cpc}*")
+    terms = _query(disclosure).split()
+    if terms:
+        parts.append("(" + " OR ".join(terms) + ")")  # OR for recall; rank sorts relevance
+    return " AND ".join(parts)
 
 
 @g.guarded_tool
@@ -73,7 +96,7 @@ def search_prior_art(disclosure: Disclosure, limit: int = 5) -> list[LoopholeRec
     if not os.getenv("USPTO_API_KEY"):
         return []  # no key, no search
     try:
-        raw = _search(_query(disclosure), limit)
+        raw = _search(_fielded_query(disclosure), limit)
     except Exception:
         return []
     if not isinstance(raw, list):

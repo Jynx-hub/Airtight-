@@ -22,7 +22,7 @@ What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.m
 | **Containment** | ✅ real enforcement (Plan B) + LIVE | offline demo (A3/A6); **`containment/planb/` enforces the four tiers on a Linux kernel — real 403, non-root, read-only fs, no route off-box (A1 Plan B, A5 sweep)**; **LIVE at https://airtight-openshell.vercel.app — real `policy.decide`, real HTTP 403 over the internet, operator approve/reject (`containment/live/`)**. Vendor `nemoclaw` binary still DGX-gated |
 | **Surface** | ✅ two frames | intake (retrieval → live pipeline → grant) + engine panel over every committed artifact; D3's dishonest edit boxes replaced with a labelled seam |
 
-Suite: `.venv/bin/pytest tests/` → **185 passed**, 0 skipped, stub mode, no network.
+Suite: `.venv/bin/pytest tests/` → **186 passed**, 0 skipped, stub mode, no network.
 
 📌 **Product path now assembles the airtight draft — recorded and graded.** The stated end
 goal (describe an invention → find the loopholes from prior similar patents → draft against
@@ -38,7 +38,11 @@ them → self-correct) is now the path the Surface runs. Three pieces, all **pro
   application to a §103 "distinguish over" record at `extraction_confidence 0.5` (never takes a
   reserved statute slot); the fetch is a `guarded_tool` so a poisoned reference is dropped on
   the tool_result hop; degrades to `[]` with no key / error / quarantine. **[x]** —
-  `tests/test_prior_art.py`, incl. the harness-never-imports-it isolation guard.
+  `tests/test_prior_art.py`, incl. the harness-never-imports-it isolation guard. **Verified
+  live with a real key:** the first pass used plain `q=<terms>` and returned recent
+  unclassified filings (display devices, biology) — now a fielded query scoped to granted
+  REGULAR applications in the disclosure's CPC class (mirrors `data/pull_uspto.py`), which
+  flips the hits to in-domain G06F software patents.
 - **Wired into the Surface draft path** (`surface/jobs.py` `draft_guardrails`, this change) —
   the drafting turn is now primed with retrieved memory **plus** live prior art for the
   disclosure (appended, deduped by id, so a live reference always reaches the draft it was
