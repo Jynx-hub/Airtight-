@@ -9,6 +9,7 @@ closed=False / no defects — it never fabricates a delta.
 
 import json
 import re
+from concurrent.futures import ThreadPoolExecutor
 from typing import Literal, Optional
 
 from pydantic import BaseModel
@@ -69,33 +70,38 @@ def _parse_json(text: str) -> dict | None:
         return None
 
 
-def score_checklist(claims_text: str, checklist: list[LoopholeRecord]) -> list[ChecklistVerdict]:
-    verdicts = []
-    for item in checklist:
-        user = (
-            f"LOOPHOLE\npattern: {item.pattern}\n"
-            f"claim shape that triggered it: {item.claim_shape}\n"
-            f"remedy that fixed it: {item.remedy}\n\n"
-            f"DRAFT CLAIMS\n{claims_text}"
-        )
-        reply = call_model(
-            [{"role": "system", "content": CHECKLIST_SYSTEM}, {"role": "user", "content": user}],
-            role="tool",
-            **JUDGE_GEN,
-        )
-        if reply.mode == "stub":
-            verdicts.append(ChecklistVerdict(item_id=item.id, closed=False, judge_mode="stub"))
-            continue
+def _score_one(claims_text: str, item: LoopholeRecord) -> ChecklistVerdict:
+    """One blinded verdict: the judge sees only this item + the claims."""
+    user = (
+        f"LOOPHOLE\npattern: {item.pattern}\n"
+        f"claim shape that triggered it: {item.claim_shape}\n"
+        f"remedy that fixed it: {item.remedy}\n\n"
+        f"DRAFT CLAIMS\n{claims_text}"
+    )
+    reply = call_model(
+        [{"role": "system", "content": CHECKLIST_SYSTEM}, {"role": "user", "content": user}],
+        role="tool",
+        **JUDGE_GEN,
+    )
+    if reply.mode == "stub":
+        return ChecklistVerdict(item_id=item.id, closed=False, judge_mode="stub")
 
-        data = _parse_json(reply.text) or {}
-        closed = bool(data.get("closed"))
-        evidence = data.get("evidence")
-        if closed and not (isinstance(evidence, str) and _norm(evidence) in _norm(claims_text)):
-            closed, evidence = False, None  # unverifiable evidence => not closed
-        verdicts.append(
-            ChecklistVerdict(item_id=item.id, closed=closed, evidence=evidence, judge_mode="live")
-        )
-    return verdicts
+    data = _parse_json(reply.text) or {}
+    closed = bool(data.get("closed"))
+    evidence = data.get("evidence")
+    if closed and not (isinstance(evidence, str) and _norm(evidence) in _norm(claims_text)):
+        closed, evidence = False, None  # unverifiable evidence => not closed
+    return ChecklistVerdict(item_id=item.id, closed=closed, evidence=evidence, judge_mode="live")
+
+
+def score_checklist(claims_text: str, checklist: list[LoopholeRecord]) -> list[ChecklistVerdict]:
+    """One blinded call per item, fanned out CONCURRENTLY — the endpoint's
+    continuous batching (the vLLM story) turns 6 sequential calls into ~1x
+    wall-clock while keeping each verdict fully isolated. Results in list order."""
+    if not checklist:
+        return []
+    with ThreadPoolExecutor(max_workers=min(8, len(checklist))) as pool:
+        return list(pool.map(lambda it: _score_one(claims_text, it), checklist))
 
 
 def count_defects(claims_text: str, spec_text: str) -> list[Defect]:
