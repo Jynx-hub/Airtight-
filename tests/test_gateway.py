@@ -54,6 +54,19 @@ def test_gateway_resolves_operator_upstream_from_the_one_table(monkeypatch):
     assert model == "nemotron"
 
 
+def test_gateway_resolves_the_nim_upstream_too(monkeypatch):
+    """A2 'two inference destinations': Modal AND NIM both live at the gateway layer, so
+    the operator's one flip repoints the upstream while the sandbox still only ever talks
+    to inference.local. This is the NIM half; test_gateway_resolves_..._modal is the Modal half."""
+    _clear_backend_env(monkeypatch)
+    monkeypatch.setenv("INFERENCE_BACKEND", "nim")
+    monkeypatch.setenv("NVIDIA_API_KEY", "nvapi-test")
+
+    base, model, key = inference_gateway.resolve_upstream()
+    assert "integrate.api.nvidia.com" in base   # the second destination
+    assert key == "nvapi-test"
+
+
 def test_mask_never_reveals_the_key():
     assert inference_gateway._mask("supersecretkey") == "<set:14ch>"
     assert inference_gateway._mask("") == "<empty>"

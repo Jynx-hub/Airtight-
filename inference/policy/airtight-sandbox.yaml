@@ -1,7 +1,10 @@
 # Airtight OpenShell sandbox policy — DRAFT, schema per research/nemoclaw-openshell.md §3/§5.
-# Starts in audit (observe, don't block) per the audit→enforce convention; flip each
-# `enforcement: audit` to `enforce` for the judged run after reviewing the denial log.
-# UNVERIFIED against the live early-preview schema — validate on DGX Spark (ONBOARDING.md).
+# A2: the per-endpoint `enforcement:` field DRIVES the decision (containment/policy.py reads
+# it; containment/planb/ enforces it for real). Sensitive endpoints — the inference hop and
+# the filing host — ship `enforce` now. Read-only discovery endpoints (patent_sources,
+# client_datastore) stay `audit` until the A5 full-agent sweep observes their real egress set,
+# then flip them too (one-liner, ONBOARDING.md step 6). Validate structure with
+# `python -m inference.policy.validate_policy`; live-schema check is on DGX (ONBOARDING.md).
 
 version: 1
 
@@ -31,7 +34,7 @@ network_policies:
       - host: inference.local           # the host-side gateway forwards to Modal (or NIM); creds host-side
         port: 443
         protocol: rest
-        enforcement: audit              # -> enforce AFTER the A5 audit sweep observes real egress (do not pre-flip)
+        enforcement: enforce            # A2: the inference hop enforces — decide() reads this field now
     binaries:
       - { path: /usr/local/bin/agent }
 
@@ -65,7 +68,7 @@ network_policies:
       - host: api.uspto.gov
         port: 443
         protocol: rest
-        enforcement: audit
+        enforcement: enforce            # A2: sensitive filing host enforces — unmatched paths default-deny
         rules:
           - allow: { method: GET, path: "/search/**" }
         deny_rules:

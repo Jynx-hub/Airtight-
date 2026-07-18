@@ -22,7 +22,7 @@ What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.m
 | **Containment** | ✅ real enforcement (Plan B) | offline: `policy.decide` + escalation wired into the demo (A3), OpenShell↔HiddenLayer fusion live (A6). **Real: `containment/planb/` enforces the four tiers on a Linux kernel — real 403, non-root, read-only fs, no route off-box (A1 Plan B, A5 sweep).** Vendor `nemoclaw` binary still DGX-gated; judged run deploys the same compose to a remote host |
 | **Surface** | ◐ starter | idea → draft → patent works; edit boxes discard input; no chart view |
 
-Suite: `.venv/bin/pytest tests/` → **78 passed**, 0 skipped, stub mode, no network.
+Suite: `.venv/bin/pytest tests/` → **84 passed**, 0 skipped, stub mode, no network.
 (The gateway's full 3-process end-to-end proof is `python -m runtime.gateway_smoke`, kept
 out of the suite so `pytest tests/` stays server-free.)
 
@@ -88,29 +88,24 @@ the repo is prose or an f-string.
   uses plain-HTTP forward-proxy requests; production HTTPS `CONNECT` shows the gate only
   `host:443`, so path-granularity needs TLS termination at the gate (what OpenShell does). The
   network/process/filesystem isolation and host-level allow/deny are protocol-independent and fully real.
-- ◐ **A2 · Make the policy YAML enforce — open items recorded 2026-07-18; not autonomously
-  flippable.** The three needs from the original spec now resolve as:
-  1. **Two inference destinations — RESOLVED by A4, moved layer.** The spec assumed the agent
-     reaches Modal/NIM directly, so both belonged in the sandbox allowlist. **A4 changed
-     that:** the sandbox now talks only to `inference.local` (the gateway), and the two
-     upstreams {Modal, NIM} are the *gateway's* host-side egress. Adding
-     `integrate.api.nvidia.com` to the sandbox allowlist would re-permit the agent to reach a
-     model endpoint directly — breaking the "operator pins the endpoint" invariant A4 just
-     built. So the sandbox enforces the single gateway hop; the destinations live at the
-     gateway. Recorded in the YAML comment on `inference_gateway`.
-  2. **`enforce` — now demonstrated for real in Plan B; still deliberately not flipped in the
-     shipped YAML.** `containment/planb/` enforces for real (`ENFORCE=enforce` → real 403;
-     `ENFORCE=audit` → observe + log), so the audit→enforce sweep is no longer cosmetic. The
-     shipped `airtight-sandbox.yaml` still ships `audit` on purpose: the repo rule (CLAUDE.md,
-     A5, risk table) is to flip *after* the sweep observes the real egress set of the **full
-     agent** — pre-flipping is the "door nobody knew about" risk A5 exists to catch. (The
-     offline `containment/policy.py` simulator also ignores the `enforcement:` field; the Plan
-     B gate is what actually reads intent and enforces.) The flip is a one-liner during A5.
-  3. **Validation against the live schema — DGX-gated.** The draft follows the *researched*
-     schema; validating against the live early-preview schema needs the box (`ONBOARDING.md`
-     "Things to confirm").
-  Done here: the stale `vLLM-on-Brev` comment fixed → Modal, and the destination-placement
-  decision recorded. The rest is A1/A5/DGX, not a macOS edit.
+- ◐ **A2 · Make the policy YAML enforce — done 2026-07-18 except the live-schema check (DGX).**
+  1. **`enforce` on the inference endpoint — DONE & verified.** The original complaint was
+     that "strictness only exists as a Python default arg" — no longer true: `containment/
+     policy.py` now **reads the per-endpoint `enforcement:` field**, so the artifact drives.
+     `inference_gateway` and the sensitive `filing_api` ship `enforce`; read-only discovery
+     endpoints (`patent_sources`, `client_datastore`) stay `audit` for the A5 full-agent
+     sweep. Proven by `test_enforcement_field_drives_the_decision` (flip the field → the
+     decision flips) and enforced for real in Plan B (`ENFORCE=enforce` → real 403).
+  2. **Two inference destinations — DONE at the correct (gateway) layer.** A4 made the sandbox
+     talk only to `inference.local`; the two upstreams {Modal, NIM} are the gateway's
+     host-side egress, both reachable by the operator's one flip (tested:
+     `test_gateway_resolves_operator_upstream_from_the_one_table` (Modal) +
+     `test_gateway_resolves_the_nim_upstream_too`). NIM in the *sandbox* allowlist would break
+     the "operator pins the endpoint" invariant, so it correctly lives at the gateway.
+  3. **Validation — LOCAL structural check DONE; live schema still DGX.**
+     `inference/policy/validate_policy.py` (`python -m inference.policy.validate_policy` + 3
+     tests) checks the four tiers, enforcement modes, rule shapes, and the inference hop. The
+     live early-preview schema check remains on the box (`ONBOARDING.md` "Things to confirm").
 - [x] **A3 · Wire the Policy Advisor client in — done 2026-07-18.** `containment/demo.py`
   now calls `PolicyAdvisorClient.escalate()` (`agent/policy_advisor.py`, landed `0878a5f`)
   on every default-deny; the hardcoded `proposal_flow()` prints are gone and

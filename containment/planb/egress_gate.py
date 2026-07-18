@@ -60,8 +60,11 @@ class Gate(BaseHTTPRequestHandler):
         # Forward-proxy requests carry an absolute URI in the request line.
         u = urlsplit(self.path)
         host, path = (u.hostname or ""), (u.path or "/")
+        # A2: in enforce mode honor each endpoint's `enforcement:` field from the YAML
+        # (override=None); in audit mode force global observe. Deny_rules (hard-deny) are
+        # mode-independent either way.
         result = decide("egress", host, method, path, policy_path=POLICY,
-                        enforcement_override="enforce")
+                        enforcement_override=(None if ENFORCE == "enforce" else "audit"))
         _log(ENFORCE, result.decision.value, method, host, path)
 
         # A5 audit mode: observe the real egress set, let it through (research §5).

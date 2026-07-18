@@ -60,7 +60,7 @@ def decide(
     path: str,
     *,
     policy_path: str | Path = DEFAULT_POLICY,
-    enforcement_override: str = "enforce",
+    enforcement_override: str | None = None,
 ) -> PolicyResult:
     policy = yaml.safe_load(Path(policy_path).read_text())
     method = method.upper()
@@ -98,10 +98,13 @@ def decide(
                         matched_rule=f"access: {access}",
                     )
 
-            # Endpoint matched but no rule matched. enforcement_override models the
-            # operator's audit->enforce flip and takes precedence over the YAML's
-            # shipped `enforcement:` (which starts at audit for discovery).
-            if enforcement_override == "audit":
+            # Endpoint matched but no rule matched. The per-endpoint `enforcement:`
+            # field in the YAML DRIVES the decision — that is what makes the artifact,
+            # not a Python default, the source of strictness (A2). `enforcement_override`
+            # lets the operator force a mode over the file (e.g. the A5 audit->enforce
+            # sweep, or the Plan B gate pinning `enforce`). Absent both, default enforce.
+            mode = (enforcement_override or ep.get("enforcement") or "enforce").lower()
+            if mode == "audit":  # research §5: audit logs and lets traffic through
                 return PolicyResult(
                     Decision.ALLOW, host, method, path, matched_policy=name,
                     matched_rule="audit mode (observe, don't block)",

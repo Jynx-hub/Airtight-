@@ -53,6 +53,32 @@ def test_decision_is_data_driven(tmp_path):
                   policy_path=edited).decision is Decision.DEFAULT_DENY_ESCALATE
 
 
+def test_enforcement_field_drives_the_decision(tmp_path):
+    """A2: the YAML's per-endpoint `enforcement:` field — not a Python default — decides
+    audit (allow + log) vs enforce (default-deny) on a matched-host / unmatched-rule.
+    data.uspto.gov ships `audit` and only allows GET, so a POST is the unmatched case."""
+    policy = yaml.safe_load(POLICY.read_text())
+
+    audit_p = tmp_path / "audit.yaml"
+    audit_p.write_text(yaml.safe_dump(policy))
+    assert decide("egress", "data.uspto.gov", "POST", "/x",
+                  policy_path=audit_p).decision is Decision.ALLOW  # audit: observe, don't block
+
+    for ep in policy["network_policies"]["patent_sources"]["endpoints"]:
+        ep["enforcement"] = "enforce"
+    enforce_p = tmp_path / "enforce.yaml"
+    enforce_p.write_text(yaml.safe_dump(policy))
+    assert decide("egress", "data.uspto.gov", "POST", "/x",
+                  policy_path=enforce_p).decision is Decision.DEFAULT_DENY_ESCALATE  # flipped by the file
+
+
+def test_inference_endpoint_ships_enforce():
+    """A2: the inference hop enforces in the shipped artifact (not just via a Python arg)."""
+    policy = yaml.safe_load(POLICY.read_text())
+    ep = policy["network_policies"]["inference_gateway"]["endpoints"][0]
+    assert ep["host"] == "inference.local" and ep["enforcement"] == "enforce"
+
+
 def test_audit_override_allows_with_log():
     r = d("api.dropboxapi.com", "POST", "/x", enforcement_override="audit")
     # unknown host still escalates (no endpoint to audit); matched-but-unruled would allow
