@@ -15,6 +15,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
+hl = ["hiddenlayer-sdk"]  # only needed with AIRTIGHT_HL_ENABLED=true
 
 [tool.setuptools]
 packages = ["airtight", "agent"]

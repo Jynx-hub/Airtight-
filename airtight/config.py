@@ -20,5 +20,11 @@ API_KEY = os.getenv("AIRTIGHT_API_KEY", "dummy")  # vLLM ignores it; NIM require
 # UNVERIFIED model ID — Person 2 corrects against the server's /v1/models (inference/RUNBOOK.md)
 MODEL = os.getenv("AIRTIGHT_MODEL", "nvidia/nemotron-3-nano-31b-a3b")
 
+# --- HiddenLayer guardrails bus (M2) — auth is OAuth2 client-credentials, research/hiddenlayer.md §4 ---
 HL_ENABLED = os.getenv("AIRTIGHT_HL_ENABLED", "false").lower() == "true"
-HIDDENLAYER_API_KEY = os.getenv("HIDDENLAYER_API_KEY", "")
+HL_CLIENT_ID = os.getenv("HIDDENLAYER_CLIENT_ID", "")
+HL_CLIENT_SECRET = os.getenv("HIDDENLAYER_CLIENT_SECRET", "")
+HL_TOKEN = os.getenv("HIDDENLAYER_TOKEN", "")  # pre-minted shortcut the SDK accepts
+HL_PROJECT_ID = os.getenv("HIDDENLAYER_PROJECT_ID", "")  # scopes the ruleset (hl-project-id)
+HL_ENVIRONMENT = os.getenv("HIDDENLAYER_ENVIRONMENT", "prod-us")
+HL_TIMEOUT_S = float(os.getenv("HIDDENLAYER_TIMEOUT_SECONDS", "10"))

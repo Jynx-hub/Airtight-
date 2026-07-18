@@ -30,9 +30,18 @@ def _reasoning_params(role: Role) -> dict:
 
 
 def _analyze(hop: str, payload):
-    # M2 slot: HiddenLayer client.interactions.analyze() replaces this body.
-    # Signature is frozen — the doorway calls it on every input and output hop.
-    return payload
+    # M2: the HiddenLayer bus. Signature frozen — called on every input/output hop.
+    # HL_ENABLED=false short-circuits inside guardrails.analyze (zero network/import).
+    # Streaming caveat: the output hop sees accumulated text after chunks were
+    # already yielded, so REDACT is log-only for streams.
+    from . import guardrails as g
+
+    if hop == "input":
+        g.analyze(g.Hop.USER_PROMPT, g.messages_text(payload))  # detect-only, fail-open
+        return payload
+
+    verdict = g.analyze(g.Hop.MODEL_RESPONSE, payload if isinstance(payload, str) else str(payload))
+    return verdict.text
 
 
 def _client():
@@ -58,8 +67,7 @@ def call_model(
     messages = _analyze("input", messages)
 
     if config.MODE == "stub":
-        text = STUB_REPLIES[role]
-        _analyze("output", text)
+        text = _analyze("output", STUB_REPLIES[role])  # bus transforms (e.g. REDACT) apply in stub too
         if stream:
             return iter(word + " " for word in text.split(" "))
         return ModelReply(text=text, raw={"stub": True, "role": role}, mode="stub")
