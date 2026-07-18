@@ -22,6 +22,8 @@ results/
 # B2: episodes are written nested (<disclosure_id>/*.json) — ignore the subdirs, keep .gitkeep
 memory/episodes/*.json
 memory/episodes/*/
+# D2: ingest-distilled records are agent-generated, outside data/
+memory/ingested/
 
 # Env / secrets — but DO track the config template
 .env

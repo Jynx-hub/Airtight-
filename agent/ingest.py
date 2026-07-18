@@ -9,11 +9,15 @@ raises GuardrailBlocked on a fail-closed error (document NOT admitted).
 """
 
 import argparse
+import hashlib
 import sys
 from pathlib import Path
 
-from airtight import config
+from airtight import LoopholeRecord, call_model, config
 from airtight import guardrails as g
+from agent.memory import LoopholeStore
+
+INGESTED_DIR = "memory/ingested"  # agent-generated store, outside data/ (like memory/episodes)
 
 
 def _extract_text(path: Path) -> str:
@@ -47,6 +51,51 @@ def ingest_document(path: Path) -> str | None:
     if verdict.action is g.Action.QUARANTINE:
         return None
     return text
+
+
+def distill_text(text: str, source: str, tech_class: str = "TC-unknown") -> list[LoopholeRecord]:
+    """D1: turn admitted document text into LoopholeRecords via the model — through the
+    doorway, so HiddenLayer sees this hop too. Reuses DISTILL_SYSTEM/_parse_json (which
+    already emit exactly {pattern, claim_shape, remedy}); returns 0 or 1 record."""
+    from data.distill_loopholes import DISTILL_SYSTEM, _parse_json
+
+    reply = call_model(
+        [{"role": "system", "content": DISTILL_SYSTEM}, {"role": "user", "content": text[:6000]}],
+        role="tool", max_tokens=400,
+    )
+    data = _parse_json(reply.text) or {}
+    if not data.get("pattern"):
+        return []
+    rid = f"ingested-{hashlib.sha1(source.encode()).hexdigest()[:8]}"
+    return [LoopholeRecord(
+        id=rid,
+        pattern=data["pattern"][:200],
+        claim_shape=data.get("claim_shape", "")[:300],
+        technology_class=tech_class,
+        remedy=data.get("remedy", "")[:300],
+        source=f"ingested:{source}" + ("  [STUB — not real]" if reply.mode == "stub" else ""),
+    )]
+
+
+def ingest_to_memory(path, tech_class: str = "TC-unknown",
+                     memory_dir: str | Path = INGESTED_DIR) -> list[LoopholeRecord]:
+    """D2 + D3: ingest a document and, ONLY if it clears the HiddenLayer gate, distill it
+    into records and persist them to the ingested store.
+
+    D3 — the story: a QUARANTINED document (indirect injection) returns None from
+    ingest_document, so we write **zero** records; a fail-closed error raises before we ever
+    reach distillation. Wiring ingest into memory without this gate would let an attacker
+    write straight into the agent's long-term store — a persistent, compounding injection.
+    The gate is what makes learning-from-untrusted-documents safe."""
+    text = ingest_document(Path(path))
+    if text is None:
+        return []  # D3: quarantined → nothing reaches memory
+    records = distill_text(text, source=Path(path).name, tech_class=tech_class)
+    if records:
+        store = LoopholeStore.load(memory_dir) if Path(memory_dir).exists() else LoopholeStore([])
+        store.add_all(records)  # dedup by id (C3)
+        store.save(memory_dir)
+    return records
 
 
 FAKE_DETECT = {

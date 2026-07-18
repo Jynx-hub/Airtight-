@@ -18,11 +18,11 @@ What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.m
 |---|---|---|
 | **Data** | ✅ done | 134 patents (G06N/G06F/H04L), 94 held-out checklists, 193 real office-action defects, tracked in git |
 | **Inference** | ✅ first half | Nemotron on vLLM/Modal, `INFERENCE_BACKEND=modal\|nim\|gateway`, 10.67× batching on record; `inference.local` gateway injects creds host-side (A4) |
-| **Agent** | ◐ built, shallow | loop + guardrails + eval harness all real and tested; memory is static RAG, nothing compounds |
+| **Agent** | ◐ built, now compounds | loop + guardrails + eval harness real; **B**: revise turn (self-correction) + episodic compounding + bounded distill; **C**: IDF retrieval + write API; **D**: ingest→memory with a quarantine gate — all tested. Live GPU re-measurement of the delta is still the top open risk |
 | **Containment** | ✅ real enforcement (Plan B) + LIVE | offline demo (A3/A6); **`containment/planb/` enforces the four tiers on a Linux kernel — real 403, non-root, read-only fs, no route off-box (A1 Plan B, A5 sweep)**; **LIVE online at https://airtight-openshell.vercel.app — real `policy.decide`, real HTTP 403 over the internet, operator approve/reject (`containment/live/`)**. Vendor `nemoclaw` binary still DGX-gated; judged run deploys the same compose to a remote host |
 | **Surface** | ◐ starter | idea → draft → patent works; edit boxes discard input; no chart view |
 
-Suite: `.venv/bin/pytest tests/` → **84 passed**, 0 skipped, stub mode, no network.
+Suite: `.venv/bin/pytest tests/` → **95 passed**, 0 skipped, stub mode, no network.
 (The gateway's full 3-process end-to-end proof is `python -m runtime.gateway_smoke`, kept
 out of the suite so `pytest tests/` stays server-free.)
 
@@ -258,28 +258,26 @@ not a write** — nothing is recorded anywhere, and `g.QUARANTINE_LOG` / `g.AUDI
 
 Ingest is a security demo with a CLI. It is not a data path.
 
-- [ ] **D1 · Distill admitted text into records.** Don't write a new prompt —
-  `DISTILL_SYSTEM` (`data/distill_loopholes.py:28-35`) already emits exactly
-  `{pattern, claim_shape, remedy}` and `_parse_json` (`:38-46`) already handles extraction.
-  Wrap it as `distill_text(text, source, tech_class) -> list[LoopholeRecord]`, routed
-  through `call_model` so the doorway and guardrail hop still fire.
-- [ ] **D2 · Write, then merge into retrieval.** Persist to `memory/ingested/` and merge
-  via `CompositeStore` (`agent/episodes.py:112`), which already does base+extra merging
-  with id-dedup. `LoopholeStore.load` accepts both list- and object-shaped files, so a flat
-  directory needs no loader change. Depends on C3.
-- [ ] **D3 · Quarantined content must never reach memory — and this is the story.**
-  Ingest is the poisoned-PDF path (`data/fixtures/poisoned_prior_art.pdf`, two hidden
-  vectors, live-verified against real HiddenLayer). Wiring ingest into memory without a
-  gate would let an attacker write directly into the agent's long-term store — a
-  persistent, compounding injection. The HiddenLayer bus is what makes D safe, and
-  `INGESTED_DOCUMENT` already fails **closed** (`airtight/guardrails.py:84`).
-  **Say this on stage:** Track 2 isn't a bolt-on next to Track 1 — it's the precondition
-  for it. A learning agent that ingests untrusted documents *must* have a scanner on that
-  hop, or its memory is an attack surface. Add the test that proves a quarantined document
-  leaves zero records behind.
+- [x] **D1 · Distill admitted text into records — done 2026-07-18.** `agent/ingest.py::
+  distill_text(text, source, tech_class) -> list[LoopholeRecord]` reuses `DISTILL_SYSTEM`
+  + `_parse_json`, routed through `call_model` (so the doorway + guardrail hop fire).
+  Tested (`test_d1_distill_text_makes_a_record`).
+- [x] **D2 · Write, then merge into retrieval — done 2026-07-18.** `ingest_to_memory()`
+  persists distilled records to `memory/ingested/` via the C3 write API (`add_all` dedup +
+  `save`); loading that store and merging it into a corpus changes what the next run
+  retrieves — proven end-to-end in `test_d2_clean_document_lands_records_and_merges_into_retrieval`.
+  (`.gitignore` ignores `memory/ingested/`, like `memory/episodes/`.)
+- [x] **D3 · Quarantined content never reaches memory — done, and it's the story.**
+  `ingest_to_memory` distills **only** after `ingest_document` returns admitted text; a
+  QUARANTINE returns `None` (zero records) and a fail-closed error raises before distillation.
+  `test_d3_quarantined_document_leaves_zero_records` proves a poisoned doc leaves **zero**
+  records *even though distillation would have produced one if it ran* — so it's the gate,
+  not a distill failure, doing the work. **On stage:** a learning agent that ingests untrusted
+  documents *must* scan that hop, or its memory is an attack surface — Track 2 is the
+  precondition for Track 1, not a bolt-on.
 
 **Done when:** a document read at ingest changes what the agent retrieves on the next run,
-and a poisoned one provably does not.
+and a poisoned one provably does not. **✅ met 2026-07-18** — both directions tested (D2 + D3).
 
 ---
 
