@@ -46,6 +46,7 @@ PROFILES = {
     "l40s-fp8": {
         "gpu": "L40S",
         "checkpoint": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8",
+        "revision": "f8dc1c0afee92f44417695b4f5ddca9afc95ea58",  # HF head 2026-07-18
         "max_model_len": 131072,          # 128K fits L40S KV headroom
         "kv_cache_dtype": "fp8",
         "extra_env": {"VLLM_USE_FLASHINFER_MOE_FP8": "1"},  # FP8 MoE kernels (Ada/Hopper)
@@ -53,6 +54,7 @@ PROFILES = {
     "a100-bf16": {
         "gpu": "A100-80GB",
         "checkpoint": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16",
+        "revision": "cbd3fa9f933d55ef16a84236559f4ee2a0526848",  # HF head 2026-07-18
         "max_model_len": 262144,          # 256K on 80GB
         "kv_cache_dtype": "auto",         # Ampere has no FP8 tensor cores
         "extra_env": {},
@@ -60,7 +62,12 @@ PROFILES = {
 }
 _PROFILE_NAME = os.environ.get("MODAL_GPU_PROFILE", "a100-bf16")
 PROFILE = PROFILES[_PROFILE_NAME]
-MODEL_REVISION = os.environ.get("MODAL_MODEL_REVISION", "main")  # pin a commit SHA before the demo
+# Weights are PINNED to a commit SHA, not "main", so an upstream repo update cannot move
+# the model out from under a rehearsed demo. The SHA lives PER PROFILE because the FP8 and
+# BF16 checkpoints are separate HF repos with unrelated histories — one shared revision
+# would be wrong for whichever profile it wasn't taken from. Override for a one-off:
+#   MODAL_MODEL_REVISION=<sha|main> bash runtime/modal-deploy.sh
+MODEL_REVISION = os.environ.get("MODAL_MODEL_REVISION", PROFILE["revision"])
 
 # nano_v3 is a PLUGIN reasoning parser per the vLLM Nemotron-3-Nano recipe — the .py
 # file is baked into the image below. If your pinned vLLM ships `nano_v3` built-in
