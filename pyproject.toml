@@ -17,6 +17,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest>=8"]
 hl = ["hiddenlayer-sdk"]  # only needed with AIRTIGHT_HL_ENABLED=true
+web = ["fastapi>=0.110", "uvicorn>=0.29"]  # the Applicant Surface
 
 [tool.setuptools]
-packages = ["airtight", "agent", "agent.eval", "containment"]
+packages = ["airtight", "agent", "agent.eval", "containment", "surface"]

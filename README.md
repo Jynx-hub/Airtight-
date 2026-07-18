@@ -1,118 +1,70 @@
-# Patent Prosecution Defect Database
+# Airtight
 
-A local Python pipeline that queries **public** USPTO patent datasets, extracts statutory rejection records (§112, §102, §103) from Office Action text, and stores them in a structured DuckDB database.
+> **Working codename** — the pitch is a patent with no air in it: no gaps a competitor can slip through. Swap freely (Ironclad, Claimsmith, Priora).
 
-**Target:** 50,000+ records across CPC classes G06F, H04L, H01L, G06N.  
-**Authentication:** None — all data sources are fully public.
+An automated **patent platform** with two layers:
 
----
+1. **Applicant Surface** — the user-facing product: a light intake captures an invention idea, the system drafts a full patent, the user receives a filing-ready specification. Same lane as [autoinvent.com](https://www.autoinvent.com/).
+2. **Examiner Engine** — the self-improving, secured backend that wins the hackathon tracks: an autonomous agent that mines patent data + examiner rejections for the **edge cases people exploit as loopholes**, compounds them into a persistent knowledge graph, and drafts each new patent against the accumulated failure library.
 
-## Data Sources
+The engine runs in two modes: **hit-mode** (point it at an existing patent → loophole/invalidity report — the benchmarked core) and **gap-mode** (point it at a news-derived idea → whitespace/patentability report — a demo funnel, not the benchmark).
 
-| Source | Endpoint | Auth |
-|---|---|---|
-| USPTO PEDS | `https://ped.uspto.gov/api/queries` | None |
-| PatentsView | `https://api.patentsview.org/patents/query` | None |
-| Google Patents (BigQuery) | `patents-public-data.patents.publications` | GCP account (optional) |
+**The wedge:** the three ways patents fail in the real world — **loopholes** (claim language a competitor designs around), **time** (weeks of attorney drafting), **incorrectness** (§112 indefiniteness, antecedent-basis gaps, prior-art anticipation).
 
 ---
 
-## Quick Start
+## Hackathon tracks targeted (3 + a cross-cutting 4th prize)
 
-```bash
-# 1. Install dependencies
-pip install -r requirements.txt
+| Track | How Airtight fits | Ceiling |
+|-------|-------------------|---------|
+| **Recursive Intelligence** | Edge-case knowledge graph + episodic memory + RAG-from-self; measurable first-run vs last-run delta on loopholes-caught / time / correctness | 9/10 |
+| **HiddenLayer Runtime Security** | Every interaction (prompt, response, tool call, tool result, ingested doc) routed through HiddenLayer AIDR; graded response policy | 9/10 |
+| **NemoClaw + OpenShell Containment** | Capable agent (live filing creds + client datastore) contained by a 3-tier OpenShell policy with Policy-Advisor human-in-the-loop | 8/10 |
+| **Best Use of vLLM** ($500) | Agent inference served on self-hosted vLLM behind inference.local; concurrent sub-agent retrieval exploits continuous batching; Nano = small-model-punch | cross-cutting |
 
-# 2. Run a small smoke test (100 records, no writes)
-python scripts/run_ingestion.py --cpc G06F --limit 100 --dry-run
+## Stack decisions
 
-# 3. Full ingestion for all CPC classes (writes to DuckDB)
-python scripts/run_ingestion.py --cpc G06F H04L H01L G06N --limit 15000 --workers 8
+- **Model:** Nemotron 3 Super (120B-A12B, 1M ctx) primary · Nemotron 3 Nano sub-agent · Llama-3.3-Nemotron-Super-49B fallback
+- **Runtime:** NVIDIA OpenShell sandbox, stood up by NemoClaw; inference pinned to `inference.local`
+- **Serving:** vLLM (OpenAI-compatible) on Modal serverless GPU, behind `inference.local`
+- **Security:** HiddenLayer AI Runtime Security (AIDR engine, Interactions API)
+- **Harness:** LangChain Deep Agents / OpenClaw (NemoClaw-supported)
 
-# 4. Query the results
-duckdb data/patent_defects.duckdb \
-  "SELECT statutory_defect_category, COUNT(*) as n \
-   FROM patent_defects GROUP BY 1 ORDER BY 2 DESC"
-```
-
----
-
-## Output Schema
-
-Each extracted record is stored as:
-
-```json
-{
-  "app_number": "string",
-  "cpc_class": "string",
-  "filing_date": "date",
-  "vulnerable_claim_shape": "string",
-  "statutory_defect_category": "string (§112 | §102 | §103)",
-  "examiner_rationale": "string",
-  "remediated_claim_shape": "string",
-  "raw_oa_text": "string",
-  "source": "string (peds | patentsview | bigquery)",
-  "ingested_at": "timestamp"
-}
-```
+**The one architectural insight:** inference is pinned to `inference.local` (operator-chosen, not agent-chosen), so HiddenLayer's security bus and OpenShell's containment boundary converge on the *same* model hop — **one boundary, three tracks.**
 
 ---
 
-## CLI Reference
+## What lives here
 
 ```
-python scripts/run_ingestion.py [OPTIONS]
-
-Options:
-  --cpc       CPC class prefix(es) to target (default: G06F H04L H01L G06N)
-  --limit     Max records per CPC class (default: 15000)
-  --workers   Concurrent API workers (default: 8, max: 20)
-  --dry-run   Fetch and extract but do not write to DB
-  --resume    Resume from checkpoint file (skips already-ingested app numbers)
-  --source    Data source: peds | patentsview | both (default: both)
-  --db        Path to DuckDB file (default: data/patent_defects.duckdb)
-  --verbose   Print extraction details per record
+Airtight/
+├── README.md                         ← you are here (overview + index)
+├── CLAUDE.md                         ← context for Claude Code sessions in this repo
+├── airtight/                         ← shared package: the doorway (one model hop) + data shapes
+├── agent/                            ← Person 4: work loop, memory, guardrails, eval harness
+├── src/                              ← Person 1: USPTO/PTAB ingestion pipeline (corpus, groundtruth, loaders)
+├── data/                            ← Person 1: corpora, ground truth, fixtures (the pipeline's output)
+├── inference/                        ← Person 2: Modal/vLLM runbook + template, verify script, OpenShell policy
+├── surface/                          ← Person 3: applicant surface (FastAPI starter; Next.js later)
+├── tests/                            ← stub-mode smoke tests (no network needed)
+├── docs/
+│   ├── ARCHITECTURE.md               ← full spec: concept, layers, FIG.1, 3 claims, model, judge's read, build & demo, sources
+│   ├── BUILD-PLAN.md                 ← milestones M1–M6, demo script, self-assessment
+│   ├── INFERENCE-LOCAL.md            ← the one boundary: wiring, invariant, shared-doorway contract
+│   ├── JUDGING-RUBRIC.md             ← official 100-pt scorecard + how Airtight maps to it
+│   ├── WORKSTREAMS.md                ← plain-English who-builds-what plan
+│   └── SESSIONS.md                   ← per-milestone Claude Code kickoff prompts
+└── research/                         ← grounded briefings (verified 2026-07-17)
+    ├── hiddenlayer.md                ← AIDR Interactions API: endpoints, payloads, auth, SDK
+    ├── nemoclaw-openshell.md         ← blueprint tiers, policy YAML schema, Policy Advisor, CLI
+    ├── nemotron.md                   ← model lineup + recommendation
+    └── vllm.md                       ← vLLM serving: why, compatibility, Modal hosting, VRAM caveats
 ```
 
----
+**Shareable artifact:** https://claude.ai/code/artifact/5ccf4150-8223-4eca-bc0d-2516184a4092
 
-## BigQuery (Optional — Bulk Mode)
+## Status
 
-For faster ingestion of the full corpus, export from BigQuery first:
+**Phase: build.** The shared scaffold is in `main`: doorway + shapes (`airtight/`), a stub-mode agent loop (`agent/`), and Person 2's vLLM/OpenShell handoff (`inference/`). Everything runs green with `pytest tests/` and `python -m agent.run_smoke` — no network needed. Next: Person 2 deploys vLLM on Modal (M1b, template in `inference/vllm_modal.py`), then the eval-harness ablation (`docs/BUILD-PLAN.md` → M4) — the Track-1 proof and the best demo moment.
 
-```bash
-# Requires: gcloud auth application-default login
-bq query --use_legacy_sql=false < scripts/bigquery_export.sql > data/bq_raw.jsonl
-
-# Then ingest from the local export
-python scripts/run_ingestion.py --source local --input data/bq_raw.jsonl
-```
-
-See [`scripts/bigquery_export.sql`](scripts/bigquery_export.sql) for the query.
-
----
-
-## Project Structure
-
-```
-patent-defect-db/
-├── config.py                  # CPC targets, API URLs, rate limits
-├── requirements.txt
-├── db/
-│   └── schema.sql             # DuckDB DDL
-├── src/
-│   ├── clients/
-│   │   ├── peds_client.py     # USPTO PEDS async client
-│   │   └── patentsview_client.py
-│   ├── extractors/
-│   │   └── oa_extractor.py    # Regex+rule OA text parser
-│   ├── pipeline.py            # Orchestrator
-│   └── db.py                  # DuckDB helpers
-├── scripts/
-│   ├── run_ingestion.py       # CLI entry point
-│   └── bigquery_export.sql    # Optional BQ export query
-├── data/                      # .gitignored — output goes here
-└── tests/
-    ├── test_extractor.py
-    └── fixtures/sample_oa.txt
-```
+Quick start: `python3 -m venv .venv && .venv/bin/pip install -e ".[dev]" && .venv/bin/pytest tests/`
