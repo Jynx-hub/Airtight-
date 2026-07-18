@@ -16,6 +16,8 @@ from pydantic import BaseModel
 from airtight import LoopholeRecord, call_model
 
 JUDGE_GEN = {"temperature": 0.0, "seed": 1234}
+DEFECT_GEN = {**JUDGE_GEN, "max_tokens": 600}  # bound the list so it can't ramble
+DEFECT_CAP = 6  # backstop on hallucinated over-listing
 
 CHECKLIST_SYSTEM = (
     "You are a patent examiner scoring one draft against one known loophole. The "
@@ -26,13 +28,16 @@ CHECKLIST_SYSTEM = (
 )
 
 DEFECT_SYSTEM = (
-    "You are a USPTO examiner. Identify defects in the claims and specification "
-    "below under exactly these grounds: 112 indefiniteness (including "
-    "antecedent-basis errors) and enablement/written-description gaps; 102 facial "
-    "anticipation risk; 103 facial obviousness risk. List each defect once. Reply "
+    "You are a strict USPTO examiner reviewing patent claims. List ONLY material, "
+    "clearly-supported defects under exactly these grounds: 112 (indefiniteness, "
+    "antecedent-basis, enablement); 102 (facial anticipation); 103 (facial "
+    "obviousness). Rules: (1) `quote` MUST be exact verbatim language copied from "
+    "the CLAIMS — never paraphrase, never quote the specification; (2) one entry "
+    "per distinct defect, no duplicates; (3) at most 6 defects, most serious "
+    "first; (4) do NOT pad — a well-drafted claim set may have zero or one. Reply "
     'with JSON only: {"defects": [{"section": "112"|"102"|"103", "claim": <int>, '
-    '"type": "<short label>", "quote": "<offending language>"}]}. '
-    'No defects => {"defects": []}.'
+    '"type": "<short label>", "quote": "<verbatim claim language>"}]}. '
+    'No material defect => {"defects": []}.'
 )
 
 
@@ -94,24 +99,38 @@ def score_checklist(claims_text: str, checklist: list[LoopholeRecord]) -> list[C
 
 
 def count_defects(claims_text: str, spec_text: str) -> list[Defect]:
+    """Return only defects whose verbatim `quote` actually appears in the claims,
+    deduplicated and capped — so a hallucinated over-list can't inflate the count.
+    Same evidence discipline that makes score_checklist trustworthy."""
     reply = call_model(
         [
             {"role": "system", "content": DEFECT_SYSTEM},
             {"role": "user", "content": f"CLAIMS\n{claims_text}\n\nSPECIFICATION\n{spec_text}"},
         ],
         role="tool",
-        **JUDGE_GEN,
+        **DEFECT_GEN,
     )
     if reply.mode == "stub":
         return []
 
+    claims_norm = _norm(claims_text)
     data = _parse_json(reply.text) or {}
-    defects = []
+    defects, seen = [], set()
     for raw in data.get("defects", []):
-        if isinstance(raw, dict):
-            raw = {**raw, "section": str(raw.get("section", ""))}
+        if not isinstance(raw, dict):
+            continue
         try:
-            defects.append(Defect.model_validate(raw))
+            defect = Defect.model_validate({**raw, "section": str(raw.get("section", ""))})
         except Exception:
-            continue  # malformed entries are dropped, never guessed
+            continue  # malformed entries dropped, never guessed
+        quote = _norm(defect.quote)
+        if not quote or quote not in claims_norm:
+            continue  # ungrounded / hallucinated quote — drop it
+        key = (defect.section, quote)
+        if key in seen:
+            continue  # duplicate
+        seen.add(key)
+        defects.append(defect)
+        if len(defects) >= DEFECT_CAP:
+            break
     return defects
