@@ -10,7 +10,9 @@
 
 Airtight is a patent platform with two layers. The **Applicant Surface** is what a founder or attorney sees — a light intake takes an invention idea, the system drafts a full patent, and they receive a filing-ready specification (same lane as autoinvent.com). The **Examiner Engine** is the layer underneath and the one that wins the tracks: an autonomous agent that, on every run, mines real patent data and examiner rejections for the edge cases people exploit as loopholes, compounds them into a persistent knowledge graph, and drafts each new patent against the accumulated failure library.
 
-The wedge is what makes patents fail in the real world: **loopholes** (claim language a competitor designs around), **time** (weeks of attorney drafting), and **incorrectness** (§112 indefiniteness, antecedent-basis gaps, prior-art anticipation). The engine attacks all three, and because it learns from its own history, attempt fifty is provably better than attempt one — without retraining a model.
+The wedge is what makes patents fail in the real world: **loopholes** (claim language a competitor designs around), **time** (weeks of attorney drafting), and **incorrectness** (§101 subject-matter eligibility, §112 indefiniteness, antecedent-basis gaps, prior-art anticipation). The engine attacks all three, and because it learns from its own history, attempt fifty is provably better than attempt one — without retraining a model.
+
+The inventions in scope are **software & electronics** patents (see § Reduction to Practice for why the data concentrates there), so §101 eligibility (Alice/Mayo abstract-idea rejections) and §112(f) means-plus-function traps from functional claiming are first-class failure modes throughout the pipeline.
 
 Every model interaction is treated as untrusted and routed through **HiddenLayer**. The whole agent runs inside an **NVIDIA OpenShell** sandbox stood up by **NemoClaw**, routed to **Nemotron** — capable enough to file a patent, contained so it cannot exfiltrate a client's invention disclosure or file without a human.
 
@@ -22,7 +24,7 @@ A patent is only as strong as its weakest claim. Most drafting tools optimize fo
 
 - **Loopholes** — overbroad/narrow claim language a competitor designs around. Means-plus-function traps, missing dependent-claim fallbacks, unclaimed embodiments. Where money leaks.
 - **Time** — human drafting runs days to weeks and thousands of dollars per application. Speed only matters if correctness holds.
-- **Incorrectness** — §112 indefiniteness, antecedent-basis errors, enablement gaps, §102/§103 anticipation — the exact defects examiners reject on, and the ones an untrained LLM repeats.
+- **Incorrectness** — §101 subject-matter eligibility (Alice/Mayo), §112 indefiniteness, antecedent-basis errors, enablement gaps, §102/§103 anticipation — the exact defects examiners reject on, and the ones an untrained LLM repeats.
 - **The catch (why this fits recursive intelligence natively):** these failure modes are *enumerable and recurring per technology class*. That is exactly the shape of problem a self-improving knowledge base is built for.
 
 ---
@@ -114,7 +116,7 @@ Judging is a **delta between first run and last run**, so the delta must be real
 |--------|-----------|------------|
 | Loopholes caught | ▲ up | edge cases the draft closes vs. a held-out expert checklist |
 | Drafting time | ▼ down | wall-clock + rework turns to a passing draft |
-| Claim correctness | ▲ up | §112 / §102 / §103 defect count from an LLM-judge rubric |
+| Claim correctness | ▲ up | §101 / §112 / §102 / §103 defect count from an LLM-judge rubric |
 
 **Judge-proofing the delta — run the ablation live:** same invention, same Nemotron model, memory graph *empty* vs. *warmed on 50 prior patents in that class*. If loopholes-caught jumps and defects drop with nothing changed but the retrieved memory, the improvement can't be dismissed as prompt luck or a bigger model. Show the two runs side by side.
 

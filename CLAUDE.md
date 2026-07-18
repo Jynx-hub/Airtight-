@@ -8,6 +8,10 @@ Airtight is a **hackathon project**: an automated patent platform (two layers) t
 
 This directory is the **single source of truth / context store** for the project. Everything about Airtight lives here. When you learn something new about the tools, the tracks, or a design decision, update the relevant file here rather than letting it evaporate.
 
+## Domain scope — software & electronics patents
+
+The inventions Airtight intakes, drafts, and analyzes are **software and electronics** patents. Everything downstream is scoped to that domain — prior-art search, claim drafting, the edge-case knowledge graph, and the correctness checks. Concretely this means the loophole/failure library skews toward the failure modes that dominate this space: **§101 subject-matter eligibility** (Alice/Mayo — abstract-idea and "do-it-on-a-computer" rejections), **§112(f) means-plus-function** traps from functional claiming, **§112 indefiniteness / antecedent-basis** gaps, and prior-art anticipation across fast-moving software/hardware art units. Do not assume mechanical, chemical, or biotech patent conventions.
+
 ## Ground truth is in `research/`
 
 The four files in `research/` were produced from live web research on **2026-07-17** and contain the *accurate* API shapes and tool details — which differ from common assumptions. Before writing integration code, read the relevant briefing. Key corrections already captured:

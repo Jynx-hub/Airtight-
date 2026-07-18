@@ -9,7 +9,9 @@ An automated **patent platform** with two layers:
 
 The engine runs in two modes: **hit-mode** (point it at an existing patent → loophole/invalidity report — the benchmarked core) and **gap-mode** (point it at a news-derived idea → whitespace/patentability report — a demo funnel, not the benchmark).
 
-**The wedge:** the three ways patents fail in the real world — **loopholes** (claim language a competitor designs around), **time** (weeks of attorney drafting), **incorrectness** (§112 indefiniteness, antecedent-basis gaps, prior-art anticipation).
+**Domain:** the inventions are **software & electronics** patents. The whole pipeline — prior-art search, claim drafting, the edge-case knowledge graph, and the correctness checks — is scoped to that space; §101 eligibility (Alice/Mayo) and §112(f) means-plus-function are first-class failure modes here, and mechanical/chemical/biotech patent conventions don't apply.
+
+**The wedge:** the three ways patents fail in the real world — **loopholes** (claim language a competitor designs around), **time** (weeks of attorney drafting), **incorrectness** (§101 subject-matter eligibility, §112 indefiniteness, antecedent-basis gaps, prior-art anticipation).
 
 ---
 
