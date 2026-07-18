@@ -35,6 +35,12 @@ def force_stub(monkeypatch, tmp_path):
     # appends to the same log the admin frame reads, which is how 77 synthetic
     # "blocks" ended up looking like real agent activity.
     monkeypatch.setattr(g, "_SECURITY_DIR", tmp_path / "security")
+    # `config` calls load_dotenv(), so a real USPTO_API_KEY in the repo-root .env
+    # reaches these tests and turns the draft path into a LIVE USPTO call — which
+    # is how this file's "no network" claim held on CI and failed on any machine
+    # with a key. Clear it here so hermeticity is enforced, not assumed; tests
+    # that want prior art patch search_prior_art at source.
+    monkeypatch.delenv("USPTO_API_KEY", raising=False)
 
 
 def poll_job(job_id, timeout_s=10.0):
@@ -87,8 +93,8 @@ def test_draft_returns_draft_and_report():
     assert body["report"]["security_scanning"] is False
     assert body["report"]["security_findings"] == []
     assert "smart_catches" in body["report"]
-    # live prior art is part of the report contract; empty (not missing) with no
-    # USPTO key in the test env, so a keyless clone degrades cleanly
+    # live prior art is part of the report contract; empty (not missing) because
+    # force_stub clears the key, so a keyless clone degrades cleanly
     assert body["report"]["prior_art"] == []
 
 
