@@ -2,6 +2,8 @@
 
 import json
 
+import pytest
+
 from airtight import Disclosure, config
 from airtight import guardrails as g
 from agent import ingest
@@ -72,3 +74,18 @@ def test_d3_quarantined_document_leaves_zero_records(monkeypatch, tmp_path):
     recs = ingest.ingest_to_memory(doc, memory_dir=mem)
     assert recs == []                                        # nothing distilled
     assert not mem.exists() or not list(mem.glob("*.json"))  # nothing persisted
+
+
+def test_d3_refuses_to_write_with_the_bus_off(monkeypatch, tmp_path):
+    """The bus is OFF by default (AIRTIGHT_HL_ENABLED=false), where g.analyze short-circuits
+    to PASS — so an unscanned document would otherwise sail into memory. ingest_to_memory
+    must fail CLOSED: refuse to persist rather than write through an unscanned hop."""
+    monkeypatch.setattr(config, "HL_ENABLED", False)         # the default
+    monkeypatch.setattr(ingest, "call_model", _fake_model)   # would produce a record if reached
+    doc = tmp_path / "anything.txt"
+    doc.write_text("a document nobody scanned")
+    mem = tmp_path / "ingested"
+
+    with pytest.raises(RuntimeError, match="guardrail bus OFF"):
+        ingest.ingest_to_memory(doc, memory_dir=mem)
+    assert not mem.exists()                                  # nothing written

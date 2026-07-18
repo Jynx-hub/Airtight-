@@ -87,6 +87,16 @@ def ingest_to_memory(path, tech_class: str = "TC-unknown",
     reach distillation. Wiring ingest into memory without this gate would let an attacker
     write straight into the agent's long-term store — a persistent, compounding injection.
     The gate is what makes learning-from-untrusted-documents safe."""
+    # FAIL-CLOSED: with the bus OFF, g.analyze() short-circuits to PASS (unscanned), so a
+    # poisoned document would sail into long-term memory. A memory write is exactly the hop
+    # that must never happen unscanned — refuse it rather than admit blind.
+    if not config.HL_ENABLED:
+        raise RuntimeError(
+            "refusing to write ingested records to memory with the guardrail bus OFF "
+            "(AIRTIGHT_HL_ENABLED=false). The HiddenLayer scan on the ingested_document hop is "
+            "what keeps a poisoned document out of long-term memory; an unscanned write is the "
+            "attack surface D3 exists to close. Enable the bus, or read-only via ingest_document()."
+        )
     text = ingest_document(Path(path))
     if text is None:
         return []  # D3: quarantined → nothing reaches memory

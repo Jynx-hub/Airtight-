@@ -22,7 +22,7 @@ What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.m
 | **Containment** | ✅ real enforcement (Plan B) + LIVE | offline demo (A3/A6); **`containment/planb/` enforces the four tiers on a Linux kernel — real 403, non-root, read-only fs, no route off-box (A1 Plan B, A5 sweep)**; **LIVE online at https://airtight-openshell.vercel.app — real `policy.decide`, real HTTP 403 over the internet, operator approve/reject (`containment/live/`)**. Vendor `nemoclaw` binary still DGX-gated; judged run deploys the same compose to a remote host |
 | **Surface** | ◐ starter | idea → draft → patent works; edit boxes discard input; no chart view |
 
-Suite: `.venv/bin/pytest tests/` → **95 passed**, 0 skipped, stub mode, no network.
+Suite: `.venv/bin/pytest tests/` → **96 passed**, 0 skipped, stub mode, no network.
 (The gateway's full 3-process end-to-end proof is `python -m runtime.gateway_smoke`, kept
 out of the suite so `pytest tests/` stays server-free.)
 
@@ -238,6 +238,8 @@ from a flat JSON directory (`:25`, `:29-35`) — no index, no embeddings.
   device, system) count for almost nothing, rare distinctive ones carry the match, so a
   short record sharing the disclosure's specific vocabulary outranks a long one that merely
   overlaps on boilerplate. Deterministic. Tested (`test_c2_idf_overlap_beats_raw_length`).
+  C1's statute-*coverage* is preserved — `diversify_by_statute` buckets independently of the
+  within-bucket score, so `test_retrieval_spreads_across_statutes_not_one` stays green under IDF.
 - [x] **C3 · Give the store a write API — done 2026-07-18.** `LoopholeStore` now has
   `add()` (dedup by id), `add_all()`, and `save()` (flat `<id>.json`, the layout `load()`
   reads). This is what block D writes through. Tested (`test_c3_write_api_add_dedups_and_saves`).
