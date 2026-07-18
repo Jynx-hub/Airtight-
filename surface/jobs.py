@@ -68,6 +68,7 @@ class Job:
     transcript: list = field(default_factory=list)  # mutated live by draft_patent
     draft: Draft | None = None
     findings: list = field(default_factory=list)  # captured under the draft lock
+    prior_art: list = field(default_factory=list)  # live USPTO refs this draft was written against
     error: str | None = None
     started: float = field(default_factory=time.monotonic)
     finished: float | None = None
@@ -158,6 +159,31 @@ def retrieve_for(disclosure: Disclosure, k: int = 5) -> tuple[list, dict]:
     return _retrieve(records, disclosure, k), explain.explain_retrieval(records, disclosure, k=k)
 
 
+def draft_guardrails(disclosure: Disclosure, memory_records: list) -> tuple[list, list]:
+    """Guardrails for the drafting turn: the retrieved memory records plus live
+    prior art for THIS disclosure. Returns (combined, prior_art_records).
+
+    Prior art is fetched fresh from USPTO, not read from memory, so it is appended
+    to — not ranked against — the memory records: when a live reference exists it
+    should always reach the draft it was fetched for. Degrades to memory-only with
+    no USPTO_API_KEY or on any error, so the offline path is unchanged. Kept out of
+    `retrieve_for` on purpose — that feeds the dry-run preview routes, which must
+    stay network-free. Product-path only: the M4 harness never calls this, so the
+    empty-vs-warmed ablation is untouched.
+    """
+    from agent.prior_art import search_prior_art
+
+    seen = {r.id for r in memory_records}
+    prior = [r for r in search_prior_art(disclosure) if r.id not in seen]
+    return list(memory_records) + prior, prior
+
+
+def describe_prior_art(rec) -> str:
+    """One line for the grant report. The pattern already leads with the §103
+    exposure and the app number; the remedy is the distinguishing move."""
+    return f"{rec.pattern} — {rec.remedy}"[:220]
+
+
 def start(disclosure: Disclosure, k: int = 5) -> Job:
     job = Job(id=uuid.uuid4().hex[:12], disclosure=disclosure)
     _put(job)
@@ -170,6 +196,9 @@ def _run(job: Job, k: int) -> None:
         # Retrieval is pure ranking — no model call, no audit entries — so it
         # runs before the lock and a queued job still shows its context match.
         guardrails, job.retrieval = retrieve_for(job.disclosure, k=k)
+        # Live prior art is fetched before the lock — no reason to hold the model
+        # hop during a USPTO network call.
+        guardrails, job.prior_art = draft_guardrails(job.disclosure, guardrails)
         job.status = "queued"
         with exclusive_draft() as offset:
             job.audit_offset = offset
@@ -240,6 +269,7 @@ def _report(job: Job) -> dict:
     return {
         "smart_catches": draft.critique_notes,
         "loopholes_closed": draft.loopholes_closed,
+        "prior_art": [describe_prior_art(r) for r in job.prior_art],
         # Captured under the draft lock, not re-sliced here: by the time a poll
         # arrives, the next draft may already have appended to AUDIT_LOG.
         "security_findings": job.findings,

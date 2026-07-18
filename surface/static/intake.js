@@ -257,6 +257,8 @@ function renderGrant(snap) {
   rep.innerHTML = "";
   rep.append(section("Loopholes pre-empted from memory", report.loopholes_closed,
     "no records retrieved — memory is empty for this class"));
+  rep.append(section("Live prior art to distinguish over · §103", report.prior_art || [],
+    "no live prior art — set USPTO_API_KEY for a live search"));
   rep.append(section("Smart catches · self-critique", report.smart_catches,
     "the examiner turn raised nothing"));
 

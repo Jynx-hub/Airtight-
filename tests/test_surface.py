@@ -87,6 +87,42 @@ def test_draft_returns_draft_and_report():
     assert body["report"]["security_scanning"] is False
     assert body["report"]["security_findings"] == []
     assert "smart_catches" in body["report"]
+    # live prior art is part of the report contract; empty (not missing) with no
+    # USPTO key in the test env, so a keyless clone degrades cleanly
+    assert body["report"]["prior_art"] == []
+
+
+def test_draft_guardrails_appends_live_prior_art(monkeypatch):
+    """The drafting turn is primed with retrieved memory PLUS live prior art for
+    this disclosure — appended, deduped by id, so a live reference always reaches
+    the draft it was fetched for."""
+    from airtight import Disclosure, LoopholeRecord
+    from surface import jobs
+
+    disc = Disclosure.model_validate(client.get("/api/sample").json())
+    memory, _ = jobs.retrieve_for(disc, k=5)
+    fake = LoopholeRecord(id="priorart-999", pattern="§103 — prior art US application 999",
+                          claim_shape="x", technology_class=disc.technology_class,
+                          remedy="add a distinguishing limitation", source="test",
+                          statute="103", extraction_confidence=0.5)
+    # draft_guardrails imports search_prior_art at call time, so patch it at source
+    monkeypatch.setattr("agent.prior_art.search_prior_art", lambda d, limit=5: [fake])
+
+    combined, prior = jobs.draft_guardrails(disc, memory)
+    assert [r.id for r in prior] == ["priorart-999"]
+    assert combined[-1].id == "priorart-999"  # appended after memory
+    assert len(combined) == len(memory) + 1
+
+
+def test_draft_guardrails_degrades_without_key(monkeypatch):
+    from airtight import Disclosure
+    from surface import jobs
+
+    monkeypatch.delenv("USPTO_API_KEY", raising=False)
+    disc = Disclosure.model_validate(client.get("/api/sample").json())
+    memory, _ = jobs.retrieve_for(disc, k=5)
+    combined, prior = jobs.draft_guardrails(disc, memory)
+    assert prior == [] and combined == memory  # no key, memory-only, unchanged
 
 
 def test_admin_page_serves():

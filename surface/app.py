@@ -50,6 +50,7 @@ class LoopholeReport(BaseModel):
 
     smart_catches: list[str]  # critique notes the agent raised against its own draft
     loopholes_closed: list[str]  # loophole ids the retrieved memory pre-empted
+    prior_art: list[str] = []  # live USPTO prior art the draft was written to distinguish over
     security_findings: list[SecurityFinding]  # quarantines/blocks from the guardrails bus
     security_scanning: bool  # False in stub / HL-off mode — no findings expected
 
@@ -97,6 +98,9 @@ def draft(disclosure: Disclosure) -> DraftResponse:
     the product.
     """
     guardrails, _ = jobs.retrieve_for(disclosure)
+    # Live prior art is fetched outside the draft lock — no reason to hold the
+    # model hop during a USPTO network call.
+    guardrails, prior_art = jobs.draft_guardrails(disclosure, guardrails)
     # Serialized, and the findings slice is taken inside the lock — otherwise a
     # concurrent draft's blocks land in this request's report. See jobs.py.
     with jobs.exclusive_draft() as offset:
@@ -105,6 +109,7 @@ def draft(disclosure: Disclosure) -> DraftResponse:
     report = LoopholeReport(
         smart_catches=result.critique_notes,
         loopholes_closed=result.loopholes_closed,
+        prior_art=[jobs.describe_prior_art(r) for r in prior_art],
         security_findings=findings,
         security_scanning=config.HL_ENABLED,
     )

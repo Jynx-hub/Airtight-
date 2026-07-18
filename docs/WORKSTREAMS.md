@@ -22,14 +22,32 @@ What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.m
 | **Containment** | ⚠️ simulated | `policy.py` decision logic is real, and now so is an escalation client — but enforcement is still a `print()`. No OpenShell exists |
 | **Surface** | ✅ two frames | intake (retrieval → live pipeline → grant) + engine panel over every committed artifact; D3's dishonest edit boxes replaced with a labelled seam |
 
-Suite: `.venv/bin/pytest tests/` → **169 passed**, 0 skipped, stub mode, no network.
+Suite: `.venv/bin/pytest tests/` → **171 passed**, 0 skipped, stub mode, no network.
 
-📌 **Unrecorded on this board:** `main` gained live USPTO prior-art search
-(`agent/prior_art.py`) and an MPEP statute reference grounding the draft/critique/revise
-loop (`agent/statute_reference.py`) at `5e5f9eb`/`f85faa7`, +11 tests, with no lane entry.
-Both claim product-path-only isolation from the M4 ablation. Noted here so it isn't lost —
-**not verified by the Surface lane**; the author should grade it against the notation above.
-The statute reference now has a currency monitor keeping it fresh — see block **SC** below.
+📌 **Product path now assembles the airtight draft — recorded and graded.** The stated end
+goal (describe an invention → find the loopholes from prior similar patents → draft against
+them → self-correct) is now the path the Surface runs. Three pieces, all **product-path only**
+(the M4 harness imports none of them, so the empty-vs-warmed ablation is untouched):
+- **MPEP statute reference** (`agent/statute_reference.py`, `5e5f9eb`) — the six software/
+  electronics doctrines (§101/§102/§103/§112(a)/(b)/(f)) with verified MPEP citations and
+  controlling standards, concatenated into the DRAFT/CRITIQUE/REVISE templates as **fixed text
+  outside the `{guardrails}` slot**, so `scaffold_proof`'s slot-equality still holds. So the
+  loop drafts and self-critiques against real law. **[x]** — `tests/test_statute_reference.py`,
+  incl. the across-arms constancy guard. A currency monitor now keeps it fresh — see block **SC** below.
+- **Live USPTO prior-art search** (`agent/prior_art.py`, `f85faa7`) — maps each similar
+  application to a §103 "distinguish over" record at `extraction_confidence 0.5` (never takes a
+  reserved statute slot); the fetch is a `guarded_tool` so a poisoned reference is dropped on
+  the tool_result hop; degrades to `[]` with no key / error / quarantine. **[x]** —
+  `tests/test_prior_art.py`, incl. the harness-never-imports-it isolation guard.
+- **Wired into the Surface draft path** (`surface/jobs.py` `draft_guardrails`, this change) —
+  the drafting turn is now primed with retrieved memory **plus** live prior art for the
+  disclosure (appended, deduped by id, so a live reference always reaches the draft it was
+  fetched for). Kept out of `retrieve_for` so the dry-run preview routes stay network-free.
+  Both `/api/draft` (sync) and the job path report it; the grant view renders a "Live prior art
+  to distinguish over · §103" section. **◐** — verified in stub end-to-end (renders, degrades
+  to 0 with no key, browser-checked); the **live** quality (is the assembled draft genuinely
+  airtight) is unmeasured and rides the same GPU window as B and the ablation re-run.
+  `tests/test_surface.py` (append + keyless-degrade).
 
 **The two headline numbers, stated honestly:**
 
