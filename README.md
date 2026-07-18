@@ -28,7 +28,7 @@ The engine runs in two modes: **hit-mode** (point it at an existing patent → l
 
 - **Model:** Nemotron 3 Super (120B-A12B, 1M ctx) primary · Nemotron 3 Nano sub-agent · Llama-3.3-Nemotron-Super-49B fallback
 - **Runtime:** NVIDIA OpenShell sandbox, stood up by NemoClaw; inference pinned to `inference.local`
-- **Serving:** vLLM (OpenAI-compatible) on Brev GPU, behind `inference.local`
+- **Serving:** vLLM (OpenAI-compatible) on Modal's free tier (scale-to-zero), behind `inference.local`; free NVIDIA NIM hosted endpoint as fallback
 - **Security:** HiddenLayer AI Runtime Security (AIDR engine, Interactions API)
 - **Harness:** LangChain Deep Agents / OpenClaw (NemoClaw-supported)
 
@@ -43,10 +43,11 @@ Airtight/
 ├── README.md                         ← you are here (overview + index)
 ├── CLAUDE.md                         ← context for Claude Code sessions in this repo
 ├── airtight/                         ← shared package: the doorway (one model hop) + data shapes
-├── agent/                            ← Person 4: work loop, smoke runner (memory/eval land here)
-├── data/                             ← Person 1: corpora, ground truth, fixtures
-├── inference/                        ← Person 2: vLLM runbook, verify script, OpenShell policy draft
-├── surface/                          ← Person 3: applicant surface (Next.js later)
+├── agent/                            ← Person 4: work loop, memory, guardrails, eval harness
+├── src/                              ← Person 1: USPTO/PTAB ingestion pipeline (corpus, groundtruth, loaders)
+├── data/                            ← Person 1: corpora, ground truth, fixtures (the pipeline's output)
+├── inference/                        ← Person 2: Modal/vLLM runbook + template, verify script, OpenShell policy
+├── surface/                          ← Person 3: applicant surface (FastAPI starter; Next.js later)
 ├── tests/                            ← stub-mode smoke tests (no network needed)
 ├── docs/
 │   ├── ARCHITECTURE.md               ← full spec: concept, layers, FIG.1, 3 claims, model, judge's read, build & demo, sources
@@ -54,18 +55,19 @@ Airtight/
 │   ├── INFERENCE-LOCAL.md            ← the one boundary: wiring, invariant, shared-doorway contract
 │   ├── JUDGING-RUBRIC.md             ← official 100-pt scorecard + how Airtight maps to it
 │   ├── WORKSTREAMS.md                ← plain-English who-builds-what plan
-│   └── SESSIONS.md                   ← per-milestone Claude Code kickoff prompts
+│   ├── SESSIONS.md                   ← per-milestone Claude Code kickoff prompts
+│   └── COSTS.md                      ← free-tier hosting plan (Modal + NIM) + deploy flags
 └── research/                         ← grounded briefings (verified 2026-07-17)
     ├── hiddenlayer.md                ← AIDR Interactions API: endpoints, payloads, auth, SDK
     ├── nemoclaw-openshell.md         ← blueprint tiers, policy YAML schema, Policy Advisor, CLI
     ├── nemotron.md                   ← model lineup + recommendation
-    └── vllm.md                       ← vLLM serving: why, compatibility, Brev hosting, VRAM caveats
+    └── vllm.md                       ← vLLM serving: why, compatibility, Modal hosting, VRAM caveats
 ```
 
 **Shareable artifact:** https://claude.ai/code/artifact/5ccf4150-8223-4eca-bc0d-2516184a4092
 
 ## Status
 
-**Phase: build.** The shared scaffold is in `main`: doorway + shapes (`airtight/`), a stub-mode agent loop (`agent/`), and Person 2's vLLM/OpenShell handoff (`inference/`). Everything runs green with `pytest tests/` and `python -m agent.run_smoke` — no network needed. Next: Person 2 stands up vLLM on Brev (M1b), then the eval-harness ablation (`docs/BUILD-PLAN.md` → M4) — the Track-1 proof and the best demo moment.
+**Phase: build.** The shared scaffold is in `main`: doorway + shapes (`airtight/`), a stub-mode agent loop (`agent/`), and Person 2's vLLM/OpenShell handoff (`inference/`). Everything runs green with `pytest tests/` and `python -m agent.run_smoke` — no network needed. Next: Person 2 deploys vLLM on Modal (M1b, template in `inference/vllm_modal.py`), then the eval-harness ablation (`docs/BUILD-PLAN.md` → M4) — the Track-1 proof and the best demo moment.
 
 Quick start: `python3 -m venv .venv && .venv/bin/pip install -e ".[dev]" && .venv/bin/pytest tests/`

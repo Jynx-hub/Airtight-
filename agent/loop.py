@@ -55,9 +55,13 @@ def draft_patent(
     disclosure: Disclosure,
     guardrails: list[LoopholeRecord] | None = None,
     transcript: list | None = None,
+    fan_out: bool = False,
+    max_workers: int | None = None,
+    episode_sink=None,
     **gen_kwargs,
 ) -> Draft:
-    slot = render_guardrails(guardrails or [])
+    guardrails = guardrails or []
+    slot = render_guardrails(guardrails)
 
     def turn(name: str, system: str, user: str, role: str) -> str:
         messages = [{"role": "system", "content": system}, {"role": "user", "content": user}]
@@ -66,22 +70,40 @@ def draft_patent(
             transcript.append({"turn": name, "messages": messages, "reply": reply.text})
         return reply.text
 
+    # Concurrent sub-agent retrieval (opt-in). Notes fold into the draft USER
+    # message only — never the SYSTEM templates the ablation hashes.
+    notes_text = ""
+    if fan_out and guardrails:
+        from agent.subagents import fan_out_retrieval, notes_block
+
+        notes_text = notes_block(fan_out_retrieval(disclosure, guardrails, max_workers, **gen_kwargs))
+
     plan = turn("plan", PLAN_SYSTEM, disclosure.model_dump_json(), "tool")
     draft = turn(
         "draft",
         DRAFT_SYSTEM.format(guardrails=slot),
-        f"Plan:\n{plan}\n\nDisclosure:\n{disclosure.model_dump_json()}",
+        f"Plan:\n{plan}\n\nDisclosure:\n{disclosure.model_dump_json()}{notes_text}",
         "draft",
     )
     critique = turn("critique", CRITIQUE_SYSTEM.format(guardrails=slot), draft, "draft")
 
-    return Draft(
+    result = Draft(
         disclosure_id=disclosure.id,
         claims=_split_claims(draft),
         specification=draft,
         critique_notes=[line for line in critique.splitlines() if line.strip()],
-        loopholes_closed=[r.id for r in (guardrails or [])],
+        loopholes_closed=[r.id for r in guardrails],
     )
+
+    # Episodic write (opt-in). The eval harness never passes a sink, so the
+    # judged ablation never mutates memory — see agent/episodes.py.
+    if episode_sink is not None:
+        from agent.episodes import compress_run
+
+        mode = "stub" if __import__("airtight").config.MODE == "stub" else "live"
+        episode_sink.record(compress_run(disclosure, guardrails, result, mode))
+
+    return result
 
 
 def _split_claims(text: str) -> list[str]:

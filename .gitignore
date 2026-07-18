@@ -1,22 +1,31 @@
-# macOS
-.DS_Store
+# Person 1 data pipeline output — pulled bulk data stays local (data/real/…).
+# Tracked fixtures and the committed puller scripts are unaffected (already tracked).
+data/
+*.duckdb
+checkpoint.json
 
-# Editor
-.vscode/
-.idea/
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+.pytest_cache/
 
-# Env / secrets (none tracked yet — keep it that way)
+# Eval output (re-derivable; transcripts can be large)
+results/
+
+# Agent-generated episodic memory (re-derivable)
+memory/episodes/*.json
+
+# Env / secrets — but DO track the config template
 .env
 .env.*
 !.env.example
 *.key
 *.pem
 
-# Eval output (re-derivable; transcripts can be large)
-results/
-
-# Python
-.venv/
-__pycache__/
-*.egg-info/
-.pytest_cache/
+# macOS / editors
+.DS_Store
+.vscode/
+.idea/

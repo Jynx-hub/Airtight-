@@ -3,7 +3,7 @@
 Works unchanged against the dev vLLM URL, the NIM cloud fallback, and the
 in-sandbox inference.local route — the base URL is opaque:
 
-    python inference/verify_endpoint.py --base-url http://<brev-ip>:8000/v1
+    python inference/verify_endpoint.py --base-url https://<workspace>--airtight-vllm-serve.modal.run/v1
     python inference/verify_endpoint.py --base-url ... --concurrency 16 --requests 32
 
 The concurrency run doubles as the vLLM-bounty evidence (continuous batching

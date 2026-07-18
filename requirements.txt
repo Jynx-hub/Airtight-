@@ -1,0 +1,29 @@
+# Core async HTTP
+aiohttp>=3.9.0
+aiofiles>=23.2.1
+
+# Database
+duckdb>=0.10.0
+
+# CLI + progress
+tqdm>=4.66.0
+click>=8.1.7
+
+# Data handling
+orjson>=3.9.10
+python-dateutil>=2.9.0
+
+# Text / regex helpers
+regex>=2024.0.0
+
+# E5 — Poison PDF generation + scanning
+reportlab>=4.1.0
+pdfplumber>=0.10.0
+
+# Optional: BigQuery bulk mode
+# google-cloud-bigquery>=3.17.0
+# google-auth>=2.29.0
+
+# Testing
+pytest>=8.0.0
+pytest-asyncio>=0.23.0

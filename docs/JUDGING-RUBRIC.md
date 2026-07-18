@@ -41,7 +41,7 @@
 | **Insight Quality** (10) | Loopholes-caught delta on real patent data + examiner rejections — a metric most teams won't have | M4 ablation |
 | **Usability** (10) | Applicant Surface returns a filing-ready spec a real user can act on tomorrow | Applicant layer |
 | **Creativity** (10) | Patent data + examiner rejections compounded into a self-improving failure library; security + containment fused onto one hop | Whole concept |
-| **Performance** (10) | Empty-vs-warmed ablation quantifies the speedup; audit→enforce policy tuning for a clean judged run | M4; policy dev |
+| **Performance** (10) | **Measured 10.67× aggregate throughput from vLLM continuous batching (65.2 → 695.8 tok/s), knee at the pinned `--max-num-seqs 16`, reproduced on an independent re-run**; empty-vs-warmed ablation quantifies the memory speedup; audit→enforce policy tuning for a clean judged run | M1b (`docs/THROUGHPUT.md`); M4; policy dev |
 
 **Highest-leverage move against this rubric:** the M4 eval ablation (same invention, same Nemotron model, memory empty vs. warmed). It is the single deliverable that scores directly on Technical Depth, Insight Quality, Creativity, *and* Performance at once — build it first and protect it.
 
@@ -53,8 +53,8 @@ Separate from the 100-pt scorecard. How Airtight maps to its criteria:
 
 | Criterion | Airtight's answer |
 |---|---|
-| **Efficiency under concurrent load** | The heartbeat fans out concurrent prior-art retrieval sub-agents — exactly vLLM's continuous-batching workload. Throughput matters in the loop; it is not decorative. |
+| **Efficiency under concurrent load** | The heartbeat fans out concurrent prior-art retrieval sub-agents — exactly vLLM's continuous-batching workload. Throughput matters in the loop; it is not decorative. **Measured, not asserted: 65.2 → 695.8 tok/s (10.67×) at C=16 on one A100, curve kneeing exactly at the configured batch cap, zero failed requests — `docs/THROUGHPUT.md`.** |
 | **Small-model punch** | Nemotron 3 Nano (~3.2B active) sub-agent tier does cheap concurrent retrieval on vLLM while Super handles heavy drafting. |
-| **Real integration** | vLLM is the engine behind the operator-pinned `inference.local` hop — the same hop HiddenLayer analyzes and OpenShell contains. One boundary, four prizes. Verified at M1b. |
+| **Real integration** | vLLM is the engine behind the operator-pinned `inference.local` hop — the same hop HiddenLayer analyzes and OpenShell contains. One boundary, four prizes. Verified at M1b — endpoint proven OpenAI-compatible (chat, streaming, tool-calling) and load-tested under concurrency (`docs/THROUGHPUT.md`). |
 
 Detail in `research/vllm.md`.

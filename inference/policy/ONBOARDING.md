@@ -36,7 +36,7 @@ Stand up the NemoClaw/OpenShell sandbox **remotely** — nothing runs on a lapto
 
 - Exact repo paths + CLI verbs (`nemoclaw onboard`, `openshell sandbox create`, `openshell policy set`, `openshell rule ...`) — early preview, may have changed.
 - Policy schema field names against `docs.nvidia.com/openshell/reference/policy-schema` (our draft follows the researched schema; `blueprint.yaml` / `openclaw-sandbox.yaml` file names are conceptual).
-- That the gateway lets us point `inference.local` at an *external* vLLM host (Brev) rather than the default NIM route.
+- That the gateway lets us point `inference.local` at an *external* vLLM host (the Modal endpoint) rather than the default NIM route.
 - The in-sandbox URL shape (`https://inference.local/v1` vs a port variant) — the doorway treats it as an opaque env string, so any shape works.
 
 ## Plan B (if the preview won't stand up)

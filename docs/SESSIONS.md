@@ -10,10 +10,10 @@ Read CLAUDE.md, docs/ARCHITECTURE.md, docs/BUILD-PLAN.md, docs/INFERENCE-LOCAL.m
 
 Goal for this session: M1 + M1b. Scaffold a src/ layout and stand up the containment + inference spine:
 - OpenShell sandbox via NemoClaw, harness = LangChain Deep Agents / OpenClaw.
-- Agent inference pinned to inference.local, which forwards to a vLLM-served Nemotron (start with Nemotron 3 Nano for reliability; Super if the GPU allows).
+- Agent inference pinned to inference.local, which forwards to a vLLM-served Nemotron deployed on Modal's free tier (start with Nemotron 3 Nano on L40S/FP8 for reliability; Super if a bigger box lands). NVIDIA NIM hosted endpoint is the one-env-flip fallback.
 - Verify the OpenAI-compatible endpoint works and handles concurrent requests (continuous batching).
 
-Give me a plan with the exact files you'll create, the vllm serve command, and the inference.local wiring. Don't edit yet — plan first, flag any repo paths or CLI verbs that need confirming against the early-preview NemoClaw/OpenShell docs.
+Give me a plan with the exact files you'll create, the `modal deploy` / vllm serve command, and the inference.local wiring. Don't edit yet — plan first, flag any repo paths or CLI verbs that need confirming against the early-preview NemoClaw/OpenShell docs.
 ```
 
 ## Session B — M4 the ablation harness (the money milestone)

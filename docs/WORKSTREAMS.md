@@ -19,7 +19,7 @@ Airtight is a **robot patent lawyer**. You tell it your invention, and it writes
 | Person | Their part | Branch | In one sentence |
 |--------|-----------|--------|-----------------|
 | **1 — Data** | The library | `lane/data` | Finds the patents, rejections, and ground truth the robot learns from — and the test set that proves it learned. |
-| **2 — Inference** | The brain hosting | `lane/inference` | Rents the Brev GPU, serves Nemotron on vLLM, and hands everyone one endpoint behind `inference.local`. Then moves onto the locked doors. |
+| **2 — Inference** | The brain hosting | `lane/inference` | Deploys Nemotron on vLLM to Modal's free tier (scale-to-zero), with the NVIDIA NIM free endpoint as a one-flip fallback, and hands everyone one endpoint behind `inference.local`. Then moves onto the locked doors. |
 | **3 — Surface** | The screen + the show | `lane/surface` | Builds what people click, and runs the live demo for the judges. |
 | **4 — Anudeep** | The robot itself | `lane/agent` | The agent loop, the security bus, the memory, and the "it got smarter" proof. The critical path. |
 
@@ -52,7 +52,7 @@ main   ← the shared, always-working copy
 1. **One doorway for the AI brain.** Every model call goes through *one* shared function (Person 4 builds it, stubbed to return "all clear" at first). Persons 1–3 build against the stub from minute one. Full contract: `docs/INFERENCE-LOCAL.md`.
 2. **A folder for each person** so nobody's files collide.
 3. **Agreed data shapes** — what a "Disclosure," a "Draft," a "LoopholeRecord," and an "EvalResult" look like — written down once so all four parts speak the same language. Person 1 and Person 4 co-own this; it's the contract between the data and the harness.
-4. **A secrets file** listing the keys each part needs (Brev/vLLM URL, HiddenLayer key, NIM fallback key, USPTO endpoints). Check they all work on day one.
+4. **A secrets file** listing the keys each part needs (Modal endpoint URL + HF token; NIM `nvapi-` key for the fallback/dev endpoint; HiddenLayer key; USPTO endpoints). Check they all work on day one.
 5. **The one rule nobody breaks:** *the operator chooses the AI model, never the robot.* Everything runs remote — nothing on a laptop. (`docs/INFERENCE-LOCAL.md`.)
 
 ---
@@ -75,11 +75,13 @@ main   ← the shared, always-working copy
 
 **Your job:** Stand up the AI brain everyone else calls, then help lock the doors. Your first job (F1-F4) is **M1b** and the **$500 vLLM bounty** — it's front-loaded, so plan to finish it early and roll onto the second half. Serving detail: `research/vllm.md` · wiring: `docs/INFERENCE-LOCAL.md`.
 
-### First: the endpoint (M1b + the bounty)
-- [ ] **F1** `feat/inference-vllm` — Rent the Brev GPU ($100 credits per team member), `pip install vllm`, `vllm serve` **Nemotron 3 Nano** (the guaranteed path — it fits). Try **Super** only if the VRAM allows; don't burn hours on it.
-- [ ] **F2** `feat/inference-verify` — Prove the endpoint is OpenAI-compatible (chat + streaming), then **load-test it with concurrent requests** and write down the throughput numbers. Continuous batching under concurrent load is exactly what the bounty judges — a real before/after number is gold.
-- [ ] **F3** `feat/inference-routing` — Wire `inference.local` → your vLLM URL (creds host-side, never in the sandbox), and configure the **NIM cloud fallback** so one config flip swaps backends if the box dies.
-- [ ] **F4** `feat/inference-runbook` — Hand the team one base URL + model name via the secrets file. Write the 5-line "box died, bring it back" runbook, and own keeping the GPU alive through judging.
+> **Status (2026-07-18):** ✅ **F1 + F2 done** — Nemotron 3 Nano deployed on vLLM to Modal's free tier, `inference.local` live, and the concurrent-batching numbers are on record: **10.67× aggregate throughput (65.2 → 695.8 tok/s)** with the curve kneeing at C=16 exactly where `--max-num-seqs 16` is pinned. That's **M1b** plus the $500 bounty evidence (`docs/THROUGHPUT.md`). ✅ **F3 done** too — one-var `INFERENCE_BACKEND` flip, all three backends (legacy/modal/nim) verified green end-to-end. **Next:** F4 team handoff via the secrets file + keep-warm runbook (`MODAL_MIN_CONTAINERS=1` for the judged run), then the OpenShell locks F5–F7.
+
+### First: the endpoint (M1b + the $500 vLLM bounty)
+- [x] **F1** `feat/inference-modal` — Deploy **Nemotron 3 Nano** on vLLM to **Modal's free tier** (`modal deploy runtime/modal_app.py`). **L40S + FP8** is the guaranteed fit; weights cached in a Modal Volume, HF token as a Modal Secret. Scale-to-zero for dev — you only burn credits while a request is running. (Serve **Super** only if you later land a bigger box; don't burn hours on it.)
+- [x] **F2** `feat/inference-verify` — Prove the Modal endpoint is OpenAI-compatible (chat + streaming), then **load-test it with concurrent requests** and write down the throughput numbers. Continuous batching under concurrent load is exactly what the $500 bounty judges — a real before/after number is gold. → **`docs/THROUGHPUT.md`: 65.2 → 695.8 tok/s = 10.67× from continuous batching**, curve knees at C=16 exactly where `--max-num-seqs 16` is pinned. Harness `runtime/bench.py`, raw JSON in `runtime/bench-results/`. Found en route: the streaming path mislabels all output as `reasoning_content` (see THROUGHPUT.md §Open issue) — bites Lane C's streaming UI, not blocking F2.
+- [x] **F3** `feat/inference-routing` — Point `inference.local` → the **Modal URL** (creds host-side, never in the sandbox), and set the **NVIDIA NIM free dev endpoint** as the fallback so **one env flip** swaps backends if Modal is cold or credits run out. → **Done.** The flip is the single var `INFERENCE_BACKEND=modal|nim`; both credential sets coexist so flipping never destroys the other key (the old three-var flip overwrote `INFERENCE_API_KEY` with the nvapi key). **All three backends verified green end-to-end** — legacy, modal, and nim — each passing models + chat + tool-call, and the doorway's `chat()` runs unchanged across them (both reasoning modes; NIM accepts `chat_template_kwargs` with no 400). Prove it any time: `bash runtime/serve-nim.sh`. Fixed en route: `verify.sh` sourced `.env` in a way that *overwrote* exported vars, so `INFERENCE_BACKEND=nim bash verify.sh` would have silently tested Modal and passed — a green check proving nothing. No automatic failover by design (a silent hop to hosted NIM would void the bounty evidence). Two honest gaps recorded in `docs/INFERENCE-LOCAL.md`: `inference.local` is still a naming contract with no gateway process, and creds are still read inside the sandbox — both close at F5.
+- [ ] **F4** `feat/inference-runbook` — Hand the team one base URL + model name via the secrets file. Write the 5-line "keep it warm for the demo / flip to NIM" runbook, and own keeping the endpoint alive through judging (`min_containers=1` for the show).
 
 ### Then: the locked doors (M5, shared with Person 4)
 - [ ] **F5** `feat/inference-openshell` — Set the four kinds of locks on the sandbox: file writes, limited user, allowed internet destinations, and the pinned brain. *(`research/nemoclaw-openshell.md`)*
@@ -128,7 +130,7 @@ main   ← the shared, always-working copy
 ```
 Step 0  →  The 2-hour shared setup (everyone, together). Doorway stub in main.
 Step 1  →  All four lanes run in parallel:
-           P1 pulls data · P2 stands up vLLM/Brev · P3 builds screens on mocks
+           P1 pulls data · P2 deploys vLLM to Modal (free tier) · P3 builds screens on mocks
            P4 builds the agent loop against the stub
 Step 2  →  Swap the fakes for the real thing: doorway → real vLLM endpoint (P2),
            mocks → real robot (P3), stub scanner → real HiddenLayer (P4).
@@ -146,7 +148,7 @@ Step 3  →  P1's fixtures + P4's harness = the ablation run. P3 wires the chart
 | Person | The worry | The plan |
 |--------|-----------|----------|
 | 1 | Rejection/PTAB data is messier than expected, or the checklist leaks into the warming set | Confirm the datasets download **on day one** (C0b-style spike); keep checklist and warming corpus in separate files with an overlap check |
-| 2 | Super doesn't fit the GPU, or the Brev box dies mid-demo | Nano is the guaranteed path — serve it first; NIM fallback is one config flip; the runbook brings the box back in minutes |
+| 2 | Modal cold-start stalls the demo, or the free credit runs out | Nano is the guaranteed fit on L40S; **keep one Modal container warm** (`min_containers=1`) for the demo window; the NIM free endpoint is one env-flip away; scale-to-zero keeps dev effectively free |
 | 3 | A live internet call glitches mid-demo | Every moment has a pre-recorded backup; rehearse twice |
 | 4 | One person owning agent + memory + security + eval is too much | The stub-first doorway means nothing blocks on you; P2 takes the OpenShell locks; if still tight, P1 co-owns eval scoring (they built the checklist) and M6 polish gets cut before M4 does |
 

@@ -1,0 +1,78 @@
+Application/Control Number: 16/123,456                            Page 4
+Art Unit: 2194
+
+                             OFFICE ACTION SUMMARY
+
+Examiner's Amendments/Comments:
+________________________________
+
+Claims 1-20 are pending; of the pending claims 1, 6, and 11 are
+independent.
+
+                          DETAILED ACTION
+
+Rejection Under 35 U.S.C. § 112(b) — Indefiniteness
+
+Claims 1, 6, and 11 are rejected under 35 U.S.C. § 112(b) as being
+indefinite for failing to particularly point out and distinctly claim
+the subject matter which the inventor regards as the invention.
+
+Regarding claim 1, the phrase "processing the data in a manner optimized
+for the given context" is unclear because one of ordinary skill in the
+art would not understand the metes and bounds of the term "optimized for
+the given context." The claim language does not provide antecedent basis
+for the limitation "said given context" which first appears in claim 1,
+line 7 without prior introduction. The examiner finds that this renders
+the claim indefinite.
+
+Applicant is required to particularly point out and distinctly claim the
+subject matter of the invention.
+
+
+Rejection Under 35 U.S.C. § 103 — Obviousness
+
+Claims 1-5 are rejected under 35 U.S.C. § 103 as being unpatentable
+over Smith et al. (US 9,876,543) in view of Jones (US 8,765,432).
+
+Smith discloses a digital data processing system comprising a processor
+configured to execute instructions (col. 3, ll. 12-25), a memory storing
+a plurality of executable modules (col. 4, ll. 1-18), and a network
+interface adapted to transmit data packets to a remote server (col. 5,
+ll. 3-9). Smith further teaches dynamically allocating resources based on
+current workload conditions (col. 6, ll. 20-35).
+
+It would have been obvious to one of ordinary skill in the art at the
+time of the invention to modify Smith's resource allocation mechanism with
+the load-balancing algorithm taught by Jones (col. 2, ll. 10-25) because
+Jones teaches that such modifications yield predictably improved
+throughput performance. One of ordinary skill in the art would have
+been motivated to combine the teachings because both references are
+directed to the same technical field of distributed computing systems
+and address the same recognized problem of resource utilization.
+
+
+Rejection Under 35 U.S.C. § 102 — Anticipation
+
+Claim 6 is rejected under 35 U.S.C. § 102(a)(1) as being anticipated by
+the disclosure of Williams (US 10,234,567).
+
+Regarding the limitation "a hardware accelerator configured to perform
+matrix multiplication operations in parallel using a systolic array
+architecture," Williams explicitly discloses (at col. 8, ll. 4-19):
+"The processing unit includes dedicated silicon logic for parallel matrix
+multiplication implemented via a systolic array." This disclosure directly
+anticipates the claimed limitation. Williams teaches each and every
+element of claim 6 as discussed in detail below.
+
+Regarding the limitation "wherein the systolic array comprises at least
+256 processing elements arranged in a two-dimensional grid," Williams
+discloses a 16×16 array of processing elements (col. 8, ll. 20-30),
+which constitutes a 256-element two-dimensional systolic array, thereby
+teaching each element of the claimed limitation.
+
+
+Any inquiry concerning this communication or earlier communications from
+the examiner should be directed to the primary examiner whose name and
+telephone number appear below.
+
+Primary Examiner — Technology Center 2100
