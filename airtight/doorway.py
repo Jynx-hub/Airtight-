@@ -11,7 +11,7 @@ from typing import Any, Iterator, Literal
 from . import config
 from .stubs import STUB_REPLIES
 
-Role = Literal["tool", "draft"]
+Role = Literal["tool", "draft", "distill"]
 
 
 @dataclass

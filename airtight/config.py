@@ -36,3 +36,9 @@ HL_TIMEOUT_S = float(os.getenv("HIDDENLAYER_TIMEOUT_SECONDS", "10"))
 EPISODES_DIR = os.getenv("AIRTIGHT_EPISODES_DIR", "memory/episodes")  # agent-generated, outside data/
 EPISODES_ENABLED = os.getenv("AIRTIGHT_EPISODES_ENABLED", "false").lower() == "true"
 SUBAGENT_MAX_WORKERS = int(os.getenv("AIRTIGHT_SUBAGENT_MAX_WORKERS", "4"))
+
+# --- Ingested memory (D: ingest -> memory) ---
+# Records distilled from documents read at ingest. Outside data/ for the same
+# reason episodes are: these are agent-generated from untrusted input and must
+# never reach the corpus the ablation measures.
+INGESTED_DIR = os.getenv("AIRTIGHT_INGESTED_DIR", "memory/ingested")

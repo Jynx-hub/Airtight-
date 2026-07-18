@@ -178,3 +178,49 @@ def test_real_pull_splits_cleanly():
     graded, corpus = holdout_split(pairs, n=10, seed=1234)
     for _, checklist in graded:
         assert_no_overlap(corpus, checklist)  # raises on id collision or >0.8 Jaccard
+
+
+def test_ablation_uncontaminated_by_ingested(tmp_path, monkeypatch):
+    """The D-side twin of test_ablation_uncontaminated_by_episodes.
+
+    Ingested records are distilled from untrusted documents. If they could reach
+    the warmed arm, the Track-1 number would be measuring the agent's own writing.
+    The harness never reads config.INGESTED_DIR and never calls merged_store, so
+    this holds by construction — assert it anyway, because 'by construction' is
+    exactly the kind of guarantee a later refactor removes without noticing.
+    """
+    from airtight import LoopholeRecord, config as _config
+    from agent.memory import LoopholeStore
+
+    baseline = json.loads(run_ablation(DATA, k=3, runs=1, out_root=tmp_path / "a").read_text())
+
+    ingested_dir = tmp_path / "ingested"
+    store = LoopholeStore([], directory=ingested_dir)
+    for i in range(20):
+        store.save(LoopholeRecord(
+            id=f"ing-noise-{i}", pattern=f"§101 fabricated pattern {i}",
+            claim_shape="a module configured to perform the recited function",
+            technology_class="G06F", remedy="noise", source="INGESTED attacker.pdf",
+            extraction_confidence=0.3))
+    monkeypatch.setattr(_config, "INGESTED_DIR", str(ingested_dir))
+
+    seeded = json.loads(run_ablation(DATA, k=3, runs=1, out_root=tmp_path / "b").read_text())
+
+    assert seeded["corpus_size"] == baseline["corpus_size"], "ingested records entered the corpus"
+    assert all(p["loopholes_caught_delta"] == 0 for p in seeded["pairs"])
+    assert ([r["loopholes_caught"] for r in seeded["results"]]
+            == [r["loopholes_caught"] for r in baseline["results"]])
+
+
+def test_extraction_confidence_cannot_perturb_the_prompt():
+    """The ablation's scaffold proof rests on the guardrails slot rendering
+    identically for identical records. A new shape field must not leak into it."""
+    from airtight import LoopholeRecord
+    from agent import loop
+
+    kw = dict(id="x", pattern="§112 indefiniteness", claim_shape="a module configured to",
+              technology_class="G06F", remedy="recite structure", source="s")
+    ground_truth = LoopholeRecord(**kw)
+    inferred = LoopholeRecord(**kw, extraction_confidence=0.3)
+    assert ground_truth.extraction_confidence == 1.0
+    assert loop.render_guardrails([ground_truth]) == loop.render_guardrails([inferred])

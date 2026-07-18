@@ -12,36 +12,21 @@ and never fabricated.
 
 import argparse
 import json
-import re
 import sys
 from pathlib import Path
 
 from airtight import LoopholeRecord, call_model, config
+# The prompt and parser live in agent/distill.py — the packaged home both this
+# script and the ingest path can import. DISTILL_SYSTEM is unchanged by the move
+# (tests/test_distill.py pins its sha256).
+from agent.distill import DISTILL_SYSTEM, parse_json
 
 GROUND = {"101": "§101 subject-matter eligibility (Alice/Mayo abstract idea)",
           "102": "§102 anticipation by prior art",
           "103": "§103 obviousness over prior art",
           "112": "§112 indefiniteness / means-plus-function / enablement"}
 
-DISTILL_SYSTEM = (
-    "You are a patent analyst. A PTAB Final Written Decision held patent claims "
-    "unpatentable. From the real decision facts below, infer the ONE core loophole "
-    "that killed the claims — the claim-drafting weakness a competitor or petitioner "
-    "exploited. Reply with JSON only: "
-    '{"pattern": "<short loophole pattern>", "claim_shape": "<the kind of claim '
-    'language that triggered it>", "remedy": "<how careful drafting would have '
-    'foreclosed it>"}.'
-)
-
-
-def _parse_json(text: str) -> dict | None:
-    m = re.search(r"\{.*\}", text, flags=re.DOTALL)
-    if not m:
-        return None
-    try:
-        return json.loads(m.group(0))
-    except json.JSONDecodeError:
-        return None
+_parse_json = parse_json  # kept: the private name is the one this module has always used
 
 
 def _tech_class(owner: dict) -> str:

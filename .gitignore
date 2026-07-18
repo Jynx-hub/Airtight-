@@ -21,9 +21,20 @@ results/
 # Agent-generated episodic memory (re-derivable)
 memory/episodes/*.json
 
+# Records distilled from documents read at ingest. Not just re-derivable —
+# these are inferred from UNTRUSTED input, and must never be committed into the
+# shared tree the ablation measures.
+memory/ingested/*.json
+
 # Env / secrets — but DO track the config template
 .env
 .env.*
+# Stray env dumps that don't match the .env naming. `Untitled` really did appear
+# at the repo root holding a live UPSTO_API_KEY, untracked and unignored — one
+# `git add .` from a public push. Belt and braces.
+Untitled
+Untitled*
+*.env.txt
 !.env.example
 *.key
 *.pem

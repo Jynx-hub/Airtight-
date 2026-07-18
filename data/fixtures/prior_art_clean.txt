@@ -1,0 +1,30 @@
+OFFICE ACTION EXCERPT — Application 15/482,119
+Art Unit 2142 · Examiner: R. Whitfield
+
+CLAIM REJECTIONS — 35 U.S.C. §112
+
+Claims 1-8 are rejected under 35 U.S.C. §112(b) as indefinite.
+
+Claim 1 recites "a cache management module configured to evict entries based on
+predicted access recency." The claim recites a purely functional limitation — a
+"module configured to" perform a stated result — without reciting the structure,
+material, or acts that perform that function. Under §112(f) this limitation is
+construed to cover the corresponding structure described in the specification and
+its equivalents. The specification describes the desired outcome (entries with the
+furthest predicted next access are evicted) but discloses no algorithm by which
+the prediction is computed.
+
+Where a claimed function is performed by a general-purpose computer, the
+specification must disclose the algorithm that transforms it into a special
+purpose computer. Absent such disclosure the claim is indefinite.
+
+RESPONSE OF RECORD (entered 2019-03-04)
+
+Applicant amended claim 1 to recite the specific steps by which the prediction is
+computed — maintaining a recency histogram per cache line, applying a decay factor
+at a fixed interval, and selecting the line whose decayed score is lowest — and
+added corresponding support at spec paragraphs [0044]-[0051]. The §112(b)
+rejection was withdrawn.
+
+NOTE: This is a clean, non-adversarial document. It exists so the ingest write
+path can be demonstrated on a file that is not the poisoned fixture.
