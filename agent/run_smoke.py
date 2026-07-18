@@ -28,8 +28,12 @@ def main() -> None:
     print(f"mode={config.MODE}  model={config.MODEL}  fan_out={args.fan_out}  episodes={args.episodes}")
     print(f"disclosure: {disclosure.id} — {disclosure.title}\n")
 
+    # B2: episodic compounding turns on via the flag OR the operator env var. Before this,
+    # AIRTIGHT_EPISODES_ENABLED was defined in config but read nowhere, so setting it did
+    # nothing — the flag was the only real gate.
+    episodes_on = args.episodes or config.EPISODES_ENABLED
     guardrails, sink = None, None
-    if args.episodes:
+    if episodes_on:
         from agent.episodes import CompositeStore, EpisodeStore
 
         episodes = EpisodeStore.load(config.EPISODES_DIR)

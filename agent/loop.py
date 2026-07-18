@@ -39,7 +39,20 @@ CRITIQUE_SYSTEM = (
     "none are listed, apply standard scrutiny:\n{guardrails}"
 )
 
+REVISE_SYSTEM = (
+    "You are a patent attorney revising your own draft after a hostile examiner's "
+    "critique. Rewrite the claims (keep the numbering) and the specification so every "
+    "listed defect is fixed with explicit claim language. Reply with the full revised "
+    "draft only — numbered claims, then the specification — no commentary.\n\n"
+    "Loophole guardrails retrieved from memory — keep each one closed:\n{guardrails}"
+)
+
 GUARDRAILS_EMPTY = "(none on record)"
+
+# B1: how many revise passes to run before giving up on convergence. Each pass feeds
+# the examiner's defects back and re-critiques; the loop stops early the moment a pass
+# surfaces no NEW defect. This is the difference between self-critique and self-correction.
+MAX_REVISE_ROUNDS = 2
 
 
 def render_guardrails(records: list[LoopholeRecord]) -> str:
@@ -59,6 +72,7 @@ def draft_patent(
     fan_out: bool = False,
     max_workers: int | None = None,
     episode_sink=None,
+    revise_rounds: int = MAX_REVISE_ROUNDS,
     **gen_kwargs,
 ) -> Draft:
     guardrails = guardrails or []
@@ -88,11 +102,33 @@ def draft_patent(
     )
     critique = turn("critique", CRITIQUE_SYSTEM.format(guardrails=slot), draft, "draft")
 
+    # B1: self-CORRECTION, not just self-critique. Feed the examiner's defects back and
+    # revise, then re-critique; repeat until a pass finds no NEW defect (converged) or we
+    # hit revise_rounds. Before this, the run ended with the examiner's defects still in
+    # the draft, and `specification` was even the *pre-critique* text.
+    findings = [line for line in critique.splitlines() if line.strip()]
+    seen = set(findings)
+    for r in range(revise_rounds):
+        if not findings:
+            break
+        draft = turn(
+            f"revise{r + 1}",
+            REVISE_SYSTEM.format(guardrails=slot),
+            f"Draft:\n{draft}\n\nExaminer defects to fix:\n{critique}",
+            "draft",
+        )
+        critique = turn(f"critique{r + 1}", CRITIQUE_SYSTEM.format(guardrails=slot), draft, "draft")
+        findings = [line for line in critique.splitlines() if line.strip()]
+        new = [f for f in findings if f not in seen]
+        if not new:  # examiner surfaced nothing new — the draft has converged
+            break
+        seen.update(findings)
+
     result = Draft(
         disclosure_id=disclosure.id,
-        claims=_split_claims(draft),
-        specification=draft,
-        critique_notes=[line for line in critique.splitlines() if line.strip()],
+        claims=_split_claims(draft),          # the revised claims
+        specification=draft,                  # the revised draft, not the pre-critique text
+        critique_notes=findings,              # the FINAL examiner pass (what still stands, if anything)
         loopholes_closed=[r.id for r in guardrails],
     )
 

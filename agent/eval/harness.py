@@ -122,7 +122,7 @@ def scaffold_proof(retrieved: list[LoopholeRecord]) -> dict:
     inside the {guardrails} slot."""
     warmed_slot = loop.render_guardrails(retrieved)
     proof = {"templates_sha256": {}, "empty_slot": loop.GUARDRAILS_EMPTY, "warmed_slot": warmed_slot}
-    for name in ("PLAN_SYSTEM", "DRAFT_SYSTEM", "CRITIQUE_SYSTEM"):
+    for name in ("PLAN_SYSTEM", "DRAFT_SYSTEM", "CRITIQUE_SYSTEM", "REVISE_SYSTEM"):
         template = getattr(loop, name)
         proof["templates_sha256"][name] = hashlib.sha256(template.encode()).hexdigest()
         if "{guardrails}" in template:
@@ -156,6 +156,7 @@ def config_fingerprint(k: int, runs: int, draft_gen: dict = DRAFT_GEN, split: di
             "PLAN_SYSTEM": hashlib.sha256(loop.PLAN_SYSTEM.encode()).hexdigest(),
             "DRAFT_SYSTEM": hashlib.sha256(loop.DRAFT_SYSTEM.encode()).hexdigest(),
             "CRITIQUE_SYSTEM": hashlib.sha256(loop.CRITIQUE_SYSTEM.encode()).hexdigest(),
+            "REVISE_SYSTEM": hashlib.sha256(loop.REVISE_SYSTEM.encode()).hexdigest(),
             "CHECKLIST_SYSTEM": hashlib.sha256(judge.CHECKLIST_SYSTEM.encode()).hexdigest(),
             "DEFECT_SYSTEM": hashlib.sha256(judge.DEFECT_SYSTEM.encode()).hexdigest(),
         },

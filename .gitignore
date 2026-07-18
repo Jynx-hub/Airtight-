@@ -19,7 +19,9 @@ __pycache__/
 results/
 
 # Agent-generated episodic memory (re-derivable)
+# B2: episodes are written nested (<disclosure_id>/*.json) — ignore the subdirs, keep .gitkeep
 memory/episodes/*.json
+memory/episodes/*/
 
 # Env / secrets — but DO track the config template
 .env

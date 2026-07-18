@@ -10,6 +10,7 @@ are opt-in (draft_patent(episode_sink=...)), so the judged run never mutates
 memory. That is what keeps "empty vs warmed" a clean two-condition comparison.
 """
 
+import re
 import uuid
 from datetime import datetime
 from pathlib import Path
@@ -18,6 +19,30 @@ from pydantic import BaseModel, Field
 
 from airtight import Disclosure, Draft, LoopholeRecord
 from agent.memory import tokens
+
+_BULLET = re.compile(r"^\s*(?:[-*•]|\d+[.)])\s+(.*\S)")
+
+
+def defect_lines(notes: list[str], cap: int = 8) -> list[str]:
+    """B3: distill ONLY substantive bulleted defect lines, capped.
+
+    `critique_notes` is every non-blank line of the examiner's reply, so without this a
+    markdown header ('## Defects') or preamble ('Here are the defects:') becomes a
+    first-class LoopholeRecord that re-enters retrieval — and with an unnormalized ranker
+    (C2) that self-generated noise outranks real PTAB records within a few runs. Keep the
+    bullets, drop the chrome, cap the count so one verbose critique can't flood memory."""
+    out: list[str] = []
+    for line in notes:
+        m = _BULLET.match(line)
+        if not m:
+            continue
+        body = m.group(1).strip()
+        if len(body) < 12:  # too short to be a real defect (e.g. "- ok", "- n/a")
+            continue
+        out.append(body)
+        if len(out) >= cap:
+            break
+    return out
 
 
 class Episode(BaseModel):
@@ -46,7 +71,7 @@ def compress_run(
     retrieved loopholes the draft engaged plus one record per critique finding,
     so next-run retrieval can surface this run's hard-won lessons."""
     distilled = list(retrieved)
-    for i, finding in enumerate(draft.critique_notes):
+    for i, finding in enumerate(defect_lines(draft.critique_notes)):  # B3: bounded, bullets only
         distilled.append(
             LoopholeRecord(
                 id=f"ep-lesson-{disclosure.id}-{i}",
@@ -78,10 +103,12 @@ class EpisodeStore:
     @classmethod
     def load(cls, directory: Path | str) -> "EpisodeStore":
         directory = Path(directory)
+        # rglob (not glob) on purpose: record() writes nested <disclosure_id>/*.json, so the
+        # store must recurse to find them. A missing dir is fine — a first run has no episodes.
         episodes = [
             Episode.model_validate_json(p.read_text())
             for p in sorted(directory.rglob("*.json"))
-        ]
+        ] if directory.exists() else []
         return cls(episodes, directory)
 
     def record(self, episode: Episode) -> Path:
