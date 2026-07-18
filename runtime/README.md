@@ -31,7 +31,9 @@ retired Brev plan. Read `../docs/INFERENCE-LOCAL.md` (the contract) and `../rese
 | `serve-nim.sh` | — | **Fallback** — proves the one-var NIM flip end-to-end (never writes `.env`) |
 | `nano_v3_reasoning_parser.py` | Modal image | vLLM reasoning-parser plugin — the real one from the NVIDIA HF repo, loaded and working in the deployed server. **Known bug:** it overrides only the non-streaming path, so *streaming* output arrives as `reasoning_content` instead of `content` (`../docs/THROUGHPUT.md` §Open issue) |
 | `verify.sh` | anywhere reaching the endpoint | Smoke-test: models list + chat + tool-call |
-| `inference_local.py` | the app | The **one doorway** — every model call goes through `chat()` |
+| `inference_local.py` | the app | The **one doorway** — every model call goes through `chat()`; `INFERENCE_BACKEND=gateway` points it at the gateway below |
+| `inference_gateway.py` | host side | **A4** — the `inference.local` gateway: holds the provider key, injects it host-side, pins the model. `INFERENCE_BACKEND=modal\|nim` picks its upstream |
+| `gateway_smoke.py` | your laptop | Offline 3-process proof of A4 (no GPU): dummy token rejected direct → provider (401), accepted via gateway (200), key absent from the agent env |
 | `bench.py` | anywhere reaching the endpoint | **Throughput harness** — concurrency sweep, streaming + TTFT, writes `bench-results/*.json` (the $500 bounty evidence) |
 | `mock_endpoint.py` | your laptop | Offline OpenAI-compatible fake with simulated batching — **validate `bench.py` here for free before spending GPU credits** |
 
@@ -82,11 +84,25 @@ bash verify.sh              # models + chat + tool-call all green
 python inference_local.py   # same check, through the doorway client → AIRTIGHT-OK
 ```
 
-Set `INFERENCE_BASE_URL=https://<workspace>--airtight-nemotron-serve.modal.run/v1`. Today
-`inference.local` is a **naming contract, not a resolvable host** — there is no hosts entry,
-no DNS, no gateway process. The OpenShell gateway lands at F5 and terminates TLS at
-`https://inference.local/v1`; until then this URL *is* `inference.local`. Either way the
+Set `INFERENCE_BASE_URL=https://<workspace>--airtight-nemotron-serve.modal.run/v1`. The
 *name* is what the rest of the system pins to.
+
+**`inference.local` now has a real gateway process (A4).** `inference_gateway.py` fronts the
+name, holds the provider key host-side, injects it, and pins the model — so the sandbox
+carries only a dummy token:
+
+```bash
+# host side (holds the real key): fronts the operator's chosen upstream
+INFERENCE_BACKEND=modal MODAL_BASE_URL=... MODAL_API_KEY=... \
+    python -m runtime.inference_gateway --port 8900
+echo '127.0.0.1 inference.local' | sudo tee -a /etc/hosts   # one-line name mapping
+python -m runtime.gateway_smoke        # offline proof, no GPU: 5 green checks
+```
+
+Then the agent points at it with `INFERENCE_BACKEND=gateway` +
+`INFERENCE_GATEWAY_URL=http://inference.local/v1` and **no provider key at all**. What's
+still outstanding is A1's Landlock/seccomp isolation (Linux) that makes "the sandbox cannot
+reach the key by any other path" an *enforced* guarantee rather than a configuration fact.
 
 Both scripts honor pre-set env, so you can smoke-test a backend without editing `.env`:
 

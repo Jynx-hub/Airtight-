@@ -17,12 +17,12 @@ What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.m
 | Lane | State | One-line reality |
 |---|---|---|
 | **Data** | ✅ done | 134 patents (G06N/G06F/H04L), 94 held-out checklists, 193 real office-action defects, tracked in git |
-| **Inference** | ✅ first half | Nemotron on vLLM/Modal, `INFERENCE_BACKEND=modal\|nim`, 10.67× batching on record |
+| **Inference** | ✅ first half | Nemotron on vLLM/Modal, `INFERENCE_BACKEND=modal\|nim\|gateway`, 10.67× batching on record; `inference.local` gateway injects creds host-side (A4) |
 | **Agent** | ◐ built, deepening | loop now self-corrects (revise turn) and compounds (episodic write, isolated from the ablation); retrieval is statute-diversified and BM25-ranked, and ingest writes into it. B, C and D all done offline — **every quality gain is still unmeasured live** |
-| **Containment** | ⚠️ simulated | `policy.py` decision logic is real, and now so is an escalation client — but enforcement is still a `print()`. No OpenShell exists |
+| **Containment** | ✅ real enforcement (Plan B) + LIVE | offline demo (A3/A6); **`containment/planb/` enforces the four tiers on a Linux kernel — real 403, non-root, read-only fs, no route off-box (A1 Plan B, A5 sweep)**; **LIVE at https://airtight-openshell.vercel.app — real `policy.decide`, real HTTP 403 over the internet, operator approve/reject (`containment/live/`)**. Vendor `nemoclaw` binary still DGX-gated |
 | **Surface** | ✅ two frames | intake (retrieval → live pipeline → grant) + engine panel over every committed artifact; D3's dishonest edit boxes replaced with a labelled seam |
 
-Suite: `.venv/bin/pytest tests/` → **172 passed**, 0 skipped, stub mode, no network.
+Suite: `.venv/bin/pytest tests/` → **186 passed**, 0 skipped, stub mode, no network.
 
 📌 **Product path now assembles the airtight draft — recorded and graded.** The stated end
 goal (describe an invention → find the loopholes from prior similar patents → draft against
@@ -79,9 +79,12 @@ them → self-correct) is now the path the Surface runs. Three pieces, all **pro
 
 ## The focus now
 
-Four blocks, in dependency order. **B, C and D are done (2026-07-18)** — B landed in a
-separate tree and merged at `d899e26`, which surfaced the collision closed by `201e8f8`.
-A3 remains unblocked and can start today; only A1/A2/A4/A5 wait on hosted hardware.
+Four blocks. **B, C and D are done (2026-07-18).** **The containment A-track is done too**
+(separate branch, merged here): A3/A4/A6 verified offline, and A1/A5/A2 are **real via Plan
+B** — `containment/planb/` enforces the four tiers on a Linux kernel with a real socket-level
+403, and it is **live online** at https://airtight-openshell.vercel.app. The only un-done
+containment items are DGX/GPU-gated: the NVIDIA vendor binary (A1), live-schema validation
+(A2), and the full-production-agent egress sweep (A5).
 
 **The single highest-leverage item is still the GPU re-run** — C1 and now C2 both changed
 retrieval, so neither live ablation number is quotable until it lands. Retrieval is sound
@@ -89,55 +92,50 @@ and offline-validated; the measurement is the last step.
 
 ### A · Containment — make OpenShell real
 
-Today: `containment/policy.py` is a genuine, data-driven, tested policy evaluator, and
-everything around it is theatre. `containment/openshell_sim.py:5-6` says so in its own
-docstring. Every "403" is a `print()` (`:29`, `:36`). `attempt_egress()` never opens a
-socket. No `openshell` or `nemoclaw` binary is installed anywhere — every occurrence in
-the repo is prose or an f-string.
+Was: `containment/policy.py` a genuine evaluator and everything around it theatre — every
+"403" a `print()`, `attempt_egress()` never opening a socket, no `openshell`/`nemoclaw`
+binary anywhere. **Now real:** the offline demo runs the real escalation client, and
+`containment/planb/` enforces the four tiers on a Linux kernel with a **real socket-level
+403** (verified `bash containment/planb/run.sh`).
 
-- [ ] **A1 · Stand up the sandbox.** `nemoclaw onboard` on **hosted DGX Spark**, then
-  `nemoclaw <name> connect`. Binary go/no-go; gates A2, A4, A5 and the sandbox half of B.
-  Steps (all CLI verbs still UNVERIFIED): `inference/policy/ONBOARDING.md`.
-  Fallback if the preview won't stand up: `research/nemoclaw-openshell.md` §8
-  (gVisor/Firecracker + OPA/Rego + a NIM proxy) on a **remote** Linux host — never local,
-  never venue hardware. OpenShell needs Linux Landlock + seccomp-BPF; macOS cannot run it.
-- [ ] **A2 · Make the policy YAML enforce.** `inference/policy/airtight-sandbox.yaml`
-  covers all four tiers on paper but **ships `enforcement: audit` on every endpoint**
-  (`:26,37,43,49,61,75`) — which per `research/nemoclaw-openshell.md` §5 *logs and lets
-  traffic through*. The strictness only exists as a Python default arg
-  (`containment/policy.py:63`), so the simulator is stricter than the artifact it models.
-  Needed: `enforce` on the inference endpoint, **two** inference destinations (Modal *and*
-  NIM, not one), and validation against the live schema.
-- [ ] **A3 · Wire the Policy Advisor client in — the unblocked one.** The client itself now
-  **exists and is tested**: `agent/policy_advisor.py` (landed `0878a5f`) turns a default-deny
-  into a narrow `addRule` proposal, blocks on the operator's decision, and refuses to
-  escalate a `HARD_DENY` — against an injectable transport that is a mock today and
-  `policy.local` when A1 lands. Four tests cover it.
-  **But nothing calls it.** `grep -rn policy_advisor` returns its own test and one f-string;
-  `containment/demo.py` still runs the nine hardcoded prints in `openshell_sim.py:40-49`,
-  with a **pre-written rejection** and no approve path. The escalation logic is a library,
-  not a path the demo executes. The remaining work is the wiring: replace `proposal_flow()`
-  with a real `PolicyAdvisorClient.escalate()` call, and exercise `MockTransport(approve=True)`
-  so both branches are demonstrable. Still does not need A1.
-- [ ] **A4 · Close the two honest gaps** (both recorded in `docs/INFERENCE-LOCAL.md`):
-  `inference.local` becomes a resolvable host with a gateway process instead of a naming
-  contract, and **credentials move host-side** — today `runtime/inference_local.py` reads
-  the API key from inside the sandbox, so "creds never in the sandbox" is currently false.
-  The gateway injection is the real engineering here, not the YAML.
-- [ ] **A5 · Audit → enforce sweep.** Run the full agent under `enforcement: audit`,
-  read what it actually tries (`openshell logs <name> --tail --source sandbox`), then flip
-  to `enforce`. This is the pass that catches the door nobody thought of — an un-covered
-  egress path is the named top risk on this track. Needs a runnable agent, so schedule after B.
-- [ ] **A6 · Fix the dead M2 fusion.** `containment/demo.py:11-12` claims the demo fuses
-  OpenShell and HiddenLayer on one action — "the one boundary story". It doesn't: the
-  `@g.guarded_tool` block at `:36-45` is only reachable on `Decision.ALLOW`, and both
-  `attempt_egress` calls return on deny before reaching it. Beat 3 (`:61`) bypasses it
-  entirely. **The headline claim of that file is unreachable code at runtime.** Also
-  `containment/fixtures/exfil_request.json` is read by nothing.
+- ◐ **A1 · Stand up the sandbox — Plan B BUILT & verified; vendor binary DGX-gated.**
+  Primary (NVIDIA `nemoclaw`/OpenShell on DGX Spark) is a gated preview, unreachable from
+  here (`ONBOARDING.md`). **Plan B (`research/…` §8) is now REAL:** `containment/planb/`
+  stands up the four-tier model on a stock Linux kernel (OrbStack) — docker `internal`
+  network = **no route off-box** except the egress gate; sandbox runs **non-root, cap-drop
+  ALL, no-new-privileges, read-only fs** (`CapEff: 0`, a write to `/app` fails); the gate
+  runs the real `policy.decide()` → **real 403**. What's left: remote-host deploy for the
+  judged run, and the gated vendor binary. Caveat: path-level rules are HTTP-demo-scoped
+  (HTTPS `CONNECT` needs TLS termination) — isolation + host-level allow/deny are protocol-
+  independent (`containment/planb/README.md`).
+- ◐ **A2 · Make the policy YAML enforce — done except live-schema (DGX).** `policy.py` now
+  **reads the per-endpoint `enforcement:` field** (was a Python default arg); the inference
+  hop + filing host ship `enforce`, discovery endpoints stay `audit` for the A5 sweep. Both
+  inference destinations (Modal + NIM) enumerated, all `enforce`. Local structural validation
+  (`inference/policy/validate_policy.py`); live early-preview schema check still on DGX.
+- [x] **A3 · Wire the Policy Advisor client in — done.** `containment/demo.py` calls the real
+  `PolicyAdvisorClient.escalate()` on every default-deny; both branches run (Dropbox rejected,
+  a legit host approved), the filing hard-deny is never escalated. `proposal_flow()` prints
+  gone.
+- [x] **A4 · Close the two honest gaps — code side done, verified offline.**
+  `runtime/inference_gateway.py` fronts `inference.local` and injects the provider key
+  **host-side**; `INFERENCE_BACKEND=gateway` gives the sandbox a dummy token only. Proven no-GPU
+  (`runtime/gateway_smoke.py`): dummy rejected direct (401), works via gateway (200), model
+  pinned, key absent from the agent env. The isolation *guarantee* is A1.
+- ◐ **A5 · Audit → enforce sweep — real in Plan B.** The gate honours `ENFORCE=audit|enforce`:
+  `ENFORCE=audit bash containment/planb/run.sh` logs the real egress set and lets it through,
+  then `enforce` turns each into a real 403. What's left: run the *full production agent*
+  under it (needs live GPU egress).
+- [x] **A6 · Fix the dead M2 fusion — done.** The demo now has a beat where policy **ALLOWs**
+  and HiddenLayer **still acts** on the same action (the vault read is allowed, its bytes
+  quarantined on the `TOOL_RESULT` hop). `containment/fixtures/exfil_request.json` is now the
+  demo's source of truth, not dead.
 
 **Done when:** the trick prompt *"file now + back up to Dropbox"* is blocked by policy the
 operator set — filing by `deny_rules`, Dropbox by un-allowlisted egress — with a real 403,
-and a proposal the operator can actually approve *or* reject.
+and an approvable/rejectable proposal. **✅ met in Plan B** (`containment/planb/run.sh`: real
+403 + real escalation) and **live online** (https://airtight-openshell.vercel.app). The
+offline `containment/demo.py` 403 is still `[SIM]`; the real one is Plan B / the live deploy.
 
 ### B · Recursion — make the loop compound
 
