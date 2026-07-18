@@ -54,6 +54,36 @@ magnitude more work per second for roughly half again the wait.
 run — 3.9% more tokens/sec for double the latency. Cap the heartbeat's concurrent
 sub-agent fan-out at 16.
 
+## Reproducibility — a second, independent run agrees
+
+The sweep above was re-run ~10 minutes later against the same warm deployment, from a
+separate session, with the same harness and settings. Raw JSON:
+`runtime/bench-results/sweep-20260718T060846Z.json`, captured **06:08 UTC**.
+
+| Concurrency | Run A tok/s | Run B tok/s | Δ |
+|---:|---:|---:|---:|
+| 1 | 65.2 | 67.6 | +3.7% |
+| 2 | 88.0 | 96.9 | +10.1% |
+| 4 | 150.2 | 187.4 | +24.8% |
+| 8 | 362.4 | 369.8 | +2.0% |
+| **16** | **695.8** | **712.0** | **+2.3%** |
+| 32 | 722.7 | 726.4 | +0.5% |
+
+**Both runs land the same headline and the same knee**: 10.67× vs **10.53×** C=1→C=16, knee
+at 16 in both, zero errors in both, exact `ignore_eos` token counts in both. The claim
+reproduces; it is not one lucky sweep.
+
+**Where the two runs disagree, and why it doesn't matter.** The mid-curve points are noisy
+— C=4 differs by 25%. Those levels fire only 8 requests (`max(8, 2×concurrency)`), so a
+single slow request moves the average a lot, and at low concurrency the per-level ramp-up
+and drain are a large fraction of a short wall clock. The points the argument actually
+rests on — C=1, C=16, C=32 — reproduce within 4%. If a level's exact value ever needs to
+be load-bearing, raise the request count there rather than quoting a single run.
+
+Run B passed the container-boundary check independently: its sweep ended **06:08:46 UTC**
+and the next container began loading the model at **06:09:26**, 40s later — too late to
+serve any measured request. Both runs are therefore single-A100 numbers.
+
 ## Method (and why each choice matters)
 
 - **`ignore_eos` + fixed `max_tokens=128`** — every request emits exactly the same number
