@@ -1,0 +1,78 @@
+<!doctype html>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Airtight M4 ablation — empty vs warmed</title>
+<style>
+  .viz-root {
+    --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e; --muted: #898781;
+    --baseline: #c3c2b7; --series-empty: #2a78d6; --series-warmed: #1baf7a;
+    background: var(--surface); color: var(--ink); max-width: 760px; margin: 2rem auto;
+    padding: 1.5rem; font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    .viz-root {
+      --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7; --muted: #898781;
+      --baseline: #383835; --series-empty: #3987e5; --series-warmed: #199e70;
+    }
+  }
+  h1 { font-size: 1.1rem; margin: 0 0 .25rem; }
+  .legend { display: flex; gap: 1.25rem; margin: .5rem 0 1rem; font-size: .85rem; color: var(--ink-2); }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+  .panels { display: flex; flex-wrap: wrap; gap: .5rem; }
+  figure { margin: 0; flex: 1 1 200px; }
+  figcaption { font-size: .85rem; color: var(--ink-2); text-align: center; }
+  .dir { color: var(--muted); font-size: .75rem; }
+  .bar.empty { fill: var(--series-empty); }
+  .bar.warmed { fill: var(--series-warmed); }
+  .bar:hover { filter: brightness(1.12); }
+  .baseline { stroke: var(--baseline); stroke-width: 1; }
+  .val { fill: var(--ink); font-size: 12px; text-anchor: middle; }
+  .cond { fill: var(--ink-2); font-size: 11px; text-anchor: middle; }
+  .stub { color: var(--ink-2); border: 1px solid var(--baseline); border-radius: 6px; padding: .5rem .75rem; font-size: .85rem; }
+  table { border-collapse: collapse; font-size: .85rem; margin-top: 1rem; }
+  th, td { padding: .3rem .75rem; text-align: left; border-bottom: 1px solid var(--baseline); font-variant-numeric: tabular-nums; }
+  th { color: var(--ink-2); font-weight: 600; }
+  footer { color: var(--muted); font-size: .75rem; margin-top: 1.25rem; line-height: 1.5; }
+</style>
+<div class="viz-root">
+  <h1>M4 ablation — same model, same prompts, only the memory differs</h1>
+  <div class="legend">
+    <span><i style="background:var(--series-empty)"></i>empty memory</span>
+    <span><i style="background:var(--series-warmed)"></i>warmed on 17 records</span>
+  </div>
+  
+  <div class="panels">
+  <figure>
+    <figcaption>Loopholes caught of 6 <span class="dir">(higher is better)</span></figcaption>
+    <svg viewBox="0 0 220 190" role="img" aria-label="Loopholes caught of 6, empty vs warmed">
+      <line class="baseline" x1="8" y1="160" x2="212" y2="160"/>
+      <path class="bar empty" d="M53.0,160.0 v-23.39130434782609 q0,-4.0 4.0,-4.0 h48.0 q4.0,0 4.0,4.0 v23.39130434782609 z"><title>empty: 0.8</title></path><path class="bar warmed" d="M111.0,160.0 v-105.56521739130436 q0,-4.0 4.0,-4.0 h48.0 q4.0,0 4.0,4.0 v105.56521739130436 z"><title>warmed: 3.3</title></path>
+      <text class="val" x="81.0" y="126.6086956521739">0.8</text><text class="cond" x="81.0" y="176">empty</text><text class="val" x="139.0" y="44.43478260869564">3.3</text><text class="cond" x="139.0" y="176">warmed</text>
+    </svg>
+  </figure>
+  <figure>
+    <figcaption>Wall-clock per draft (s) <span class="dir">(lower is better)</span></figcaption>
+    <svg viewBox="0 0 220 190" role="img" aria-label="Wall-clock per draft (s), empty vs warmed">
+      <line class="baseline" x1="8" y1="160" x2="212" y2="160"/>
+      <path class="bar empty" d="M53.0,160.0 v-105.56521739130436 q0,-4.0 4.0,-4.0 h48.0 q4.0,0 4.0,4.0 v105.56521739130436 z"><title>empty: 58.1</title></path><path class="bar warmed" d="M111.0,160.0 v-35.711108895093744 q0,-4.0 4.0,-4.0 h48.0 q4.0,0 4.0,4.0 v35.711108895093744 z"><title>warmed: 21.1</title></path>
+      <text class="val" x="81.0" y="44.43478260869564">58.1</text><text class="cond" x="81.0" y="176">empty</text><text class="val" x="139.0" y="114.28889110490626">21.1</text><text class="cond" x="139.0" y="176">warmed</text>
+    </svg>
+  </figure>
+  <figure>
+    <figcaption>Defects (judge rubric) <span class="dir">(lower is better)</span></figcaption>
+    <svg viewBox="0 0 220 190" role="img" aria-label="Defects (judge rubric), empty vs warmed">
+      <line class="baseline" x1="8" y1="160" x2="212" y2="160"/>
+      <path class="bar empty" d="M53.0,160.0 v-81.21739130434783 q0,-4.0 4.0,-4.0 h48.0 q4.0,0 4.0,4.0 v81.21739130434783 z"><title>empty: 1.2</title></path><path class="bar warmed" d="M111.0,160.0 v-105.56521739130436 q0,-4.0 4.0,-4.0 h48.0 q4.0,0 4.0,4.0 v105.56521739130436 z"><title>warmed: 1.5</title></path>
+      <text class="val" x="81.0" y="68.78260869565217">1.2</text><text class="cond" x="81.0" y="176">empty</text><text class="val" x="139.0" y="44.43478260869564">1.5</text><text class="cond" x="139.0" y="176">warmed</text>
+    </svg>
+  </figure></div>
+  <table>
+    <tr><th>disclosure</th><th>Δ loopholes</th><th>Δ time</th><th>Δ defects</th></tr>
+    <tr><td>uspto-19581008</td><td>-1</td><td>-236.5s</td><td>-5</td></tr><tr><td>uspto-90016193</td><td>+2</td><td>+10.4s</td><td>+1</td></tr><tr><td>uspto-90016210</td><td>+1</td><td>-0.7s</td><td>+0</td></tr><tr><td>uspto-90016224</td><td>+3</td><td>-0.3s</td><td>+0</td></tr><tr><td>uspto-90016284</td><td>+5</td><td>-1.5s</td><td>+0</td></tr><tr><td>uspto-90016344</td><td>+5</td><td>+6.3s</td><td>+6</td></tr>
+  </table>
+  <footer>
+    2026-07-18T12:39:18-05:00 · mode=live · model=nemotron · host=steven-ortega426--airtight-nemotron-serve.modal.run
+    · k=5 · runs=1 · git=aba365cf12<br>
+    draft gen={"temperature": 0.0, "seed": 1234, "max_tokens": 1100, "extra_body": {"chat_template_kwargs": {"enable_thinking": false}}} · judge gen={"temperature": 0.0, "seed": 1234}
+    · prompt hashes in results.json — nothing else changed between conditions.
+  </footer>
+</div>

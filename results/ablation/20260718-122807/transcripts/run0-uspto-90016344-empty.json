@@ -1,0 +1,106 @@
+{
+  "run": 0,
+  "condition": "empty",
+  "disclosure_id": "uspto-90016344",
+  "retrieved_ids": [],
+  "scaffold_proof": {
+    "templates_sha256": {
+      "PLAN_SYSTEM": "d2a1460f878507a31328c3c5ee8ce74c7fa3efb29b1de00b06ca9ac34417a0fa",
+      "DRAFT_SYSTEM": "9fbd0ceed05a0fe7aaf50bcf12e0ac3d6dd170c96946b96ed62985599f93c730",
+      "CRITIQUE_SYSTEM": "e26413fdbe3544ba02102e5a737f7e26ce2fc7df223ced1214d8ccd649a40d04"
+    },
+    "empty_slot": "(none on record)",
+    "warmed_slot": "(none on record)"
+  },
+  "transcript": [
+    {
+      "turn": "plan",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are the planning module of a patent-drafting agent. Given an invention disclosure as JSON, reply with a short JSON plan of drafting steps. Reply with JSON only."
+        },
+        {
+          "role": "user",
+          "content": "{\"id\":\"uspto-90016344\",\"title\":\"SYSTEM AND METHOD FOR MONITORING THE STATUS OF MULTIPLE SERVERS ON A NETWORK\",\"inventors\":[\"9871693\",\"CLOUD BYTE LLC Organization\",\"LEXARX PLLC\",\"LexArx PLLC\",\"Samuel Hendon\",\"Colin Feeser\"],\"technology_class\":\"G06F\",\"summary\":\"SYSTEM AND METHOD FOR MONITORING THE STATUS OF MULTIPLE SERVERS ON A NETWORK. USPTO application 90016344, CPC , Reexam Assigned to Examiner for Determination (filed 2026-05-27). [real USPTO metadata; abstract not exposed by the file-wrapper endpoint]\",\"details\":\"CPC classifications: . Art unit 3992, examiner ESCALANTE, OVIDIO. Application type: Re-Examination.\"}"
+        }
+      ],
+      "reply": "{\n  \"drafting_steps\": [\n    \"Extract full specification, claims, and drawings from the application file.\",\n    \"Identify key technical features related to server status monitoring, network communication, and health-check mechanisms.\",\n    \"Map each feature to corresponding elements of the independent claim(s) and supporting dependent claims.\",\n    \"Create a claim chart linking disclosed embodiments to claim limitations, noting any gaps or ambiguities.\",\n    \"Draft a concise abstract and brief background summarizing the problem and solution.\",\n    \"Prepare a detailed description with reference numbers, system architecture diagrams, and flowcharts.\",\n    \"Incorporate relevant CPC classification (G06F) and examiner details (Art Unit 3992, Examiner Ovidio Escand\u00f3n) into the file metadata.\",\n    \"Generate a claim set that emphasizes novelty over prior art, focusing on real\u2011time status aggregation, dynamic threshold adjustment, and automated remedial actions.\",\n    \"Review the draft for enablement, written description support, and compliance with USPTO formalities.\",\n    \"Finalize the specification, claims, and drawings for submission in the re\u2011examination proceeding.\"\n  ]\n}"
+    },
+    {
+      "turn": "draft",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a patent attorney. Draft numbered patent claims (independent claim 1, then dependent claims) followed by a specification section for the disclosed invention. Close common loophole patterns: antecedent-basis gaps, means-plus-function overbreadth, missing dependent-claim fallbacks.\n\nLoophole guardrails retrieved from memory for this technology class \u2014 close each one with explicit claim language; if none are listed, draft with standard care:\n(none on record)"
+        },
+        {
+          "role": "user",
+          "content": "Plan:\n{\n  \"drafting_steps\": [\n    \"Extract full specification, claims, and drawings from the application file.\",\n    \"Identify key technical features related to server status monitoring, network communication, and health-check mechanisms.\",\n    \"Map each feature to corresponding elements of the independent claim(s) and supporting dependent claims.\",\n    \"Create a claim chart linking disclosed embodiments to claim limitations, noting any gaps or ambiguities.\",\n    \"Draft a concise abstract and brief background summarizing the problem and solution.\",\n    \"Prepare a detailed description with reference numbers, system architecture diagrams, and flowcharts.\",\n    \"Incorporate relevant CPC classification (G06F) and examiner details (Art Unit 3992, Examiner Ovidio Escand\u00f3n) into the file metadata.\",\n    \"Generate a claim set that emphasizes novelty over prior art, focusing on real\u2011time status aggregation, dynamic threshold adjustment, and automated remedial actions.\",\n    \"Review the draft for enablement, written description support, and compliance with USPTO formalities.\",\n    \"Finalize the specification, claims, and drawings for submission in the re\u2011examination proceeding.\"\n  ]\n}\n\nDisclosure:\n{\"id\":\"uspto-90016344\",\"title\":\"SYSTEM AND METHOD FOR MONITORING THE STATUS OF MULTIPLE SERVERS ON A NETWORK\",\"inventors\":[\"9871693\",\"CLOUD BYTE LLC Organization\",\"LEXARX PLLC\",\"LexArx PLLC\",\"Samuel Hendon\",\"Colin Feeser\"],\"technology_class\":\"G06F\",\"summary\":\"SYSTEM AND METHOD FOR MONITORING THE STATUS OF MULTIPLE SERVERS ON A NETWORK. USPTO application 90016344, CPC , Reexam Assigned to Examiner for Determination (filed 2026-05-27). [real USPTO metadata; abstract not exposed by the file-wrapper endpoint]\",\"details\":\"CPC classifications: . Art unit 3992, examiner ESCALANTE, OVIDIO. Application type: Re-Examination.\"}"
+        }
+      ],
+      "reply": "**Patent Specification \u2013 Draft (Re\u2011examination Application No.\u202f90016344)**  \n\n---\n\n### 1. Title  \n**SYSTEM AND METHOD FOR MONITORING THE STATUS OF MULTIPLE SERVERS ON A NETWORK**\n\n---\n\n### 2. Abstract  \nA computer\u2011implemented system and method for continuously monitoring the operational status of a plurality of servers across a network. The system aggregates real\u2011time health metrics, dynamically adjusts monitoring thresholds based on historical performance, and automatically initiates remedial actions when a server\u2019s status deviates from an acceptable range. The invention improves network reliability by reducing false\u2011positive alerts and minimizing service interruption through predictive, context\u2011aware health\u2011check mechanisms.\n\n---\n\n### 3. Background  \n\nThe rapid expansion of cloud\u2011based services and distributed applications has increased the number of servers that must be monitored to maintain service availability. Conventional monitoring solutions typically rely on static polling intervals and fixed threshold values, which can lead to either excessive false alarms or delayed detection of genuine failures. Moreover, existing approaches often require manual intervention to adjust monitoring parameters when server loads or network conditions change, resulting in sub\u2011optimal performance and increased administrative overhead.\n\nAccordingly, there is a need for an automated, adaptive monitoring system that can (i) collect and correlate status information from multiple servers in real time, (ii) adjust monitoring criteria dynamically based on observed trends, and (iii) trigger remedial actions without human intervention, thereby improving overall system resilience.\n\n---\n\n### 4. Summary of the Invention  \n\nThe present invention provides a **distributed server\u2011status monitoring system** comprising:  \n\n1. **A plurality of status\u2011collector agents** deployed on each server, configured to gather a set of health\u2011related metrics (e.g., CPU utilization, memory usage, network latency, error rates).  \n2. **A central monitoring service** that receives metric streams from the agents via a secure communication channel.  \n3. **A dynamic threshold engine** that analyzes historical metric data to generate adaptive thresholds for each metric, wherein the thresholds are updated in response to changes in server load or network conditions.  \n4. **A status\u2011aggregation module** that evaluates the current metric values against the adaptive thresholds and determines a composite status for each server (e.g., *healthy*, *degraded*, *unavailable*).  \n5. **A remedial\u2011action orchestrator** that, upon detecting a composite status that satisfies a predefined condition, automatically executes one or more remedial actions such as rerouting traffic, scaling resources, or initiating a fail\u2011over to a backup server.  \n\nIn one embodiment, the system employs a **machine\u2011learning model** trained on historical performance data to predict impending failures and to pre\u2011emptively adjust thresholds, thereby reducing the likelihood of service disruption. The invention further includes a **graphical user interface** that visualizes server statuses, threshold trends, and executed remedial actions for operational staff.\n\n---\n\n### 5. Brief Description of the Drawings  \n\n| Fig. | Description |\n|------|-------------|\n| **Fig.\u202f1** | High\u2011level system architecture diagram illustrating the distributed status\u2011collector agents, central monitoring service, and remedial\u2011action orchestrator. |\n| **Fig.\u202f2** | Flowchart of the method for collecting server metrics, generating adaptive thresholds, and determining server status. |\n| **Fig.\u202f3** | Sequence diagram showing the interaction between a status\u2011collector agent and the central monitoring service during a health\u2011check cycle. |\n| **Fig.\u202f4** | Diagram of the dynamic threshold engine illustrating how historical data informs threshold updates. |\n| **Fig.\u202f5** | Example user\u2011interface screen displaying server status indicators and threshold trend graphs. |\n\n*(Reference numbers used in the drawings correspond to the elements described in the detailed description.)*\n\n---\n\n### 6. Detailed Description  \n\n#### 6.1. System Overview  \n\nReferring to **Fig.\u202f1**, the system comprises a network 102 interconnecting a plurality of servers 104\u20111 \u2026 104\u2011N, a set of status\u2011collector agents 106\u20111 \u2026 106\u2011N deployed on each server, a central monitoring service 108, a data store 110, a dynamic threshold engine 112, a status\u2011aggregation module 114, and a remedial\u2011action orchestrator 116.  \n\nEach server 104 may host one or more applications, virtual machines, or containerized workloads. The status\u2011collector agents 106 periodically query local system counters and export the collected metrics to the central monitoring service 108 via an encrypted communication channel (e.g., TLS).  \n\nThe central monitoring service 108 aggregates the incoming metric streams, stores them in data store 110, and makes them available to the dynamic threshold engine 112 and the status\u2011aggregation module 114.  \n\n#### 6.2. Metric Collection  \n\nThe status\u2011collector agents 106 collect a predefined set of metrics, which may include:  \n\n- **CPU Utilization** (percentage of processor time used)  "
+    },
+    {
+      "turn": "critique",
+      "messages": [
+        {
+          "role": "system",
+          "content": "You are a hostile patent examiner. Attack the draft below: find \u00a7112 indefiniteness, antecedent-basis errors, \u00a7102/\u00a7103 exposure, and claim language a competitor could design around. Reply as a bulleted list of defects, most severe first.\n\nKnown loophole patterns retrieved from memory \u2014 check each explicitly; if none are listed, apply standard scrutiny:\n(none on record)"
+        },
+        {
+          "role": "user",
+          "content": "**Patent Specification \u2013 Draft (Re\u2011examination Application No.\u202f90016344)**  \n\n---\n\n### 1. Title  \n**SYSTEM AND METHOD FOR MONITORING THE STATUS OF MULTIPLE SERVERS ON A NETWORK**\n\n---\n\n### 2. Abstract  \nA computer\u2011implemented system and method for continuously monitoring the operational status of a plurality of servers across a network. The system aggregates real\u2011time health metrics, dynamically adjusts monitoring thresholds based on historical performance, and automatically initiates remedial actions when a server\u2019s status deviates from an acceptable range. The invention improves network reliability by reducing false\u2011positive alerts and minimizing service interruption through predictive, context\u2011aware health\u2011check mechanisms.\n\n---\n\n### 3. Background  \n\nThe rapid expansion of cloud\u2011based services and distributed applications has increased the number of servers that must be monitored to maintain service availability. Conventional monitoring solutions typically rely on static polling intervals and fixed threshold values, which can lead to either excessive false alarms or delayed detection of genuine failures. Moreover, existing approaches often require manual intervention to adjust monitoring parameters when server loads or network conditions change, resulting in sub\u2011optimal performance and increased administrative overhead.\n\nAccordingly, there is a need for an automated, adaptive monitoring system that can (i) collect and correlate status information from multiple servers in real time, (ii) adjust monitoring criteria dynamically based on observed trends, and (iii) trigger remedial actions without human intervention, thereby improving overall system resilience.\n\n---\n\n### 4. Summary of the Invention  \n\nThe present invention provides a **distributed server\u2011status monitoring system** comprising:  \n\n1. **A plurality of status\u2011collector agents** deployed on each server, configured to gather a set of health\u2011related metrics (e.g., CPU utilization, memory usage, network latency, error rates).  \n2. **A central monitoring service** that receives metric streams from the agents via a secure communication channel.  \n3. **A dynamic threshold engine** that analyzes historical metric data to generate adaptive thresholds for each metric, wherein the thresholds are updated in response to changes in server load or network conditions.  \n4. **A status\u2011aggregation module** that evaluates the current metric values against the adaptive thresholds and determines a composite status for each server (e.g., *healthy*, *degraded*, *unavailable*).  \n5. **A remedial\u2011action orchestrator** that, upon detecting a composite status that satisfies a predefined condition, automatically executes one or more remedial actions such as rerouting traffic, scaling resources, or initiating a fail\u2011over to a backup server.  \n\nIn one embodiment, the system employs a **machine\u2011learning model** trained on historical performance data to predict impending failures and to pre\u2011emptively adjust thresholds, thereby reducing the likelihood of service disruption. The invention further includes a **graphical user interface** that visualizes server statuses, threshold trends, and executed remedial actions for operational staff.\n\n---\n\n### 5. Brief Description of the Drawings  \n\n| Fig. | Description |\n|------|-------------|\n| **Fig.\u202f1** | High\u2011level system architecture diagram illustrating the distributed status\u2011collector agents, central monitoring service, and remedial\u2011action orchestrator. |\n| **Fig.\u202f2** | Flowchart of the method for collecting server metrics, generating adaptive thresholds, and determining server status. |\n| **Fig.\u202f3** | Sequence diagram showing the interaction between a status\u2011collector agent and the central monitoring service during a health\u2011check cycle. |\n| **Fig.\u202f4** | Diagram of the dynamic threshold engine illustrating how historical data informs threshold updates. |\n| **Fig.\u202f5** | Example user\u2011interface screen displaying server status indicators and threshold trend graphs. |\n\n*(Reference numbers used in the drawings correspond to the elements described in the detailed description.)*\n\n---\n\n### 6. Detailed Description  \n\n#### 6.1. System Overview  \n\nReferring to **Fig.\u202f1**, the system comprises a network 102 interconnecting a plurality of servers 104\u20111 \u2026 104\u2011N, a set of status\u2011collector agents 106\u20111 \u2026 106\u2011N deployed on each server, a central monitoring service 108, a data store 110, a dynamic threshold engine 112, a status\u2011aggregation module 114, and a remedial\u2011action orchestrator 116.  \n\nEach server 104 may host one or more applications, virtual machines, or containerized workloads. The status\u2011collector agents 106 periodically query local system counters and export the collected metrics to the central monitoring service 108 via an encrypted communication channel (e.g., TLS).  \n\nThe central monitoring service 108 aggregates the incoming metric streams, stores them in data store 110, and makes them available to the dynamic threshold engine 112 and the status\u2011aggregation module 114.  \n\n#### 6.2. Metric Collection  \n\nThe status\u2011collector agents 106 collect a predefined set of metrics, which may include:  \n\n- **CPU Utilization** (percentage of processor time used)  "
+        }
+      ],
+      "reply": "- **Indefinite scope** \u2013 \u201ccontinuously monitoring\u201d and \u201cdynamically adjusts\u201d lack a concrete temporal or algorithmic definition, rendering the claim\u2019s subject matter vague.  \n- **Missing antecedent linkage** \u2013 The \u201cdynamic threshold engine\u201d is introduced without a prior explicit description of how thresholds are initially set, violating \u00a7112\u2019s requirement for clear antecedent support.  \n- **Over\u2011broad functional language** \u2013 Phrases such as \u201cpredictive, context\u2011aware health\u2011check mechanisms\u201d and \u201cmachine\u2011learning model\u201d are used without disclosing model architecture, training data, or inference logic, creating an antecedent\u2011basis gap.  \n- **Predictive failure coverage** \u2013 The specification hints at failure prediction but never defines the predictive criteria or the threshold\u2011adjustment algorithm, exposing \u00a7102/\u00a7103 prior\u2011art exposure (e.g., static\u2011threshold monitoring systems).  \n- **Design\u2011around vulnerability** \u2013 A competitor could implement a non\u2011learning, static\u2011threshold system that still aggregates metrics and triggers alerts, thereby circumventing the claimed adaptive\u2011threshold step.  \n- **Remedial\u2011action ambiguity** \u2013 \u201cRerouting traffic, scaling resources, or initiating a fail\u2011over\u201d are recited without specifying the triggering condition or the decision logic, making the claim susceptible to a design\u2011around that uses a different trigger (e.g., manual admin override).  \n- **Lack of concrete implementation details** \u2013 No specific data structures, APIs, or communication protocols are disclosed, weakening enablement and providing a clear avenue for a design\u2011around that uses alternative messaging formats.  \n- **Potential obviousness** \u2013 Combining \u201creal\u2011time health metrics\u201d with \u201cadaptive thresholds\u201d is a well\u2011known practice in prior monitoring tools, suggesting the claimed inventive step may be obvious, further jeopardizing \u00a7103 validity.  \n- **Missing enablement of ML model** \u2013 The specification does not disclose how the machine\u2011learning model is trained, validated, or updated, failing to satisfy \u00a7112 enablement and leaving the claim unsupported.  \n- **Broad \u201ccomposite status\u201d term** \u2013 The term \u201ccomposite status\u201d is undefined; without a precise definition, the claim covers any aggregation method, allowing competitors to design around by using a different aggregation function."
+    }
+  ],
+  "verdicts": [
+    {
+      "item_id": "ptab-IPR2025-00254",
+      "closed": false,
+      "evidence": null,
+      "judge_mode": "live"
+    },
+    {
+      "item_id": "ptab-IPR2025-00255",
+      "closed": false,
+      "evidence": null,
+      "judge_mode": "live"
+    },
+    {
+      "item_id": "ptab-IPR2025-00381",
+      "closed": false,
+      "evidence": null,
+      "judge_mode": "live"
+    },
+    {
+      "item_id": "ptab-IPR2025-00472",
+      "closed": false,
+      "evidence": null,
+      "judge_mode": "live"
+    },
+    {
+      "item_id": "ptab-PGR2022-00006",
+      "closed": false,
+      "evidence": null,
+      "judge_mode": "live"
+    },
+    {
+      "item_id": "ptab-PGR2025-00009",
+      "closed": false,
+      "evidence": null,
+      "judge_mode": "live"
+    }
+  ],
+  "defects": [],
+  "result": {
+    "disclosure_id": "uspto-90016344",
+    "condition": "empty",
+    "loopholes_caught": 0,
+    "checklist_size": 6,
+    "drafting_seconds": 15.18,
+    "defect_count": 0
+  }
+}

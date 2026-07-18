@@ -1,0 +1,197 @@
+{
+  "fingerprint": {
+    "timestamp": "2026-07-18T12:39:18-05:00",
+    "mode": "live",
+    "model": "nemotron",
+    "base_url_host": "steven-ortega426--airtight-nemotron-serve.modal.run",
+    "draft_gen": {
+      "temperature": 0.0,
+      "seed": 1234,
+      "max_tokens": 1100,
+      "extra_body": {
+        "chat_template_kwargs": {
+          "enable_thinking": false
+        }
+      }
+    },
+    "judge_gen": {
+      "temperature": 0.0,
+      "seed": 1234
+    },
+    "k": 5,
+    "runs": 1,
+    "git_sha": "aba365cf12540bcc8d0bcbfa175d6d82c95b270e",
+    "prompt_sha256": {
+      "PLAN_SYSTEM": "d2a1460f878507a31328c3c5ee8ce74c7fa3efb29b1de00b06ca9ac34417a0fa",
+      "DRAFT_SYSTEM": "9fbd0ceed05a0fe7aaf50bcf12e0ac3d6dd170c96946b96ed62985599f93c730",
+      "CRITIQUE_SYSTEM": "e26413fdbe3544ba02102e5a737f7e26ce2fc7df223ced1214d8ccd649a40d04",
+      "CHECKLIST_SYSTEM": "aee511fea90cec5ff3cef4139eff977fc2499e1ada77e9a6b6cbea97f2ce9c33",
+      "DEFECT_SYSTEM": "c5c1c2d394169aa62699205c5326144596bc99d5e75859b7b6e79ae666cc6ef5"
+    }
+  },
+  "corpus_size": 17,
+  "overlap_guard": {
+    "uspto-19581008": {
+      "id_collisions": [],
+      "jaccard_flags": []
+    },
+    "uspto-90016193": {
+      "id_collisions": [],
+      "jaccard_flags": []
+    },
+    "uspto-90016210": {
+      "id_collisions": [],
+      "jaccard_flags": []
+    },
+    "uspto-90016224": {
+      "id_collisions": [],
+      "jaccard_flags": []
+    },
+    "uspto-90016284": {
+      "id_collisions": [],
+      "jaccard_flags": []
+    },
+    "uspto-90016344": {
+      "id_collisions": [],
+      "jaccard_flags": []
+    }
+  },
+  "results": [
+    {
+      "disclosure_id": "uspto-19581008",
+      "condition": "empty",
+      "loopholes_caught": 2,
+      "checklist_size": 6,
+      "drafting_seconds": 257.77,
+      "defect_count": 6
+    },
+    {
+      "disclosure_id": "uspto-19581008",
+      "condition": "warmed",
+      "loopholes_caught": 1,
+      "checklist_size": 6,
+      "drafting_seconds": 21.3,
+      "defect_count": 1
+    },
+    {
+      "disclosure_id": "uspto-90016193",
+      "condition": "empty",
+      "loopholes_caught": 0,
+      "checklist_size": 6,
+      "drafting_seconds": 9.97,
+      "defect_count": 1
+    },
+    {
+      "disclosure_id": "uspto-90016193",
+      "condition": "warmed",
+      "loopholes_caught": 2,
+      "checklist_size": 6,
+      "drafting_seconds": 20.34,
+      "defect_count": 2
+    },
+    {
+      "disclosure_id": "uspto-90016210",
+      "condition": "empty",
+      "loopholes_caught": 1,
+      "checklist_size": 6,
+      "drafting_seconds": 22.51,
+      "defect_count": 0
+    },
+    {
+      "disclosure_id": "uspto-90016210",
+      "condition": "warmed",
+      "loopholes_caught": 2,
+      "checklist_size": 6,
+      "drafting_seconds": 21.78,
+      "defect_count": 0
+    },
+    {
+      "disclosure_id": "uspto-90016224",
+      "condition": "empty",
+      "loopholes_caught": 2,
+      "checklist_size": 6,
+      "drafting_seconds": 21.57,
+      "defect_count": 0
+    },
+    {
+      "disclosure_id": "uspto-90016224",
+      "condition": "warmed",
+      "loopholes_caught": 5,
+      "checklist_size": 6,
+      "drafting_seconds": 21.22,
+      "defect_count": 0
+    },
+    {
+      "disclosure_id": "uspto-90016284",
+      "condition": "empty",
+      "loopholes_caught": 0,
+      "checklist_size": 6,
+      "drafting_seconds": 21.8,
+      "defect_count": 0
+    },
+    {
+      "disclosure_id": "uspto-90016284",
+      "condition": "warmed",
+      "loopholes_caught": 5,
+      "checklist_size": 6,
+      "drafting_seconds": 20.27,
+      "defect_count": 0
+    },
+    {
+      "disclosure_id": "uspto-90016344",
+      "condition": "empty",
+      "loopholes_caught": 0,
+      "checklist_size": 6,
+      "drafting_seconds": 15.18,
+      "defect_count": 0
+    },
+    {
+      "disclosure_id": "uspto-90016344",
+      "condition": "warmed",
+      "loopholes_caught": 5,
+      "checklist_size": 6,
+      "drafting_seconds": 21.51,
+      "defect_count": 6
+    }
+  ],
+  "pairs": [
+    {
+      "disclosure_id": "uspto-19581008",
+      "loopholes_caught_delta": -1,
+      "drafting_seconds_delta": -236.47,
+      "defect_count_delta": -5
+    },
+    {
+      "disclosure_id": "uspto-90016193",
+      "loopholes_caught_delta": 2,
+      "drafting_seconds_delta": 10.37,
+      "defect_count_delta": 1
+    },
+    {
+      "disclosure_id": "uspto-90016210",
+      "loopholes_caught_delta": 1,
+      "drafting_seconds_delta": -0.73,
+      "defect_count_delta": 0
+    },
+    {
+      "disclosure_id": "uspto-90016224",
+      "loopholes_caught_delta": 3,
+      "drafting_seconds_delta": -0.35,
+      "defect_count_delta": 0
+    },
+    {
+      "disclosure_id": "uspto-90016284",
+      "loopholes_caught_delta": 5,
+      "drafting_seconds_delta": -1.53,
+      "defect_count_delta": 0
+    },
+    {
+      "disclosure_id": "uspto-90016344",
+      "loopholes_caught_delta": 5,
+      "drafting_seconds_delta": 6.33,
+      "defect_count_delta": 6
+    }
+  ],
+  "stopped_early": false,
+  "disclosures_completed": 6
+}
