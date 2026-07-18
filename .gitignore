@@ -1,6 +1,7 @@
-# Person 1 data pipeline output — pulled bulk data stays local (data/real/…).
-# Tracked fixtures and the committed puller scripts are unaffected (already tracked).
-data/
+# Pulled bulk data stays local; everything else under data/ is the shared contract.
+# `data/` (the rule this replaces, from 01f4daf) swallowed the whole tree, so a new
+# fixture or checklist committed nowhere and still passed tests locally.
+data/real/
 *.duckdb
 checkpoint.json
 
