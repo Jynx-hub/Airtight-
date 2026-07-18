@@ -22,6 +22,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+import time
 import urllib.error
 import urllib.request
 
@@ -32,11 +33,17 @@ from containment.policy import Decision, PolicyResult  # noqa: E402
 GATE = os.environ.get("GATE", "http://gate:8888")
 MODE = os.environ.get("ENFORCE", "enforce").strip().lower()
 _proxy = urllib.request.build_opener(urllib.request.ProxyHandler({"http": GATE}))
+# One operator session across the run, so chunk_ids increment (prop-0001, prop-0002, …)
+# instead of resetting — a counter that repeats an id reads as fake, which is the one
+# thing this whole exercise exists to disprove.
+_advisor = PolicyAdvisorClient(MockTransport())
 
 
 def egress(method: str, url: str, body: bytes | None = None):
     """One egress attempt THROUGH the gate. Returns (status, json, decision-header).
-    A 403 comes back as an HTTPError we unwrap — that is the real socket-level denial."""
+    A 403 comes back as an HTTPError we unwrap — that is the real socket-level denial.
+    A transport error (gate not reachable) returns status 0 so the caller reports a
+    clean failure instead of crashing."""
     req = urllib.request.Request(url, data=body, method=method,
                                  headers={"Content-Type": "application/json"})
     try:
@@ -44,12 +51,25 @@ def egress(method: str, url: str, body: bytes | None = None):
         return resp.status, json.loads(resp.read() or b"{}"), resp.headers.get("X-Airtight-Decision")
     except urllib.error.HTTPError as exc:
         return exc.code, json.loads(exc.read() or b"{}"), exc.headers.get("X-Airtight-Decision")
+    except (urllib.error.URLError, OSError) as exc:
+        return 0, {"error": f"gate unreachable: {exc}"}, None
 
 
-def _escalate(resp: dict, approve: bool) -> str:
+def _wait_for_gate(tries: int = 60) -> None:
+    """`depends_on` waits for container START, not for the gate to be LISTENING — and on a
+    remote host startup timing differs. Poll until the gate answers before the beats."""
+    for _ in range(tries):
+        st, _, _ = egress("GET", "http://data.uspto.gov/search/patents")
+        if st != 0:
+            return
+        time.sleep(0.25)
+
+
+def _escalate(resp: dict, approve: bool):
+    _advisor.transport = MockTransport(approve=approve)  # same client → id keeps incrementing
     denial = PolicyResult(Decision.DEFAULT_DENY_ESCALATE, resp["host"], resp["method"],
                           resp["path"], agent_guidance=resp.get("agent_guidance"))
-    return PolicyAdvisorClient(MockTransport(approve=approve)).escalate(denial)
+    return _advisor.escalate(denial)
 
 
 def check_denied(fails, label, method, url, expect, body=None, approve=None):
@@ -80,6 +100,7 @@ def check_denied(fails, label, method, url, expect, body=None, approve=None):
 def main() -> int:
     fails: list[str] = []
     print(f"— sandbox driver, gate mode = {MODE} —")
+    _wait_for_gate()  # tolerate the gate coming up a beat after the sandbox
 
     # (0) network isolation — no route off-box except the gate (independent of mode)
     try:

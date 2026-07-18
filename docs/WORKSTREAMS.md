@@ -83,6 +83,11 @@ the repo is prose or an f-string.
   (never local/venue), and — if the preview stands up — swap the container gate for the vendor
   binary. The graded architecture and the real 403 are done; the venue deployment is a `docker
   compose up` on a remote box.
+  **One honest caveat (`containment/planb/README.md`):** the gate's *path*-level discrimination
+  (same host, `allow /search/**` vs `hard-deny POST /filings/submit`) works because the demo
+  uses plain-HTTP forward-proxy requests; production HTTPS `CONNECT` shows the gate only
+  `host:443`, so path-granularity needs TLS termination at the gate (what OpenShell does). The
+  network/process/filesystem isolation and host-level allow/deny are protocol-independent and fully real.
 - ◐ **A2 · Make the policy YAML enforce — open items recorded 2026-07-18; not autonomously
   flippable.** The three needs from the original spec now resolve as:
   1. **Two inference destinations — RESOLVED by A4, moved layer.** The spec assumed the agent

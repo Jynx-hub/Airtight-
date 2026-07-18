@@ -51,5 +51,13 @@ now triggered by a real socket-level denial.
   filesystem tier for the demo.
 - The allow-path forwards to a local stub for a hermetic demo; in production the gate forwards
   to the real host in the request (and to the A4 `inference.local` gateway for the model hop).
+- **Path-granularity is HTTP-demo-scoped.** The gate sees `method`+`path` because the driver
+  sends plain-HTTP absolute-URI requests through a forward proxy. Real agent traffic is HTTPS,
+  where a standard `CONNECT` proxy sees only `host:443` — so the fine-grained beat (*same host,
+  path-level `allow /search/**` vs `hard-deny POST /filings/submit`*) needs **TLS termination /
+  MITM at the gate** to transfer to production (which is exactly what OpenShell / a real egress
+  proxy does). **What's protocol-independent and fully real here:** the network, process, and
+  filesystem isolation, and host-level allow/deny. Only the gate's *path* discrimination is
+  scoped to the HTTP demo until TLS termination is added.
 
 Requires a Linux kernel: OrbStack / Docker Desktop / Colima on macOS, or any Linux host.
