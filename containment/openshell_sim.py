@@ -37,13 +37,24 @@ def hard_denied(host: str, method: str, path: str, reason: str) -> None:
     sim(f"    reason: {reason}")
 
 
-def proposal_flow(chunk_id: str, reject_reason: str) -> None:
-    sim(f"agent: POST policy.local/v1/proposals  (op=addRule)  -> chunk_id={chunk_id}")
-    sim(f"agent: GET  policy.local/v1/proposals/{chunk_id}/wait?timeout=300")
+def proposal(prop) -> None:
+    """Render a REAL agent.policy_advisor.Proposal — the object the injectable
+    PolicyAdvisorClient returned, not a hardcoded string. Both operator decisions
+    (approve/reject) render from the same object, so what the demo prints is
+    exactly what the escalation client produced."""
+    rule = prop.rule
+    sim(f"agent: POST policy.local/v1/proposals  (op={prop.op})  -> chunk_id={prop.chunk_id}")
+    sim(f"    proposed rule: allow {rule.get('method')} {rule.get('host')}{rule.get('path')}")
+    sim(f"agent: GET  policy.local/v1/proposals/{prop.chunk_id}/wait?timeout=300")
     sim(f"operator (out-of-band): openshell rule get airtight --status pending")
-    sim(f"operator: openshell rule reject airtight --chunk-id {chunk_id} \\")
-    sim(f'              --reason \"{reject_reason}\"')
-    sim(f"gateway -> proposal {chunk_id}: rejected")
-    sim(f"    rejection_reason: {reject_reason}")
-    sim(f"    validation_result: credential_reach_expansion")
-    sim(f"agent: egress remains denied; disclosure never leaves the sandbox")
+    if prop.status == "approved":
+        sim(f"operator: openshell rule approve airtight --chunk-id {prop.chunk_id}")
+        sim(f"gateway -> proposal {prop.chunk_id}: approved; policy hot-reloaded")
+        sim(f"agent: rule now allows it — retrying the egress")
+    else:
+        sim(f"operator: openshell rule reject airtight --chunk-id {prop.chunk_id} \\")
+        sim(f'              --reason \"{prop.rejection_reason}\"')
+        sim(f"gateway -> proposal {prop.chunk_id}: rejected")
+        sim(f"    rejection_reason: {prop.rejection_reason}")
+        sim(f"    validation_result: {prop.validation_result}")
+        sim(f"agent: egress remains denied; disclosure never leaves the sandbox")

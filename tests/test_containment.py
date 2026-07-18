@@ -67,6 +67,63 @@ def test_demo_wall_holds():
     assert main() == 0
 
 
+# --- A3: the demo drives the REAL PolicyAdvisorClient, not hardcoded prints ---
+
+def test_hard_deny_is_never_escalated():
+    """Filing is hard-denied — attempt_egress must NOT submit a proposal for it."""
+    from agent.policy_advisor import MockTransport, PolicyAdvisorClient
+    from containment.demo import attempt_egress
+
+    transport = MockTransport()
+    outcome = attempt_egress("api.uspto.gov", "POST", "/filings/submit", "xml",
+                             PolicyAdvisorClient(transport))
+    assert outcome == "hard-denied"
+    assert transport.submitted == []  # escalate() was never called
+
+
+def test_default_deny_escalates_via_real_client_and_operator_rejects():
+    from agent.policy_advisor import MockTransport, PolicyAdvisorClient
+    from containment.demo import attempt_egress
+
+    transport = MockTransport(approve=False)
+    outcome = attempt_egress("api.dropboxapi.com", "POST", "/2/files/upload", "bytes",
+                             PolicyAdvisorClient(transport))
+    assert "rejected" in outcome
+    assert len(transport.submitted) == 1 and transport.submitted[0].op == "addRule"
+
+
+def test_approved_escalation_retries_and_sends():
+    """The operator-approve branch is a real path the demo exercises, not just a test."""
+    from agent.policy_advisor import MockTransport, PolicyAdvisorClient
+    from containment.demo import attempt_egress
+
+    transport = MockTransport(approve=True)
+    outcome = attempt_egress("api.patentsview.org", "GET", "/patents/query", "q=g06n",
+                             PolicyAdvisorClient(transport))
+    assert outcome == "sent"
+    assert len(transport.submitted) == 1  # escalated, then approved → retried
+
+
+# --- A6: the fusion — policy ALLOWs, HiddenLayer still acts, on ONE action ---
+
+def test_allow_action_still_crosses_hiddenlayer_and_quarantines(monkeypatch):
+    """The 'one boundary' claim: an action policy ALLOWs is independently gated by
+    HiddenLayer on the tool_result hop. Reachable AND observable, not dead code."""
+    from containment.demo import _read_vault
+
+    # gate 1: policy allows the read
+    assert d("vault.internal", "GET", "/disclosures/disc-0001").decision is Decision.ALLOW
+
+    # gate 2: HiddenLayer quarantines the returned disclosure bytes
+    monkeypatch.setattr(config, "HL_ENABLED", True)
+    monkeypatch.setattr(g, "_raw_analyze",
+                        lambda text, phase: {"metadata": {"event_id": "e"},
+                                             "analysis": [{"name": "pii", "phase": phase,
+                                                           "detected": "CONFIDENTIAL" in text,
+                                                           "findings": {"matches": []}}]})
+    assert _read_vault("/disclosures/disc-0001") == g.QUARANTINE_PLACEHOLDER
+
+
 def test_guarded_egress_blocks_pii_in_body(monkeypatch):
     monkeypatch.setattr(config, "HL_ENABLED", True)
     monkeypatch.setattr(g, "_raw_analyze",

@@ -19,10 +19,10 @@ What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.m
 | **Data** | ✅ done | 134 patents (G06N/G06F/H04L), 94 held-out checklists, 193 real office-action defects, tracked in git |
 | **Inference** | ✅ first half | Nemotron on vLLM/Modal, `INFERENCE_BACKEND=modal\|nim`, 10.67× batching on record |
 | **Agent** | ◐ built, shallow | loop + guardrails + eval harness all real and tested; memory is static RAG, nothing compounds |
-| **Containment** | ⚠️ simulated | `policy.py` decision logic is real, and now so is an escalation client — but enforcement is still a `print()`. No OpenShell exists |
+| **Containment** | ⚠️ simulated | `policy.py` decision + the escalation client are real and now wired into the demo (A3), and the OpenShell↔HiddenLayer fusion is a live beat (A6) — but the "403" is still a `[SIM]` print, not a socket refusal. No OpenShell binary exists; A1/A4 close that |
 | **Surface** | ◐ starter | idea → draft → patent works; edit boxes discard input; no chart view |
 
-Suite: `.venv/bin/pytest tests/` → **70 passed**, 0 skipped, stub mode, no network.
+Suite: `.venv/bin/pytest tests/` → **74 passed**, 0 skipped, stub mode, no network.
 
 **The two headline numbers, stated honestly:**
 
@@ -50,8 +50,9 @@ Suite: `.venv/bin/pytest tests/` → **70 passed**, 0 skipped, stub mode, no net
 
 ## The focus now
 
-Four blocks, in dependency order. **A3, B, C and D are all unblocked and can start today** —
-only A1/A2/A4/A5 wait on hosted hardware.
+Four blocks, in dependency order. **A3 and A6 landed 2026-07-18** (the escalation client is
+wired into the demo and the OpenShell↔HiddenLayer fusion is a live beat). **B, C and D are
+unblocked and can start today** — only A1/A2/A4/A5 wait on hosted hardware.
 
 ### A · Containment — make OpenShell real
 
@@ -74,17 +75,19 @@ the repo is prose or an f-string.
   (`containment/policy.py:63`), so the simulator is stricter than the artifact it models.
   Needed: `enforce` on the inference endpoint, **two** inference destinations (Modal *and*
   NIM, not one), and validation against the live schema.
-- [ ] **A3 · Wire the Policy Advisor client in — the unblocked one.** The client itself now
-  **exists and is tested**: `agent/policy_advisor.py` (landed `0878a5f`) turns a default-deny
-  into a narrow `addRule` proposal, blocks on the operator's decision, and refuses to
-  escalate a `HARD_DENY` — against an injectable transport that is a mock today and
-  `policy.local` when A1 lands. Four tests cover it.
-  **But nothing calls it.** `grep -rn policy_advisor` returns its own test and one f-string;
-  `containment/demo.py` still runs the nine hardcoded prints in `openshell_sim.py:40-49`,
-  with a **pre-written rejection** and no approve path. The escalation logic is a library,
-  not a path the demo executes. The remaining work is the wiring: replace `proposal_flow()`
-  with a real `PolicyAdvisorClient.escalate()` call, and exercise `MockTransport(approve=True)`
-  so both branches are demonstrable. Still does not need A1.
+- [x] **A3 · Wire the Policy Advisor client in — done 2026-07-18.** `containment/demo.py`
+  now calls `PolicyAdvisorClient.escalate()` (`agent/policy_advisor.py`, landed `0878a5f`)
+  on every default-deny; the hardcoded `proposal_flow()` prints are gone and
+  `openshell_sim.proposal()` renders the **real** `Proposal` object the client returned.
+  Both branches run in the demo: Dropbox → `MockTransport(approve=False)` → rejected with a
+  real `chunk_id`/reason; a legitimate un-allowlisted prior-art host →
+  `MockTransport(approve=True)` → approved → the retry proceeds. The filing hard-deny is
+  **not** escalated (tested: `transport.submitted == []`). `grep -rn PolicyAdvisorClient`
+  now returns the demo, not just its own test. Four new tests in `tests/test_containment.py`.
+  **Scope, honestly:** the deny and the approvable/rejectable proposal are now real
+  (decision from the YAML, proposal from the injectable client) — but the "403" is still a
+  `[SIM]` line, not a socket-level refusal from an enforcing gateway. That last mile is
+  A1/A4, not A3.
 - [ ] **A4 · Close the two honest gaps** (both recorded in `docs/INFERENCE-LOCAL.md`):
   `inference.local` becomes a resolvable host with a gateway process instead of a naming
   contract, and **credentials move host-side** — today `runtime/inference_local.py` reads
@@ -94,16 +97,29 @@ the repo is prose or an f-string.
   read what it actually tries (`openshell logs <name> --tail --source sandbox`), then flip
   to `enforce`. This is the pass that catches the door nobody thought of — an un-covered
   egress path is the named top risk on this track. Needs a runnable agent, so schedule after B.
-- [ ] **A6 · Fix the dead M2 fusion.** `containment/demo.py:11-12` claims the demo fuses
-  OpenShell and HiddenLayer on one action — "the one boundary story". It doesn't: the
-  `@g.guarded_tool` block at `:36-45` is only reachable on `Decision.ALLOW`, and both
-  `attempt_egress` calls return on deny before reaching it. Beat 3 (`:61`) bypasses it
-  entirely. **The headline claim of that file is unreachable code at runtime.** Also
-  `containment/fixtures/exfil_request.json` is read by nothing.
+- [x] **A6 · Fix the dead M2 fusion — done 2026-07-18.** The demo now has a beat where
+  policy **ALLOWs** and HiddenLayer **still acts**, on one action: the vault read is allowed
+  by `policy.decide`, and the returned disclosure bytes are quarantined by the guarded_tool
+  `TOOL_RESULT` hop (observable in the run — the bytes come back as the quarantine
+  placeholder, not the disclosure). That is the "one boundary" story made real: two
+  independent gates on the same action, not a `guarded_tool` block stranded behind a deny.
+  The bus is the same code path live-verified in `agent/poison_demo.py`, but the *detection*
+  in this beat is scripted deterministically (a PII flag — which this key does not raise
+  live; see the M2 caveat under Done), exactly as the tests monkeypatch it and as
+  `MockTransport` scripts the operator, so the fusion is observable offline. `containment/fixtures/exfil_request.json` is
+  now the demo's source of truth (prompt, forbidden/approvable/allowed actions), so it is
+  read, not dead. Test: `test_allow_action_still_crosses_hiddenlayer_and_quarantines`.
 
 **Done when:** the trick prompt *"file now + back up to Dropbox"* is blocked by policy the
 operator set — filing by `deny_rules`, Dropbox by un-allowlisted egress — with a real 403,
 and a proposal the operator can actually approve *or* reject.
+
+**Status (2026-07-18):** three of the four clauses are real — the block is decided by the
+operator's YAML (`policy.decide`), and the proposal is a real approvable-*or*-rejectable
+object from `PolicyAdvisorClient` (A3), both demonstrable via `python -m containment.demo`.
+The one clause still open is *"a real 403"*: today it is a `[SIM]` line, because a
+socket-level refusal needs an enforcing OpenShell gateway (A1) and host-side creds (A4),
+which need Linux/DGX hardware. So: **deny + proposal are real; the literal 403 is not yet.**
 
 ### B · Recursion — make the loop compound
 
