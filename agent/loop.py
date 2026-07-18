@@ -13,6 +13,12 @@ condition-dependent text anywhere else.
 import re
 
 from airtight import Disclosure, Draft, LoopholeRecord, call_model
+from agent.statute_reference import reference_block
+
+# The MPEP legal reference is a fixed constant in every drafting/critique/revise
+# template — identical across the ablation's empty and warmed arms, so it grounds
+# the model in real law without touching the warmed-vs-empty delta.
+_REF = reference_block()
 
 PLAN_SYSTEM = (
     "You are the planning module of a patent-drafting agent. Given an invention "
@@ -25,6 +31,7 @@ DRAFT_SYSTEM = (
     "then dependent claims) followed by a specification section for the disclosed "
     "invention. Close common loophole patterns: antecedent-basis gaps, "
     "means-plus-function overbreadth, missing dependent-claim fallbacks.\n\n"
+    + _REF + "\n\n"
     "Loophole guardrails retrieved from memory for this technology class — close "
     "each one with explicit claim language; if none are listed, draft with "
     "standard care:\n{guardrails}"
@@ -32,20 +39,24 @@ DRAFT_SYSTEM = (
 
 CRITIQUE_SYSTEM = (
     "You are a hostile patent examiner. Attack the draft below: find §112 "
-    "indefiniteness, antecedent-basis errors, §102/§103 exposure, and claim "
-    "language a competitor could design around. Reply as a bulleted list of "
+    "indefiniteness, antecedent-basis errors, §101/§102/§103 exposure, and claim "
+    "language a competitor could design around. Ground every defect in the "
+    "standards below and cite the MPEP section. Reply as a bulleted list of "
     "defects, most severe first.\n\n"
+    + _REF + "\n\n"
     "Known loophole patterns retrieved from memory — check each explicitly; if "
     "none are listed, apply standard scrutiny:\n{guardrails}"
 )
 
 REVISE_SYSTEM = (
     "You are a patent attorney revising your own draft after a hostile examiner's "
-    "critique. Apply every material defect below: fix §112 indefiniteness and "
-    "antecedent-basis gaps, narrow means-plus-function overbreadth, add "
-    "dependent-claim fallbacks, and foreclose each design-around named. Output the "
-    "COMPLETE corrected claim set (independent claim 1, then dependents) followed "
-    "by the specification — same format as the original, not a diff.\n\n"
+    "critique. Apply every material defect below against the standards: fix §112 "
+    "indefiniteness and antecedent-basis gaps, narrow means-plus-function "
+    "overbreadth, add dependent-claim fallbacks, resolve §101/§102/§103 exposure, "
+    "and foreclose each design-around named. Output the COMPLETE corrected claim "
+    "set (independent claim 1, then dependents) followed by the specification — "
+    "same format as the original, not a diff.\n\n"
+    + _REF + "\n\n"
     "Loophole guardrails retrieved from memory for this technology class — keep "
     "each one closed as you revise; if none are listed, revise with standard "
     "care:\n{guardrails}"
