@@ -1,0 +1,34 @@
+[
+  {
+    "id": "oa-19387326-c1-1deb5fb6",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently Amended) A user device, UE , for a wireless communication network, like a 3rd Generation Partnership Project, 3GPP, network, wherein the UE comprises a plurality of UE capabilities, the UE capabilities indicating functions the UE is capable to perform, and wherein the UE is to inform on one or more parts of the plurality of UE capabilities using one or more identification values, e.g., hash values, wherein the UE is capable to use one or more artificial intellig ence / machine learning, AI/ ML, models, and the plurality of UE capabilities comprises information on the one or more AI/ ML models, wherein the UE is to store additional information for identifying and/or executing a certain AI/ ML model, the additional information including a validity of the certain AI/ ML model and a cell ID linked to the certain AI/ ML model, and wherein the validity of an AI/ ML model is associated with a sig naling of AI/ ML model update or capability information, and the validity of the certain AI/ ML model is determined when the UE is associated with the cell ID, and/or the certain AI/ML model is valid when the UE is associated with the cell ID. Currently amended 2",
+    "technology_class": "G06N",
+    "remedy": "Examiner's ground: Claims 1-6, 8, 14, 15, 18 and 20 are rejected under 35 U.S.C. 103 as being unpatentable over Shen et al, U.S. Patent Application Publication No. 20220342713 A1 (hereinafter Shen) in view of Lindheimer et al, U.S. Patent Application Publication No. 20220007176 A1 (hereinafter Lindheimer). Regarding Claim 1, Shen discloses a user device, UE, for a wireless communication network, like a 3rd Generatio",
+    "source": "USPTO application 19387326, CTNF office action; claims 1, 3, 4, 5, 6, 8, 14, 15, 18, 20 rejected under 35 U.S.C. 103 as being unpatentable over Shen et al, U"
+  },
+  {
+    "id": "oa-19387326-c7-92c5ec4c",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently Amended) The user device, UE, of claim [[ 2]] 1, wherein: [[ -]] the UE is to receive from the wireless communication network or from a further UE a message, like a Master Information Block, MIB, or a System Information Block, SIB, indicating one or more identification values or a common identification value representing AI/ ML models, and/or [[ -]] responsive to the message, the UE is to: [ [o]] use the one or more AI/ML models indicated by the one or more identification values or the common identification value as default AI/ ML model, or [[o]] use among the one or more AI/ ML models indicated by the one or more identification values or the common identification value a first AI/ ML model supported by the UE as default AI/ ML model, or [[o]] bar the one or more AI/ ML models indicated by the one or more identification values or the common identification value from being used by the UE. Currently amended 8",
+    "technology_class": "G06N",
+    "remedy": "Examiner's ground: Claims 7 and 9 are rejected under 35 U.S.C. 103 as being unpatentable over Shen in view of Lindheimer, in further view of Wang et al, U.S. Patent Application Publication No. 20250048085 A1 (hereinafter Wang, using prior art date of parent European Patent Application Publication No. EP 4518385 A1). Regarding Claim 7, Shen in view of Lindheimer discloses all the limitations of the user device, UE, o",
+    "source": "USPTO application 19387326, CTNF office action; claims 7, 9 rejected under 35 U.S.C. 103 as being unpatentable over Shen in view of Lindheimer, in further view of Wang et al, U"
+  },
+  {
+    "id": "oa-19387326-c12-0cce6fa4",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently Amended) The user device, UE, of claim [[2]] 1, wherein an AI/ ML model is identified by a non-unique identification value used at different origins of the AI/ ML model, like different AI /ML servers or different wireless communication networks, and wherein the UE is to link the AI/ ML model with the origin of the AI/ ML model. Currently amended 13",
+    "technology_class": "G06N",
+    "remedy": "Examiner's ground: Claims 12-13 are rejected under 35 U.S.C. 103 as being unpatentable over Shen in view of Lindheimer, in further view of Yang, U.S. Patent Application Publication No. 20250227507 A1 (using prior art date of parent Chinese Application Publication No. CN 117835262 A). Regarding Claim 12, Shen in view of Lindheimer discloses all the limitations of the user device, UE, of claim 2. Shen does not express",
+    "source": "USPTO application 19387326, CTNF office action; claims 12, 13 rejected under 35 U.S.C. 103 as being unpatentable over Shen in view of Lindheimer, in further view of Yang, U"
+  },
+  {
+    "id": "oa-19387326-c16-c2ced958",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently Amended) The user device, UE, of claim [[ 2]] 1, wherein each of the AI/ ML models is identified by the individual identification value, e.g., an individual hash value, and the common identification value identifying two or more of the AI/ ML models is acquired using the individual identification values, e.g., by hashing the individual hash values. Currently amended 17",
+    "technology_class": "G06N",
+    "remedy": "Examiner's ground: Claims 16-17 are rejected under 35 U.S.C. 103 as being unpatentable over Shen in view of Lindheimer, in further view of Guan et al, U.S. Patent Application Publication No. 20250030612 A1 (hereinafter Guan). Regarding Claim 16, Shen in view of Lindheimer discloses all the limitations of the network entity of claim 2. Shen discloses wherein each of the AI/ML models is identified by the individual id",
+    "source": "USPTO application 19387326, CTNF office action; claims 16, 17 rejected under 35 U.S.C. 103 as being unpatentable over Shen in view of Lindheimer, in further view of Guan et al, U"
+  }
+]

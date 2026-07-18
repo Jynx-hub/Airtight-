@@ -84,7 +84,7 @@ def test_ablation_end_to_end_stub(tmp_path):
     assert transcript["scaffold_proof"]["warmed_slot"] != transcript["scaffold_proof"]["empty_slot"]
 
 
-# ---------- pooled layout (data/real is gitignored, so build the tree from tracked fixtures) ----------
+# ---------- pooled layout (synthetic tree, so the split logic is tested deterministically) ----------
 
 def _pool(tmp_path, n_pairs: int = 6, n_unpaired: int = 0) -> pathlib.Path:
     """A disclosures/ + checklists/ pool shaped like the puller's output."""
@@ -169,7 +169,7 @@ def test_unknown_layout_raises(tmp_path):
 
 
 @pytest.mark.skipif(not (DATA / "real" / "checklists").exists(),
-                    reason="data/real is a local pull (gitignored); run data/pull_uspto.py --groundtruth")
+                    reason="data/real absent; it ships with the repo — restore it or run data/pull_uspto.py --groundtruth")
 def test_real_pull_splits_cleanly():
     """The real holdout must not leak into the real warming corpus. No model calls."""
     from agent.eval.harness import holdout_split, load_pairs

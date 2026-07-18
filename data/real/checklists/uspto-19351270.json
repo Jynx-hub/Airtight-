@@ -1,0 +1,26 @@
+[
+  {
+    "id": "oa-19351270-c1-5bbf7011",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently amended) A system for latent space processing with attention mechanisms, comprising:a computing device comprising a processor and memory storing instructions that, when executed, cause the computing device to: receive input data; generate latent space representations of the input data using an encoding mechanism; process the latent space representations using a latent processing subsystem that operates directly on the latent space representations without token embedding layers or positional encoding layers; route the processed latent space representations through an expert processing system comprising a plurality of expert modules, wherein different expert modules are configured to provide specialized processing capabilities; and generate output data from the expert-processed latent space representations using a decoding mechanism; wherein the expert processing system operates in a gated configuration where a gating module selectively activates a subset of the plurality of expert modules based on characteristics of the latent space representations; and wherein the gating module employs selection strategies selected from the group consisting of: top-k selection, entropy-based scoring, threshold-based routing, and learned assignment functions. Currently amended 2",
+    "technology_class": "G06N",
+    "remedy": "Examiner's ground: Claims 1, 3, 4, 5, 8, 9, 10, 11, 13, 14, 15, 18, 19, 20 are rejected under 35 U.S.C. 103 as being unpatentable over Gilard-Bachrach et al. (\u201cCryptonets: Applying Neural Networks to encrypted data with high throughput and Accuracy.\u201d International Conference on Machine learning, New York, 2016) in view of Petersen et al. (US Patent Number 5,225,978) and Zwicklbauer et al. (USPGPUB 2023/0394284). Reg",
+    "source": "USPTO application 19351270, CTNF office action; claims 1, 4, 5, 8, 9, 11, 13, 14, 15, 18, 19, 20 rejected under 35 U.S.C. 103 as being unpatentable over Gilard-Bachrach et al"
+  },
+  {
+    "id": "oa-19351270-c2-55af2ecb",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The system of claim 1, wherein the latent processing subsystem comprises a transformer-based architecture that computes attention mechanisms directly on the latent space representations by generating query, key, and value matrices from the latent space representations. Original 3",
+    "technology_class": "G06N",
+    "remedy": "Examiner's ground: Claims 2, 12 are rejected under 35 U.S.C. 103 as being unpatentable over Gilard-Bachrach et al., Peterden et al. and Zwicklbauer et al. as applied to claim 1 above, and further in view of Worrall et al. (interpretable Transforms with encoder-decoder Networks\u201d, Proceedings of the IEEE. International Conference on Computer Vision, 2017). Regarding claims 2 and 12, Gilard-Bachrach et al., Peterden et",
+    "source": "USPTO application 19351270, CTNF office action; claims 2, 12 rejected under 35 U.S.C. 103 as being unpatentable over Gilard-Bachrach et al"
+  },
+  {
+    "id": "oa-19351270-c7-1d64620f",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The system of claim 1, wherein the latent space representations are homomorphically encrypted, enabling processing without decryption for federated learning across multiple client devices. Original 8",
+    "technology_class": "G06N",
+    "remedy": "Examiner's ground: Claims 7, 17 are rejected under 35 U.S.C. 103 as being unpatentable over Gilard-Bachrach et al., Peterden et al. and Zwicklbauer et al. as applied to claim 1 above, and further in view of Soltani et al. (US Patent Number 11,514,714). Regarding claims 7 and 17, Bachrach et al. and Peterden et al. and Zwicklbauer et al. combined disclose all the limitation discussed above except the system and metho",
+    "source": "USPTO application 19351270, CTNF office action; claims 7, 17 rejected under 35 U.S.C. 103 as being unpatentable over Gilard-Bachrach et al"
+  }
+]

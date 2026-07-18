@@ -1,0 +1,26 @@
+[
+  {
+    "id": "oa-19325156-c6-df579aa1",
+    "pattern": "\u00a7112 \u2014 enablement gap",
+    "claim_shape": "(Currently Amended) The operating method of claim 1, wherein the function approximation unit further comprises an intermediate register that stores the preprocessing result and an output of the single shared programmable function approximation circuit, and the method comprises transmitting an output of the intermediate register and an output of the plurality of preprocessing circuits to one of the plurality of post-processing circuits according to a control signal thereof. Currently amended 7",
+    "technology_class": "G06N",
+    "remedy": "Examiner's ground: Claims 6 and 12-20 are rejected under 35 U.S.C. 112(a) or 35 U.S.C. 112 (pre-AIA), first paragraph, as failing to comply with the enablement requirement. The claim(s) contains subject matter which was not described in the specification in such a way as to enable one skilled in the art to which it pertains, or with which it is most nearly connected, to make and/or use the invention. Regarding Claim",
+    "source": "USPTO application 19325156, CTNF office action; claims 6, 12, 13, 14, 15, 16, 17, 18, 19, 20 rejected under 35 U.S.C. 112 (a) or 35 U"
+  },
+  {
+    "id": "oa-19325156-c1-5a8d2086",
+    "pattern": "\u00a7102 \u2014 anticipation by a single reference",
+    "claim_shape": "(Currently Amended) An operating method of a function approximation unit configured to approximate a nonlinear function within a neural processing unit, wherein the function approximation unit comprises an input register, a plurality of preprocessing circuits respectively dedicated to different nonlinear functions and configured to perform a function-specific preprocessing including a reciprocal function, a reciprocal of a sq uare root function, or a negative exponential function, a single shared programmable function approximation circuit configured to approximate only a mantissa component using a comparator-based segmentation scheme, and a plurality of post-processing circuits respectively paired with the plurality of preprocessing circuits and configured to perform a function-specific post-processing, and the method comprises: storing an input value through the input register; transmitting the input value to a selected one of the plurality of preprocessing circuits according to a control signal; generating a preprocessing result corresponding to the input value by the selected one of the plurality of preprocessing circuits; transmitting the preprocessing result to the single shared programmable function approximation circuit and a selected one of the plurality of post-processing circuits; generating an approximated function output based on the preprocessing result in the single shared programmable function approximation circuit; and generating a final output value by post-processing the preprocessing result or the approximated function output in the selected one of the plurality of post-processing circuits. Currently amended 2",
+    "technology_class": "G06N",
+    "remedy": "Examiner's ground: Claims 1, 4-6, and 10-11 are rejected under 35 U.S.C. 102(a)(1) as being anticipated by Ananthanarayanan et al. (U.S. 2024/0289168, hereinafter \u201cAnanthanarayanan\u201d). Regarding Claim 1, Ananthanarayanan teaches an operating method of a function approximation unit configured to approximate a nonlinear function within a neural processing unit, wherein the function approximation unit comprises an input",
+    "source": "USPTO application 19325156, CTNF office action; claims 1, 4, 5, 6, 10, 11 rejected under 35 U.S.C. 102 (a)(1) as being anticipated by Ananthanarayanan et al"
+  },
+  {
+    "id": "oa-19325156-c3-d9e64153",
+    "pattern": "\u00a7103 \u2014 obviousness over combined prior art",
+    "claim_shape": "(Original) The operating method of claim 1, wherein the control signal has a length of two bits and is used to select the selected one of the plurality of preprocessing circuits. Original 4",
+    "technology_class": "G06N",
+    "remedy": "Examiner's ground: Claims 2-3, 7-9, and 12-20 are rejected under 35 U.S.C. 103 as being unpatentable over Ananthanarayanan. Regarding Claim 2, Ananthanarayanan teaches wherein the plurality of preprocessing circuits comprise circuits for processing a reciprocal function, a reciprocal of a square root function or a negative exponential function (fig. 2; \u00b6 [0030] and [0035]\u2014the preprocessing circuits include an expone",
+    "source": "USPTO application 19325156, CTNF office action; claims 3, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19 rejected under 35 U.S.C. 103 as being unpatentable over Ananthanarayanan"
+  }
+]
