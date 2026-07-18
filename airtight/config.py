@@ -34,7 +34,7 @@ HL_TIMEOUT_S = float(os.getenv("HIDDENLAYER_TIMEOUT_SECONDS", "10"))
 
 # --- Episodic memory + concurrent sub-agents (M3 "compounds" + vLLM workload) ---
 EPISODES_DIR = os.getenv("AIRTIGHT_EPISODES_DIR", "memory/episodes")  # agent-generated, outside data/
-EPISODES_ENABLED = os.getenv("AIRTIGHT_EPISODES_ENABLED", "false").lower() == "true"
+EPISODES_ENABLED = os.getenv("AIRTIGHT_EPISODES_ENABLED", "false").lower() == "true"  # gates episodic WRITE (agent/loop.py); ablation never writes regardless
 SUBAGENT_MAX_WORKERS = int(os.getenv("AIRTIGHT_SUBAGENT_MAX_WORKERS", "4"))
 
 # --- Ingested memory (D: ingest -> memory) ---

@@ -122,7 +122,7 @@ def scaffold_proof(retrieved: list[LoopholeRecord]) -> dict:
     inside the {guardrails} slot."""
     warmed_slot = loop.render_guardrails(retrieved)
     proof = {"templates_sha256": {}, "empty_slot": loop.GUARDRAILS_EMPTY, "warmed_slot": warmed_slot}
-    for name in ("PLAN_SYSTEM", "DRAFT_SYSTEM", "CRITIQUE_SYSTEM"):
+    for name in ("PLAN_SYSTEM", "DRAFT_SYSTEM", "CRITIQUE_SYSTEM", "REVISE_SYSTEM"):
         template = getattr(loop, name)
         proof["templates_sha256"][name] = hashlib.sha256(template.encode()).hexdigest()
         if "{guardrails}" in template:
@@ -134,7 +134,8 @@ def scaffold_proof(retrieved: list[LoopholeRecord]) -> dict:
     return proof
 
 
-def config_fingerprint(k: int, runs: int, draft_gen: dict = DRAFT_GEN, split: dict | None = None) -> dict:
+def config_fingerprint(k: int, runs: int, draft_gen: dict = DRAFT_GEN, split: dict | None = None,
+                       revise_rounds: int = 1) -> dict:
     try:
         git_sha = subprocess.run(
             ["git", "rev-parse", "HEAD"], capture_output=True, text=True, cwd=Path(__file__).parent
@@ -150,12 +151,14 @@ def config_fingerprint(k: int, runs: int, draft_gen: dict = DRAFT_GEN, split: di
         "judge_gen": judge.JUDGE_GEN,
         "k": k,
         "runs": runs,
+        "revise_rounds": revise_rounds,
         "split": split,  # None for the pre-split fixtures layout
         "git_sha": git_sha,
         "prompt_sha256": {
             "PLAN_SYSTEM": hashlib.sha256(loop.PLAN_SYSTEM.encode()).hexdigest(),
             "DRAFT_SYSTEM": hashlib.sha256(loop.DRAFT_SYSTEM.encode()).hexdigest(),
             "CRITIQUE_SYSTEM": hashlib.sha256(loop.CRITIQUE_SYSTEM.encode()).hexdigest(),
+            "REVISE_SYSTEM": hashlib.sha256(loop.REVISE_SYSTEM.encode()).hexdigest(),
             "CHECKLIST_SYSTEM": hashlib.sha256(judge.CHECKLIST_SYSTEM.encode()).hexdigest(),
             "DEFECT_SYSTEM": hashlib.sha256(judge.DEFECT_SYSTEM.encode()).hexdigest(),
         },
@@ -173,12 +176,14 @@ def run_condition(
     transcript_dir: Path,
     run_idx: int,
     draft_gen: dict = DRAFT_GEN,
+    revise_rounds: int = 1,
 ) -> EvalResult:
     retrieved = store.retrieve(disclosure, k)  # executes in BOTH conditions (empty store -> [])
     transcript: list = []
 
     t0 = time.perf_counter()
-    draft = loop.draft_patent(disclosure, guardrails=retrieved, transcript=transcript, **draft_gen)
+    draft = loop.draft_patent(disclosure, guardrails=retrieved, transcript=transcript,
+                              max_revise_rounds=revise_rounds, **draft_gen)
     seconds = time.perf_counter() - t0
 
     claims_text = "\n".join(f"{i + 1}. {c}" for i, c in enumerate(draft.claims))
@@ -213,7 +218,7 @@ def run_condition(
 def run_ablation(data_root: Path, k: int = 5, runs: int = 1, out_root: Path = Path("results/ablation"),
                  draft_gen: dict = DRAFT_GEN, layout: str = "fixtures",
                  n: int | None = None, seed: int = SPLIT_SEED,
-                 deadline: float | None = None) -> Path:
+                 deadline: float | None = None, revise_rounds: int = 1) -> Path:
     """Run the paired empty-vs-warmed ablation over every graded disclosure.
 
     Two layouts. "fixtures" is the pre-split curated tree (data/fixtures/disclosures +
@@ -278,14 +283,14 @@ def run_ablation(data_root: Path, k: int = 5, runs: int = 1, out_root: Path = Pa
             for condition, store in (("empty", empty), ("warmed", warmed)):
                 results.append(
                     run_condition(disclosure, store, checklist, condition, k, transcript_dir,
-                                  run_idx, draft_gen)
+                                  run_idx, draft_gen, revise_rounds)
                 )
         if stopped_early:
             break
 
     pairs = _pair_deltas(results)
     payload = {
-        "fingerprint": config_fingerprint(k, runs, draft_gen, split),
+        "fingerprint": config_fingerprint(k, runs, draft_gen, split, revise_rounds),
         "corpus_size": len(warmed),
         "overlap_guard": guard_reports,
         "results": [r.model_dump() for r in results],

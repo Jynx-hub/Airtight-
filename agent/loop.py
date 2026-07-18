@@ -39,6 +39,18 @@ CRITIQUE_SYSTEM = (
     "none are listed, apply standard scrutiny:\n{guardrails}"
 )
 
+REVISE_SYSTEM = (
+    "You are a patent attorney revising your own draft after a hostile examiner's "
+    "critique. Apply every material defect below: fix §112 indefiniteness and "
+    "antecedent-basis gaps, narrow means-plus-function overbreadth, add "
+    "dependent-claim fallbacks, and foreclose each design-around named. Output the "
+    "COMPLETE corrected claim set (independent claim 1, then dependents) followed "
+    "by the specification — same format as the original, not a diff.\n\n"
+    "Loophole guardrails retrieved from memory for this technology class — keep "
+    "each one closed as you revise; if none are listed, revise with standard "
+    "care:\n{guardrails}"
+)
+
 GUARDRAILS_EMPTY = "(none on record)"
 
 
@@ -58,6 +70,7 @@ def draft_patent(
     transcript: list | None = None,
     fan_out: bool = False,
     max_workers: int | None = None,
+    max_revise_rounds: int = 1,
     episode_sink=None,
     **gen_kwargs,
 ) -> Draft:
@@ -79,26 +92,45 @@ def draft_patent(
 
         notes_text = notes_block(fan_out_retrieval(disclosure, guardrails, max_workers, **gen_kwargs))
 
+    from agent.episodes import material_defects
+
     plan = turn("plan", PLAN_SYSTEM, disclosure.model_dump_json(), "tool")
-    draft = turn(
+    current = turn(
         "draft",
         DRAFT_SYSTEM.format(guardrails=slot),
         f"Plan:\n{plan}\n\nDisclosure:\n{disclosure.model_dump_json()}{notes_text}",
         "draft",
     )
-    critique = turn("critique", CRITIQUE_SYSTEM.format(guardrails=slot), draft, "draft")
+    critique = turn("critique", CRITIQUE_SYSTEM.format(guardrails=slot), current, "draft")
+    initial_critique = critique  # the mistakes MADE — what the episode learns from
+
+    # Self-correction: feed the critique back and revise, until no material defect
+    # remains or the round cap. Identical loop on both ablation arms; the only
+    # variable is still the {guardrails} slot. Stub replies carry no defect, so
+    # material_defects() is empty and this never runs — output stays byte-identical.
+    rounds = 0
+    while rounds < max_revise_rounds and material_defects(critique):
+        current = turn(
+            f"revise-{rounds + 1}",
+            REVISE_SYSTEM.format(guardrails=slot),
+            f"Draft:\n{current}\n\nExaminer critique:\n{critique}",
+            "draft",
+        )
+        rounds += 1
+        if rounds < max_revise_rounds:  # skip the re-critique after the last permitted revise
+            critique = turn(f"critique-{rounds + 1}", CRITIQUE_SYSTEM.format(guardrails=slot), current, "draft")
 
     result = Draft(
         disclosure_id=disclosure.id,
-        claims=_split_claims(draft),
-        specification=draft,
-        critique_notes=[line for line in critique.splitlines() if line.strip()],
+        claims=_split_claims(current),  # POST-revision (was the raw pre-critique draft)
+        specification=current,
+        critique_notes=[line for line in initial_critique.splitlines() if line.strip()],
         loopholes_closed=[r.id for r in guardrails],
     )
 
-    # Episodic write (opt-in). The eval harness never passes a sink, so the
-    # judged ablation never mutates memory — see agent/episodes.py.
-    if episode_sink is not None:
+    # Episodic write (B2): opt-in AND env-gated. The eval harness never passes a
+    # sink, so no env flip can make the judged ablation mutate memory.
+    if episode_sink is not None and __import__("airtight").config.EPISODES_ENABLED:
         from agent.episodes import compress_run
 
         mode = "stub" if __import__("airtight").config.MODE == "stub" else "live"

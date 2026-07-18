@@ -18,7 +18,7 @@ What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.m
 |---|---|---|
 | **Data** | ✅ done | 134 patents (G06N/G06F/H04L), 94 held-out checklists, 193 real office-action defects, tracked in git |
 | **Inference** | ✅ first half | Nemotron on vLLM/Modal, `INFERENCE_BACKEND=modal\|nim`, 10.67× batching on record |
-| **Agent** | ◐ built, shallow | loop + guardrails + eval harness all real and tested; retrieval is now statute-diversified and IDF-ranked, and ingest writes into it — but the *loop* still doesn't compound (no revise turn, no episode ever written) |
+| **Agent** | ◐ built, deepening | loop now self-corrects (revise turn) and compounds (episodic write, isolated from the ablation); retrieval is statute-diversified and BM25-ranked, and ingest writes into it. B, C and D all done offline — **every quality gain is still unmeasured live** |
 | **Containment** | ⚠️ simulated | `policy.py` decision logic is real, and now so is an escalation client — but enforcement is still a `print()`. No OpenShell exists |
 | **Surface** | ◐ starter | idea → draft → patent works; edit boxes discard input; no chart view |
 
@@ -111,42 +111,35 @@ and a proposal the operator can actually approve *or* reject.
 
 ### B · Recursion — make the loop compound
 
-Today the loop is a straight line and nothing carries across runs. This is the Track-1
-mechanism, and it is the largest gap between what `docs/ARCHITECTURE.md:105-110` claims
-and what the code does.
+**Done 2026-07-18 (`e4f6fcd`), B3→B1→B2 order. Loop now self-corrects and compounds; the
+one thing left is measuring the live quality gain (needs a GPU window — the mechanism is
+proven offline).**
 
-- [ ] **B1 · Add a revise turn.** `agent/loop.py` is three sequential calls — plan (`:81`),
-  draft (`:82-87`), critique (`:88`) — and then stops. The critique lands in
-  `Draft.critique_notes` (`:94`) and is **never fed back**. `Draft.specification` (`:93`)
-  is even set to the raw *pre-critique* text. A hostile examiner finds defects and the run
-  ends with those defects still in the draft. Feed the critique back as a revision turn,
-  loop until no new findings or N rounds. ~10 lines, and it is the difference between
-  "self-critique" and self-*correction*.
-- [ ] **B2 · Turn episodic memory on.** `airtight/config.py:37` defines
-  `EPISODES_ENABLED` — and **it is referenced nowhere else in the repo**. Setting
-  `AIRTIGHT_EPISODES_ENABLED=true` changes nothing. The real gate is the `--episodes` CLI
-  flag (`agent/run_smoke.py:24`) and the `episode_sink=None` default (`agent/loop.py:60`),
-  which the eval harness never passes (`agent/eval/harness.py:181`). `memory/episodes/`
-  holds one 0-byte `.gitkeep`; **no episode has ever been written.** Consequence worth
-  saying out loud: the measured ablation contains zero compounding — it measures static
-  RAG only.
-- [ ] **B3 · Bound the distillation before switching it on.** `compress_run`
-  (`agent/episodes.py:49-59`) appends **one synthetic `LoopholeRecord` per line of
-  `critique_notes`**, and `critique_notes` is every non-blank line of the reply
-  (`agent/loop.py:94`) — so markdown headers and "Here are the defects:" become
-  first-class memory records that re-enter retrieval. Combined with C2's unnormalized
-  ranking, self-generated noise outranks real PTAB records within a few runs. **Do B3
-  before B2 ships**, or compounding poisons its own corpus.
+- [x] **B1 · Revise turn — done.** `draft_patent` (`agent/loop.py`) gains `max_revise_rounds`
+  (default 1): plan → draft → critique → **while `material_defects(critique)`: revise → re-critique**.
+  `claims`/`specification` are now POST-revision (the pre-critique-text bug is fixed);
+  `critique_notes` keeps the INITIAL critique (the mistakes the episode learns from). Stub
+  replies carry no defect keyword, so stub does 0 revises and the ablation stub-delta-0
+  invariant is untouched. `REVISE_SYSTEM` is in `scaffold_proof` + the fingerprint;
+  `revise_rounds` is stamped; `--revise-rounds` on the CLI. Tests: `tests/test_revise.py`.
+- [x] **B2 · Episodic write — done.** The dead `EPISODES_ENABLED` now gates the write
+  (`sink AND flag`). **Isolation is absolute:** the harness passes no sink, so no env flip
+  writes during the ablation — regression-locked by `test_ablation_uncontaminated_by_episodes`
+  (now with the flag *on*). Verified: `run_smoke --episodes` run 1 wrote an episode, run 2
+  retrieved it ("0 past" → "1 past"). Real quality gain still needs a live multi-run; the
+  compounding *mechanism* is proven offline.
+- [x] **B3 · Bounded distillation — done (first, as required).** New deterministic
+  `material_defects()` keeps only critique lines naming a §NNN or defect keyword; `compress_run`
+  distills a CAPPED (`DISTILL_CAP=3`), cleaned set with `§NNN` in the pattern so the validator
+  derives `.statute`. Headers/preambles/bare bullets never become records. Tests cover the
+  filter, the cap, and no-poison-in-stub.
 
-Two smaller correctness items in the same area: `EpisodeStore.load` uses `rglob`
-(`agent/episodes.py:84`) while `LoopholeStore.load` uses `glob` (`agent/memory.py:31`) —
-the two stores disagree on recursion. And `.gitignore` ignores `memory/episodes/*.json`
-while `record()` writes to `memory/episodes/<disclosure_id>/*.json`, so the first episodes
-ever written get staged despite the stated intent. **Confirmed by observation 2026-07-18,
-no longer just inferred from the glob:** a single `python -m agent.run_smoke --episodes`
-left `memory/episodes/disc-0001/…json` showing as untracked, and `git check-ignore` does
-not match it. (The C/D work added `memory/ingested/*.json`, where the one-level glob *is*
-correct — `LoopholeStore.save` writes flat. Left B's line alone deliberately.)
+Correctness items closed: the `rglob` (episodes, subdirs) vs `glob` (flat corpus) difference
+is now documented as intentional on both; `.gitignore` is `memory/episodes/**/*.json`, so
+subdir episodes are actually ignored. **Re-verified after the C/D merge 2026-07-18** —
+`git check-ignore` matches a freshly written `memory/episodes/<id>/x.json`, so this is
+observed, not reported. The C/D rule `memory/ingested/*.json` stays a one-level glob on
+purpose: `LoopholeStore.save` writes flat, so `**` would claim a nesting that never occurs.
 
 ### C · Context memory — make retrieval right ✅ done 2026-07-18
 
