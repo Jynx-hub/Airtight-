@@ -29,8 +29,9 @@ act. Prove it: `bash runtime/serve-nim.sh`.
   default **A100** rate (~$2.50/hr), roughly **~12 GPU-hours** — more than a hackathon of
   bursty dev needs.
 - **The one paid moment is the demo.** Pin a warm replica only for the judged window
-  (`MODAL_MIN_CONTAINERS=1 modal deploy`) so there's no cold-start on stage, then set it
-  back to `0`. That's ~$2/hr for an hour, still inside the credit.
+  (`MODAL_MIN_CONTAINERS=1 bash runtime/modal-deploy.sh`) so there's no cold-start on
+  stage, then set it back to `0`. That's ~$2.50/hr for an hour, still inside the credit.
+  Go through the script, never bare `modal deploy` — see `runtime/RUNBOOK.md`.
 
 ## GPU profile (cost vs quality)
 

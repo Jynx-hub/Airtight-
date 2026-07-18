@@ -25,7 +25,7 @@ vLLM shipped **day-0 support for Nemotron 3** (hybrid Mamba-Transformer MoE). Th
 
 **Brev is no longer available to us** — we host on **Modal's free tier** instead. It's serverless GPU with **scale-to-zero**, so you pay (out of the free monthly credit) only while a request runs, and it's still *self-hosted vLLM* → the $500 bounty is intact. Full cost/free-tier plan: `docs/COSTS.md`.
 
-1. **Deploy to Modal** — `runtime/modal_app.py` runs `vllm serve` on a Modal GPU and exposes an OpenAI-compatible web endpoint. `bash runtime/modal-deploy.sh` (needs a free Modal account + an HF token stored as a Modal Secret for the gated weights). Default GPU profile is **L40S + FP8 Nano** — the cheapest tier that fits.
+1. **Deploy to Modal** — `runtime/modal_app.py` runs `vllm serve` on a Modal GPU and exposes an OpenAI-compatible web endpoint. `bash runtime/modal-deploy.sh` (needs a free Modal account + an HF token stored as a Modal Secret for the gated weights). Default GPU profile is **A100-80GB + BF16 Nano** — the judged path, picked for cold-start recovery once both profiles were measured on 2026-07-18 (`docs/THROUGHPUT.md`). L40S + FP8 is cheaper and faster to run but cold-starts in ~12 min, so it's the dev/bulk profile.
 2. vLLM downloads the weights (cached in a Modal Volume so cold starts don't re-download) and serves on `:8000`, which Modal proxies as `https://<workspace>--airtight-nemotron-serve.modal.run`.
 3. Point `inference.local` at that URL. The route is **operator-pinned**, so the agent inside the OpenShell sandbox cannot repoint it — that's the containment property. vLLM is the engine; `inference.local` is the locked pipe to it.
 4. **Fallback:** the free **NVIDIA NIM hosted endpoint** (`integrate.api.nvidia.com`, model `nvidia/nemotron-3-nano-30b-a3b`) — a one-env-flip swap if Modal is cold or credits run out. Hosted, so it doesn't count toward the bounty; it's the safety net.
@@ -47,7 +47,7 @@ Adds one milestone — **M1b: stand up vLLM behind `inference.local`; verify Ope
 ## To confirm on the day
 
 - Exact `vllm serve` flags for the chosen Nemotron variant (check the vLLM Nemotron 3 cookbook) — and whether your pinned vLLM ships the `nano_v3` reasoning parser built-in or needs the plugin file.
-- The Modal GPU profile (L40S/FP8 default vs A100/BF16) and that the free monthly credit covers your dev + demo hours (`docs/COSTS.md`).
+- ~~The Modal GPU profile~~ — **settled 2026-07-18**: `a100-bf16` is the default and the judged profile (`docs/THROUGHPUT.md`). Still confirm the free monthly credit covers your dev + demo hours (`docs/COSTS.md`).
 - That the OpenShell egress route to the Modal (or NIM) host is on the allowlist (read/inference egress), and that the agent cannot repoint it.
 
 ## Sources

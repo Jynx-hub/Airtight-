@@ -8,14 +8,17 @@
 #   3) modal secret create huggingface HF_TOKEN=hf_xxx   # gated-weights pull token
 #
 # Cost: scale-to-zero → you only burn the free monthly credit while a request runs.
-# Default GPU profile is L40S + FP8 (cheapest fit). For the A100-80GB BF16 quality
-# path:  MODAL_GPU_PROFILE=a100-bf16 bash runtime/modal-deploy.sh
+# Default GPU profile is A100-80GB + BF16 — the JUDGED profile, picked for cold-start
+# recovery (~1-2 min) rather than price. L40S + FP8 is cheaper AND faster to run but
+# cold-starts in ~12 min, so it's the dev/bulk path, not the demo one:
+#   MODAL_GPU_PROFILE=l40s-fp8 bash runtime/modal-deploy.sh
+# Both measured 2026-07-18 — see docs/THROUGHPUT.md before switching.
 set -euo pipefail
 cd "$(dirname "$0")"
 # Load .env WITHOUT clobbering the environment: a pre-exported var must WIN, matching
 # python-dotenv's default in inference_local.py. A bare `set -a; . ./.env` did the
 # OPPOSITE, which silently broke this script's own documented usage above
-# (`MODAL_GPU_PROFILE=a100-bf16 bash modal-deploy.sh`) and the demo keep-warm flow
+# (`MODAL_GPU_PROFILE=l40s-fp8 bash modal-deploy.sh`) and the demo keep-warm flow
 # (`MODAL_MIN_CONTAINERS=1 bash modal-deploy.sh` deployed scale-to-zero anyway).
 if [[ -f .env ]]; then
   while IFS= read -r line || [[ -n "$line" ]]; do
@@ -32,7 +35,10 @@ command -v modal >/dev/null || { echo "modal CLI not found — pip install modal
 # the demo so the first real request never eats a cold download. Uncomment to run:
 #   modal run modal_app.py::prewarm    # (add a prewarm fn if you want this)
 
-echo "▶ Deploying airtight-nemotron to Modal (profile=${MODAL_GPU_PROFILE:-l40s-fp8})…"
+# Don't restate modal_app.py's default profile here — this banner drifted into reporting
+# l40s-fp8 while the app actually deployed a100-bf16, which is the worst thing to be wrong
+# about 15 minutes before a judged run. Name the fallback's OWNER instead; it can't rot.
+echo "▶ Deploying airtight-nemotron to Modal (profile=${MODAL_GPU_PROFILE:-<modal_app.py default>})…"
 modal deploy modal_app.py
 
 cat <<'EOF'
