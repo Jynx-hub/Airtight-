@@ -5,11 +5,11 @@
 An automated **patent platform** with two layers:
 
 1. **Applicant Surface** — the user-facing product: a light intake captures an invention idea, the system drafts a full patent, the user receives a filing-ready specification. Same lane as [autoinvent.com](https://www.autoinvent.com/).
-2. **Examiner Engine** — the self-improving, secured backend that wins the hackathon tracks: an autonomous agent that mines patent data + examiner rejections for the **edge cases people exploit as loopholes**, compounds them into a persistent knowledge graph, and drafts each new patent against the accumulated failure library.
+2. **Examiner Engine** — the self-improving, secured backend that wins the hackathon tracks: an autonomous agent that mines patent data + examiner rejections for the **edge cases people exploit as loopholes**, compounds them into a persistent failure library — records indexed by statutory basis (§101/§102/§103/§112), CPC class and claim shape — and drafts each new patent against it.
 
 The engine runs in two modes: **hit-mode** (point it at an existing patent → loophole/invalidity report — the benchmarked core) and **gap-mode** (point it at a news-derived idea → whitespace/patentability report — a demo funnel, not the benchmark).
 
-**Domain:** the inventions are **software & electronics** patents. The whole pipeline — prior-art search, claim drafting, the edge-case knowledge graph, and the correctness checks — is scoped to that space; §101 eligibility (Alice/Mayo) and §112(f) means-plus-function are first-class failure modes here, and mechanical/chemical/biotech patent conventions don't apply.
+**Domain:** the inventions are **software & electronics** patents. The whole pipeline — prior-art search, claim drafting, the edge-case failure library, and the correctness checks — is scoped to that space; §101 eligibility (Alice/Mayo) and §112(f) means-plus-function are first-class failure modes here, and mechanical/chemical/biotech patent conventions don't apply.
 
 **The wedge:** the three ways patents fail in the real world — **loopholes** (claim language a competitor designs around), **time** (weeks of attorney drafting), **incorrectness** (§101 subject-matter eligibility, §112 indefiniteness, antecedent-basis gaps, prior-art anticipation).
 
@@ -19,7 +19,7 @@ The engine runs in two modes: **hit-mode** (point it at an existing patent → l
 
 | Track | How Airtight fits | Ceiling |
 |-------|-------------------|---------|
-| **Recursive Intelligence** | Edge-case knowledge graph + episodic memory + RAG-from-self; measurable first-run vs last-run delta on loopholes-caught / time / correctness | 9/10 |
+| **Recursive Intelligence** | Statute-indexed edge-case failure library + episodic memory + RAG-from-self; measurable first-run vs last-run delta on loopholes-caught / time / correctness | 9/10 |
 | **HiddenLayer Runtime Security** | Every interaction (prompt, response, tool call, tool result, ingested doc) routed through HiddenLayer AIDR; graded response policy | 9/10 |
 | **NemoClaw + OpenShell Containment** | Capable agent (live filing creds + client datastore) contained by a 3-tier OpenShell policy with Policy-Advisor human-in-the-loop | 8/10 |
 | **Best Use of vLLM** ($500) | Agent inference served on self-hosted vLLM behind inference.local; concurrent sub-agent retrieval exploits continuous batching; Nano = small-model-punch | cross-cutting |
@@ -79,14 +79,14 @@ Quick start (Python 3.10+; 3.12 is what the suite is verified on):
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -e ".[dev,web,poison]" && .venv/bin/pytest tests/
-# expect: 57 passed — no network, no .env, no GPU
+# expect: 111 passed — no network, no .env, no GPU
 ```
 
 Take the `web` and `poison` extras even if you aren't touching the surface or the E5
-security demo. `tests/test_surface.py` `importorskip`s fastapi and the poison-PDF test
-`importorskip`s pdfplumber *by design*, so a `.[dev]`-only clone reports a green **52 passed,
-2 skipped** — green, but with the four surface tests and the poison-PDF test silently not
-run (`.[dev,web]` without `poison` is **56 passed, 1 skipped**). **57 passed** (no skips) is
+security demo. `tests/test_surface.py` `importorskip`s fastapi and the two poison-PDF tests
+`importorskip` pdfplumber *by design*, so a `.[dev]`-only clone reports a green **105 passed,
+6 skipped** — green, but with the four surface tests and both poison-PDF tests silently not
+run (`.[dev,web]` without `poison` is **109 passed, 2 skipped**). **111 passed** (no skips) is
 the number that means "everything a fresh clone can run, ran."
 
 `test_real_pull_splits_cleanly` runs by default now: `data/real/` — the 50-patent G06N
@@ -104,4 +104,27 @@ use it if you need a byte-identical env rather than a working one.
 
 **If you just need to call the model,** start at `runtime/RUNBOOK.md` — the consumer quickstart and the demo-day operator card. You do not need a Modal account.
 
-Next highest-leverage work: the four blocks in `docs/WORKSTREAMS.md` — make OpenShell actually enforce, make the loop recursive, fix statute-aware retrieval, and connect ingest to memory.
+### Ingest → memory, both halves (stub mode, no network, ~60s)
+
+A document read at ingest changes what the agent retrieves next run — and a poisoned one
+provably does not. Steps 1/3/5 are the *same command*; only what happened between them differs.
+
+```bash
+python -m agent.run_smoke --ingested                       # 1. baseline: 5 corpus records
+python -m agent.ingest data/fixtures/prior_art_clean.txt \
+    --fake-clean --remember --tech-class G06F              # 2. -> memory/ingested/ing-<hash>.json
+python -m agent.run_smoke --ingested                       # 3. ing-<hash> is now retrieved
+python -m agent.ingest data/fixtures/poisoned_prior_art.pdf \
+    --fake-detect --remember                               # 4. QUARANTINED; 0 records written
+python -m agent.run_smoke --ingested                       # 5. byte-identical to step 3
+```
+
+The gate sits *upstream of the model*, so step 4 spends zero tokens on the attacker's
+content — the doorway never sees it. That is why Track 2 isn't a bolt-on next to Track 1:
+a learning agent that ingests untrusted documents must have a scanner on that hop, or its
+memory is an attack surface.
+
+Next highest-leverage work: `docs/WORKSTREAMS.md`. Blocks C (retrieval) and D (ingest →
+memory) are done; **the GPU ablation re-run is the top open item** — retrieval changed
+twice, so neither live number is quotable until it lands. A (make OpenShell actually
+enforce) and B (make the loop recursive) are unblocked.

@@ -18,11 +18,11 @@ What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.m
 |---|---|---|
 | **Data** | ✅ done | 134 patents (G06N/G06F/H04L), 94 held-out checklists, 193 real office-action defects, tracked in git |
 | **Inference** | ✅ first half | Nemotron on vLLM/Modal, `INFERENCE_BACKEND=modal\|nim`, 10.67× batching on record |
-| **Agent** | ◐ built, shallow | loop + guardrails + eval harness all real and tested; memory is static RAG, nothing compounds |
+| **Agent** | ◐ built, shallow | loop + guardrails + eval harness all real and tested; retrieval is now statute-diversified and IDF-ranked, and ingest writes into it — but the *loop* still doesn't compound (no revise turn, no episode ever written) |
 | **Containment** | ⚠️ simulated | `policy.py` decision logic is real, and now so is an escalation client — but enforcement is still a `print()`. No OpenShell exists |
 | **Surface** | ◐ starter | idea → draft → patent works; edit boxes discard input; no chart view |
 
-Suite: `.venv/bin/pytest tests/` → **70 passed**, 0 skipped, stub mode, no network.
+Suite: `.venv/bin/pytest tests/` → **111 passed**, 0 skipped, stub mode, no network.
 
 **The two headline numbers, stated honestly:**
 
@@ -50,8 +50,12 @@ Suite: `.venv/bin/pytest tests/` → **70 passed**, 0 skipped, stub mode, no net
 
 ## The focus now
 
-Four blocks, in dependency order. **A3, B, C and D are all unblocked and can start today** —
-only A1/A2/A4/A5 wait on hosted hardware.
+Four blocks, in dependency order. **C and D are done (2026-07-18).** A3 and B remain
+unblocked and can start today; only A1/A2/A4/A5 wait on hosted hardware.
+
+**The single highest-leverage item is still the GPU re-run** — C1 and now C2 both changed
+retrieval, so neither live ablation number is quotable until it lands. Retrieval is sound
+and offline-validated; the measurement is the last step.
 
 ### A · Containment — make OpenShell real
 
@@ -138,13 +142,28 @@ Two smaller correctness items in the same area: `EpisodeStore.load` uses `rglob`
 (`agent/episodes.py:84`) while `LoopholeStore.load` uses `glob` (`agent/memory.py:31`) —
 the two stores disagree on recursion. And `.gitignore` ignores `memory/episodes/*.json`
 while `record()` writes to `memory/episodes/<disclosure_id>/*.json`, so the first episodes
-ever written get staged despite the stated intent.
+ever written get staged despite the stated intent. **Confirmed by observation 2026-07-18,
+no longer just inferred from the glob:** a single `python -m agent.run_smoke --episodes`
+left `memory/episodes/disc-0001/…json` showing as untracked, and `git check-ignore` does
+not match it. (The C/D work added `memory/ingested/*.json`, where the one-level glob *is*
+correct — `LoopholeStore.save` writes flat. Left B's line alone deliberately.)
 
-### C · Context memory — make retrieval right
+### C · Context memory — make retrieval right ✅ done 2026-07-18
 
-`agent/memory.py` ranks on a 3-tuple: `technology_class` exact match, raw token overlap,
-then `rec.id` reverse-alphabetical (`:41-48`). The store is a plain Python list hydrated
-from a flat JSON directory (`:25`, `:29-35`) — no index, no embeddings.
+`agent/memory.py` ranks on a 3-tuple: `technology_class` exact match, **BM25 relevance**,
+then `rec.id` reverse-alphabetical. The store is still a plain Python list hydrated from a
+flat JSON directory — no index, no embeddings — but it now retains its directory and can
+be written to. All four items closed; read C2's caveat before quoting it.
+
+⚠️ **Two cross-lane contract additions landed with this block** (`airtight/` is the frozen
+shared contract, so they are called out here rather than buried):
+`LoopholeRecord.extraction_confidence: float = 1.0` (`airtight/shapes.py`) — semantics and
+default lifted from `db/schema.sql`'s column of the same name, optional so all 193 tracked
+records validate unchanged, and **unread by `loop.render_guardrails`, so it cannot perturb
+the ablation prompt** (asserted by `test_extraction_confidence_cannot_perturb_the_prompt`).
+And a `"distill"` role on `doorway.Role` + `airtight/stubs.py` — without a record-shaped
+stub reply, the ingest write path yields zero records offline and would look wired while
+doing nothing on a fresh clone.
 
 - [x] **C1 · Rank by statute — done 2026-07-18 (`d1c60b1`), offline-validated.**
   `LoopholeRecord` now carries a `statute` field (`airtight/shapes.py`), derived from the
@@ -163,55 +182,156 @@ from a flat JSON directory (`:25`, `:29-35`) — no index, no embeddings.
   mechanism behind the backwards run.
   **What's left is measurement, not code:** neither corpus has been re-run live, so the
   delta itself is still unproven. Tracked as a risk below.
-- [ ] **C2 · Normalize the overlap score.** Overlap is a raw unnormalized count against
-  `pattern + claim_shape + remedy`, and real records carry 600+ char `claim_shape` fields
-  (full amended claim text). Longest record mechanically wins. Normalize by length or
-  weight by IDF.
-- [ ] **C3 · Give the store a write API.** `LoopholeStore` has no `add()` and no `save()` —
-  it is read-only by construction, which is precisely why D exists as a separate block.
-- [ ] **C4 · Decide the knowledge graph question, and say so.** There is **no graph in
-  code** — no `networkx`, no node/edge types, no traversal. The "graph" is one boolean
-  equality on `technology_class`. `README.md:8` and `docs/ARCHITECTURE.md:80,105-110`
-  assert a persistent knowledge graph as fact. Either build edges (statute ↔ claim shape ↔
-  CPC class) or change the prose. Do not walk a judge into that gap.
-  Note `db/schema.sql` already designed the richer shape — `statutory_defect_category`,
-  `cpc_class`, confidence and provenance columns — before it was abandoned for flat JSON.
-  It is dead (`duckdb` is still an unused dependency), but it is a good spec for C1.
+- [x] **C2 · Rank by BM25 — done 2026-07-18, offline-validated. Read the caveat.**
+  `_rank` (`agent/memory.py`) now scores IDF-weighted matches with BM25 length damping
+  instead of a raw overlap count. Measured on the real pooled split (10 graded
+  disclosures, 167-record corpus, no GPU):
 
-### D · Ingest → memory — close the circuit
+  | | raw (before) | **BM25 b=0.3 (shipped)** | `overlap/len` |
+  |---|---|---|---|
+  | cross-disclosure top-5 Jaccard | 0.172 | **0.098** | 0.205 |
+  | distinct records used across 10 | 23 | **29** | 26 |
+  | checklist statutes covered | 10/10 | **10/10** | 10/10 |
+  | retrieved-set length percentile | 0.815 | 0.792 | 0.521 |
+  | bloat promoted over both parents | 100% | 97% | 8% |
 
-**The circuit is open.** `agent/ingest.py` imports only `airtight.config` and
-`airtight.guardrails` — never `agent.memory`, never `LoopholeRecord`. `ingest_document`
-(`:44-49`) returns the admitted text, and every caller drops it: `:87` uses it for `len()`
-in a print at `:103`; `agent/poison_demo.py:71` checks it for `None`. The
-`"loophole report: attempted indirect injection recorded"` line at `:98-99` is a **print,
-not a write** — nothing is recorded anywhere, and `g.QUARANTINE_LOG` / `g.AUDIT_LOG`
-(`airtight/guardrails.py:90-91`) are module-level lists that die with the process.
+  **What actually improved is disclosure-specificity, not length bias.** Cross-disclosure
+  Jaccard falling 0.172 → 0.098 means retrieval stopped handing the same big records to
+  every disclosure — that is the property the ablation rewards, and it comes from **IDF**,
+  which is already fully present at `b=0`. Length percentile barely moved (0.815 → 0.792)
+  and the bloat probe barely moved (100% → 97%): **C2 as shipped does not fix "longest
+  record wins" in the direct sense this item originally proposed**, and the board should
+  not claim it does.
+  That was deliberate. `b` (length-normalization strength) trades directly against
+  resistance to episodic noise, measured over the same 10 disclosures — how often a
+  `compress_run`-shaped record built from the disclosure's own vocabulary lands in the top 10:
+  `b=0.3` → **1/10** · `b=0.6` → 7/10 · `b=0.75` (textbook default) → 7/10 · `b=1.0` → 9/10 ·
+  `overlap/len` → **10/10, and rank #1 for every one of them**. Raw scored 0/10.
+  So the literal instruction in this item — "normalize by length" — would have handed B2/B3
+  a corpus where self-generated noise outranks every real PTAB record by construction.
+  `b=0.3` keeps the retrieval win and the noise resistance; it gives up the bloat fix,
+  which is the weakest of the three signals (a record holding two real patterns genuinely
+  *is* relevant to queries matching either). The sweep table is in the code at the constant.
+  Determinism: IDF is summed over a `sorted()` intersection (set-of-strings iteration order
+  varies with `PYTHONHASHSEED` — verified, and a subprocess test pins it) and the score is
+  `round(…, 6)` before it enters the sort key, so a libm difference can't reorder near-ties.
+  All 70 pre-existing tests pass unmodified; 6 new ones in `tests/test_retrieval_ranking.py`.
+- [x] **C3 · Give the store a write API — done 2026-07-18.** `LoopholeStore` now retains
+  the directory it loaded from and has `add()` (in-memory, id-deduped, **zero I/O**) and
+  `save()` (one flat `<id>.json`). `merged_store(*stores)` returns a plain `LoopholeStore`,
+  so it still satisfies `CompositeStore`'s `base` contract — that is what let D compose
+  ingested memory with episodes **without editing `agent/episodes.py`**.
+  `empty()` keeps `directory is None`, so the ablation's control arm is structurally
+  incapable of persisting anything. `self.records` is still a plain list, because
+  `CompositeStore` and `assert_no_overlap` both reach for it directly.
+  12 tests in `tests/test_memory_write.py`.
+- [x] **C4 · Knowledge graph — decided: the prose was wrong, so the prose changed.**
+  There is no graph in code and none was built. Building one would have been a second
+  ranking change inside the window before the GPU re-run — the exact mistake this board
+  already records once — and the honest description costs nothing: after C1+C2 the system
+  has statute-diversified, IDF-ranked, CPC-gated retrieval over a persistent failure
+  library, which is a real mechanism that just isn't a graph.
+  Fixed: `README.md:8` ("persistent knowledge graph" → "persistent failure library —
+  records indexed by statutory basis, CPC class and claim shape"), `README.md:12`,
+  `README.md:22`, and `docs/JUDGING-RUBRIC.md:38`.
+  **`docs/ARCHITECTURE.md` deliberately left alone** — `:7` already carries a "design spec,
+  not a status report" disclaimer naming this exact gap. README and JUDGING-RUBRIC carried
+  no such hedge, which is why they were the exposed ones.
+  If the graph is ever built, `db/schema.sql` remains the good spec (`statutory_defect_category`,
+  `cpc_class`, confidence and provenance columns), and it should be retrieval-neutral so it
+  can land without invalidating a measurement.
 
-Ingest is a security demo with a CLI. It is not a data path.
+### D · Ingest → memory — close the circuit ✅ done 2026-07-18
 
-- [ ] **D1 · Distill admitted text into records.** Don't write a new prompt —
-  `DISTILL_SYSTEM` (`data/distill_loopholes.py:28-35`) already emits exactly
-  `{pattern, claim_shape, remedy}` and `_parse_json` (`:38-46`) already handles extraction.
-  Wrap it as `distill_text(text, source, tech_class) -> list[LoopholeRecord]`, routed
-  through `call_model` so the doorway and guardrail hop still fire.
-- [ ] **D2 · Write, then merge into retrieval.** Persist to `memory/ingested/` and merge
-  via `CompositeStore` (`agent/episodes.py:112`), which already does base+extra merging
-  with id-dedup. `LoopholeStore.load` accepts both list- and object-shaped files, so a flat
-  directory needs no loader change. Depends on C3.
-- [ ] **D3 · Quarantined content must never reach memory — and this is the story.**
-  Ingest is the poisoned-PDF path (`data/fixtures/poisoned_prior_art.pdf`, two hidden
-  vectors, live-verified against real HiddenLayer). Wiring ingest into memory without a
-  gate would let an attacker write directly into the agent's long-term store — a
-  persistent, compounding injection. The HiddenLayer bus is what makes D safe, and
-  `INGESTED_DOCUMENT` already fails **closed** (`airtight/guardrails.py:84`).
-  **Say this on stage:** Track 2 isn't a bolt-on next to Track 1 — it's the precondition
-  for it. A learning agent that ingests untrusted documents *must* have a scanner on that
-  hop, or its memory is an attack surface. Add the test that proves a quarantined document
-  leaves zero records behind.
+**The circuit is closed.** It was open: `agent/ingest.py` imported only `airtight.config`
+and `airtight.guardrails`, `ingest_document` returned admitted text and every caller
+dropped it, and the `"loophole report … recorded"` line was a print, not a write. Ingest
+was a security demo with a CLI, not a data path.
+
+It is now a data path with a gate on it: `ingest_to_memory()` distils admitted text into
+the store via `agent/distill.py`, and quarantined text stops one line earlier — upstream
+of the model, not merely upstream of the disk.
+
+- [x] **D1 · Distill admitted text into records — done 2026-07-18.** New `agent/distill.py`
+  holds the extraction contract both producers share. It lives in `agent/` rather than
+  `data/` because `data` is not a packaged module — `agent.ingest` importing `data.…` works
+  from a checkout and breaks in a wheel; `data/distill_loopholes.py` now imports *up*.
+  `DISTILL_SYSTEM` moved byte-identically (sha256 pinned in a test, verified against git HEAD).
+  **`INGEST_SYSTEM` is deliberately a different prompt**: `DISTILL_SYSTEM` asserts "a PTAB
+  Final Written Decision held patent claims unpatentable", which is false about an arbitrary
+  ingested document — feeding the model a false premise to get a plausible record is how
+  fabricated memory gets minted. Only the JSON contract is shared.
+  `distill_text(text, source, tech_class)` yields **at most one record, by function arity**
+  — not a cap applied afterwards. That is the structural fix for the shape B3 flags in
+  `compress_run` (one record per *line* of a reply). Ids are `sha256` of the **input**
+  (`ing-<12 hex>`), never the reply, so a nondeterministic live model cannot mint a second
+  id for the same document and re-ingest is idempotent. Input truncated to 6000 chars.
+  `tech_class` **raises on a `TC####` value** — `distill_loopholes._tech_class` emits USPTO
+  Technology Centers, which can never equal a `Disclosure`'s CPC class, so such a record
+  would be permanently invisible to retrieval. Filenames are stripped of `§()` before
+  entering `source`, or an attacker-named file could pick its own statute bucket.
+  9 tests in `tests/test_distill.py`.
+- [x] **D2 · Write, then merge into retrieval — done 2026-07-18.** Records persist flat to
+  `memory/ingested/<id>.json` (`config.INGESTED_DIR`, gitignored with a tracked `.gitkeep`).
+  Retrieval merges them behind a new `--ingested` flag on `agent/run_smoke.py`, layered so
+  the two sources stay orthogonal — **the `--episodes` B2 gate is untouched and its
+  retrieval path is verified identical to the pre-change wiring.** `CompositeStore` needed
+  no edit: `merged_store` composes one layer below it.
+- [x] **D3 · Quarantined content never reaches memory — done 2026-07-18, and this is the
+  story.** The gate is `ingest_document`'s existing `None` return, and it is the only one,
+  so `distill_text` is unreachable past a quarantine. **The stronger claim, and the one to
+  say on stage: a poisoned document never reaches the model at all** — the gate sits
+  upstream of `call_model`, so no tokens are spent on attacker content and the doorway
+  never sees it. `GuardrailBlocked` propagates uncaught by design (catching it inside
+  `ingest_to_memory` is precisely the bug that would reopen the hole).
+  The test asserts the model was never *called*, not merely that no file appeared —
+  verified to fail when the gate is removed. Also hardened `ingest_document` to return
+  `verdict.text` rather than the raw input: a no-op today, but the moment anyone maps
+  `pii → REDACT` onto this hop, the old code would have persisted un-redacted text.
+  The `:98-99` line this board called out as "a print, not a write" is now true — it cites
+  the `results/security/quarantine.jsonl` record and the event id.
+  10 tests in `tests/test_ingest_memory.py`, plus `test_ablation_uncontaminated_by_ingested`
+  in `tests/test_eval.py`.
+
+**Post-review hardening (2026-07-18).** A multi-agent review of the C/D diff confirmed 10
+defects; all are fixed, and the ones worth knowing about were places where the code did not
+do what its own docstring claimed:
+
+- **`ingest_to_memory` had no gate at all with the bus OFF — which is the default.**
+  `HL_ENABLED` defaults false, `g.analyze` then short-circuits to PASS, so the quarantine
+  check could never fire and an unscanned document was distilled and persisted. Verified by
+  the reviewer, and *no test covered it* because every test called `hl_on()` first. Now
+  raises `UnscannedIngest`, and the CLI refuses `--remember` with exit 2 instead of
+  reporting success while writing nothing.
+- **Provenance was written only into `source`, which `render_guardrails` drops** — so an
+  inferred record reached the drafting prompt formatted exactly like a PTAB-mined one. The
+  marker now rides in `pattern`, which *is* rendered. Kept out of `agent/loop.py`, so the
+  ablation scaffold hash is untouched.
+- **`--memory-dir` accepted any path**, so `--memory-dir data/corpus/loopholes` would write
+  a confidence-0.3 record into the git-tracked graded corpus. `save()` now refuses anything
+  under `data/`.
+- **`_rank` keyed its token cache by `rec.id`** — last-wins, so duplicate ids (which
+  `load()` does not dedup) scored every copy with the last one's text. A regression C2
+  introduced; the overlap count it replaced tokenized inline and was immune. Now keyed by
+  position.
+- **`_safe_source` stripped `§()` but `_STATUTE_RE` also matches `\s`**, so
+  `Office Action 101.pdf` still injected a statute — and the test covering it **passed for
+  the wrong reason** (the stub pattern already contained `§112`, so `statute_of` returned
+  before reaching `source`). Both fixed; the test now asserts against `statute_of` directly.
+- `save()` no longer overwrites a record `add()` refused (disk and memory could disagree
+  after a reload).
+
+Two of the new regression tests were themselves verified to *fail* against the reintroduced
+bug, because the first version of the duplicate-id test passed under sabotage.
 
 **Done when:** a document read at ingest changes what the agent retrieves on the next run,
-and a poisoned one provably does not.
+and a poisoned one provably does not. ✅ **Both halves observed end-to-end, stub mode, no
+network** — `python -m agent.run_smoke --ingested` retrieves 5 corpus records; after
+`python -m agent.ingest data/fixtures/prior_art_clean.txt --fake-clean --remember
+--tech-class G06F`, the same command returns `ing-644d1b8495b7` (§112, confidence 0.3) in
+the retrieved set, displacing `lh-w-006`; after ingesting the poisoned PDF with
+`--fake-detect --remember`, the retrieved set is byte-identical to the run before it and
+`memory/ingested/` still holds exactly one file. Full sequence in `README.md`.
 
 ---
 
@@ -262,6 +382,9 @@ and a poisoned one provably does not.
 | Docs claim enforcement the code doesn't have | `docs/ARCHITECTURE.md:95,236` assert real Landlock enforcement and real Policy-Advisor HITL. Both collapse under a `grep openshell`. Fix the prose or build the thing — C4 is the same problem for the knowledge graph |
 | **Two implementations of the one hop** | `airtight/doorway.py` and `runtime/inference_local.py` are parallel clients for the same operator-pinned boundary. Not broken, but "one boundary, three tracks" currently has two doorways. Steven + Anudeep pick the canonical one and delegate the other — see `docs/INTEGRATION-STATUS.md` |
 | Compounding poisons its own corpus | B3 before B2. Non-negotiable ordering |
+| **`diversify_by_statute` sold a guaranteed top-k slot to any sparse statute bucket — half fixed 2026-07-18, half still open for B** | **D-side closed; B-side still open by scope decision.** The round-robin takes one record from *every* bucket before any bucket yields a second, so a record's slot depended on how rare its statute is, not on its score. Found by code review to be broader than the original B-lane note, and to bite D directly: the ingested `ing-644d1b8495b7` took **position 2 of 5** in the README demo, and on the real corpus a record with *zero* token overlap and the wrong CPC class still took slot 5, evicting a real PTAB record. **Fixed for untrusted records:** only records at `extraction_confidence >= 1.0` get a bucket; anything below competes on rank alone and enters only by out-ranking a diversified pick. The zero-overlap record is now excluded, and the demo record moved to position 5 — which is where `_rank` actually puts it, so the demo now rests on merit rather than on an unearned slot. Verified byte-identical to the plain round-robin when every record is trusted, so **the ablation is untouched**. **Still open for B:** `compress_run` records carry `statute ""` *and* the default confidence 1.0, so they will own the `"?"` bucket the moment B2 lands. The one-line B-side fix is to drain `"?"` last, or to mint episode records below the trust threshold — the mechanism is now in place for the latter |
+| **`data/distill_loopholes.py` mints `TC####` classes that can never match a CPC disclosure** | Found by review. `_tech_class` returns `f"TC{n}"` (USPTO Technology Center) for every PTAB record it writes, while `_rank`'s highest-order term is `rec.technology_class == disclosure.technology_class` against a CPC class like `G06F`. So every TC-classed record permanently loses that term and is structurally outranked by any CPC-classed one. `agent/distill.py` now raises on TC-shaped input for the *ingest* path, so the two producers disagree on the same field — deliberately, and recorded here rather than reconciled: fixing the ground-truth path rewrites `technology_class` across the corpus the **GPU re-run** measures. Do it immediately after the re-run, not before |
+| **Ranking changed, so `agent/memory.py` must be frozen at a recorded SHA when the GPU window opens** | C2 is the last intentional ranking change before the re-run. Record the SHA in this file when the window opens. This board already reports "both live numbers were produced by code that no longer exists" once; the freeze is what stops it reporting it twice |
 | Modal cold start / credits | Keep the app **paused** by default; `min_containers=1` only in the demo window; NIM is one env flip away |
 
 ---
