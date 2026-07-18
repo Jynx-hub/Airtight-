@@ -1,0 +1,42 @@
+[
+  {
+    "id": "oa-19080000-c14-ec15f818",
+    "pattern": "\u00a7101 \u2014 abstract-idea eligibility",
+    "claim_shape": "(Currently Amended) A system for secure knowledge transfer between machine learning models comprising:one or more at least one processing circuitry operatively coupled to a non- transitory memory, the at least one processing circuitry processors configured to: receive a query within a secure environment; determine whether a local language model within the secure environment is capable of processing the query based on one or more criteria; generate a response using the local language model when the local language model is determined to be capable of processing the query; generate an external processing request when the local language model is determined to be not capable of processing the query; encrypt the external processing request using homomorphic encryption; transmit the encrypted external processing request to an external environment; receive an encrypted response from the external environment; decrypt the encrypted response within the secure environment to generate a decrypted response; perform knowledge distillation on the decrypted response to extract knowledge patterns, wherein performing the knowledge distillation includes extracting, within the secure environment, at least one chain-of-thought reasoning pattern from the decrypted response; and update the local language model using the extracted knowledge patterns. Currently amended 15",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 14-17 are rejected under 35 U.S.C. 101 because the claimed invention is directed to non-statutory subject matter. Claim 12 is directed towards a system/device lacking at least one hardware element. The device/system comprising a processor (specification paragraph [0097] defines processor with open definition and therefore could be broadly interpreted as software). Therefore, the device/syst",
+    "source": "USPTO application 19080000, CTNF office action; claims 14, 15, 16, 17 rejected under 35 U.S.C. 101 because the claimed invention is directed to non-statutory subject matter"
+  },
+  {
+    "id": "oa-19080000-c1-3a9c9f20",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently Amended) A method for secure knowledge transfer between machine learning models, comprising:determining whether a local language model within a secure environment is capable of processing an input query based on one or more criteria; generating a response using the local language model when the local language model is determined to be capable of processing the query; generating an external processing request when the local language model is determined to be not capable of processing the query; encrypting the external processing request using a homomorphic encryption technique; transmitting the encrypted external processing request to an external environment; receiving an encrypted response from the external environment; decrypting the encrypted response within the secure environment to g enerate a decrypted response; performing knowledge distillation on the decrypted response to extract knowledge patterns, wherein performing the knowledge distillation includes extracting, within the secure environment, at least one chain-of-thoug ht reasoning pattern from the decrypted response; and updating the local language model using the extracted knowledge patterns. Currently amended 2",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 1-4, 6-7, 9-11, 13-14, 16, 18 and 20-22 are rejected under 35 U.S.C. 103 as being unpatentable over Vasseur et al. (Pub. No.: US 2025/0086205, hereinafter Vasseur) in view of Sarpatwar et al. (Pub. No.: US 2021/0397988, hereinafter Sarpatwar) and Williams et al. (Pub. No.: US 2024/0320348, hereinafter Williams). Regarding claim 1: Vasseur teaches: A method for secure knowledge transfer betw",
+    "source": "USPTO application 19080000, CTNF office action; claims 1, 2, 3, 4, 6, 7, 9, 10, 11, 13, 14, 16 rejected under 35 U.S.C. 103 as being unpatentable over Vasseur et al"
+  },
+  {
+    "id": "oa-19080000-c5-a530ffcb",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently Amended) The method of claim 1, wherein performing the knowledge distillation comprises extracting at least one of: chain-of-thought reasoning patterns, response templates, domain-specific knowledge, optimization parameters, and model weights. Currently amended 6",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 5 and 23 are rejected under 35 U.S.C. 103 as being unpatentable over Vasseur et al. (Pub. No.: US 2025/0086205, hereinafter Vasseur) in view of Sarpatwar et al. (Pub. No.: US 2021/0397988, hereinafter Sarpatwar) and Williams et al. (Pub. No.: US 2024/0320348, hereinafter Williams) and Ma et al. (Pub. No.: US 2025/0124350, hereinafter Ma). Regarding claim 5: Vasseur as modified doesn\u2019t expli",
+    "source": "USPTO application 19080000, CTNF office action; claims 5, 23 rejected under 35 U.S.C. 103 as being unpatentable over Vasseur et al"
+  },
+  {
+    "id": "oa-19080000-c8-305ee340",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Previously Presented) The method of claim 1, further comprising:augmenting the query with information from a private database within the secure environment using a retrieval augmented generation (RAG) module to generate an enhanced query; and processing the enhanced query using the local language model. Previously presented 9",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 8, 17 and 19 are rejected under 35 U.S.C. 103 as being unpatentable over Vasseur et al. (Pub. No.: US 2025/0086205, hereinafter Vasseur) in view of Sarpatwar et al. (Pub. No.: US 2021/0397988, hereinafter Sarpatwar) and Williams et al. (Pub. No.: US 2024/0320348, hereinafter Williams) and Ge (CN 119807261). Regarding claims 8 and 17: Vasseur as modified doesn\u2019t explicitly teach but Ge discl",
+    "source": "USPTO application 19080000, CTNF office action; claims 8, 17, 19 rejected under 35 U.S.C. 103 as being unpatentable over Vasseur et al"
+  },
+  {
+    "id": "oa-19080000-c12-7d74a9cb",
+    "pattern": "\u00a7103 \u2014 obviousness over combined prior art",
+    "claim_shape": "(Previously Presented) The method of claim 1, wherein the external processing request is processed using a hardware accelerator optimized for homomorphic encryption operations. Previously presented 13",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 12 and 15 are rejected under 35 U.S.C. 103 as being unpatentable over Vasseur et al. (Pub. No.: US 2025/0086205, hereinafter Vasseur) in view of Sarpatwar et al. (Pub. No.: US 2021/0397988, hereinafter Sarpatwar) and Williams et al. (Pub. No.: US 2024/0320348, hereinafter Williams) and Kim (Pub. No.: US 2025/0106005). Regarding claims 12 and 15: Vasseur as modified doesn\u2019t explicitly teach ",
+    "source": "USPTO application 19080000, CTNF office action; claims 12, 15 rejected under 35 U.S.C. 103 as being unpatentable over Vasseur et al"
+  }
+]

@@ -1,0 +1,34 @@
+[
+  {
+    "id": "oa-18740227-c1-527f4caa",
+    "pattern": "\u00a7102 \u2014 anticipation by a single reference",
+    "claim_shape": "(Currently Amended) A system for contextual customization of video content, the system comprising:one or more processors; and one or more computer-readable media storing computer-usable instructions that, when executed by the one or more processors, cause the one or more processors to: receive user profile data representing one or more characteristics of a user; receive a set of content data comprising an indication of one or more video content objectives; based on the set of content data and the user profile data,execute a context prompt server comprising a context prompt generator model configured to input at least the user profile data and the set of content data to generate one or more content generation prompts for a video generator model based at least on the user profile data and the set of content data, wherein the context prompt generator model infers one or more context prompts based on the user profile data, wherein the one or more content generation prompts includes the one or more context prompts, and apply the one or more content generation prompts to the video generator model to generate targeted video content data; and transmit the targeted video content data to a user equipment client application to cause the user equipment client application to present video content based on the targeted video content data. Currently amended 2",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 1-2, 6-7 and 18 are rejected under 35 U.S.C. 102(a)(2) as being anticipated by Li et al. (U.S. Patent Application Publication 2024/0292070). Referring to claim 1, Li discloses a system for contextual customization of video content, the system comprising: one or more processors; and one or more computer-readable media storing computer-usable instructions (see Paragraphs 0089-0094) that, when",
+    "source": "USPTO application 18740227, CTNF office action; claims 1, 2, 6, 7, 18 rejected under 35 U.S.C. 102 (a)(2) as being anticipated by Li et al"
+  },
+  {
+    "id": "oa-18740227-c8-3c303520",
+    "pattern": "\u00a7103 \u2014 obviousness over combined prior art",
+    "claim_shape": "(Original) The system of claim 1, wherein the set of content data at least in part comprises campaign data received via a network from an advertising data campaign platform. Original 9",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 8 and 10-11 are rejected under 35 U.S.C. 103 as being unpatentable over Li et al. (U.S. Patent Application Publication 2024/0292070). Referring to claim 8, Li discloses all of the limitations in claim 1, but fails to teach that the set of content data at least in part comprises campaign data received via a network from an advertising data campaign platform. The Examiner takes Official Notic",
+    "source": "USPTO application 18740227, CTNF office action; claims 8, 10, 11 rejected under 35 U.S.C. 103 as being unpatentable over Li et al"
+  },
+  {
+    "id": "oa-18740227-c9-a8aa3db2",
+    "pattern": "\u00a7103 \u2014 obviousness over combined prior art",
+    "claim_shape": "(Original) The system of claim 1, the one or more processors further to receive the user profile data via a network based on data from at least one of: a consumer data platform, a customer data platform, a customer experience platform, a relationship management system, user interactions with one or more websites, and interactions within a mobile application. Original 10",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claim 9 is rejected under 35 U.S.C. 103 as being unpatentable over Li et al. (U.S. Patent Application Publication 2024/0292070) in view of Harris et al. (U.S. Patent Application Publication 2002/0108109). Referring to claim 9, Li discloses all of the limitations of claim 1, but fails to teach receiving the user profile data via a network based on a consumer data platform. Harris discloses receivin",
+    "source": "USPTO application 18740227, CTNF office action; claim 9 rejected under 35 U.S.C. 103 as being unpatentable over Li et al"
+  },
+  {
+    "id": "oa-18740227-c14-110f98b1",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently Amended) A telecommunications network, the network comprising: an operator core network; at least one edge server coupled to a core network edge of the operator core network; at least one radio access network coupled to the operator core network, wherein the at least one radio access network establishes one or more communication links between the operator core network and one or more user equipment (UE); and at least one network function executed on one or more processors configured to perform one or more operations to: generate one or more content generation prompts for input to a video generator model based on a set of content data comprising an indication of one or more video content objectives, and user profile data representing one or more characteristics of a user defining a target of the one or more video content objectives, wherein the one or more content generation prompts include a set of one or more content prompts representing the one or more video content obj ectives based at least on the set of content data, and include a set of one or more context prompts based at least on the user profile data, wherein the set of one or more context prompts define a set of features that form a setting to place the one or more video content obj ectives of the set of one or more content prompts within a context; generate targeted video content data based on applying the one or more content generation prompts to the video generator model; and stream the targeted video content data via the at least one radio access network to a user equipment client application to cause the user equipment client application to present video content based on the targeted video content data. Currently amended 15",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 14-16 are rejected under 35 U.S.C. 103 as being unpatentable over Li et al. (U.S. Patent Application Publication 2024/0292070) in view of Infante et al. (U.S. Patent Application Publication 2025/0133273). Referring to claim 14, see the rejection of claim 1 and note that Li fails to teach the specific architecture claimed. Infante discloses a telecommunications network comprising an operator",
+    "source": "USPTO application 18740227, CTNF office action; claims 14, 15, 16 rejected under 35 U.S.C. 103 as being unpatentable over Li et al"
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "id": "oa-19078662-c1-318358e8",
+    "pattern": "\u00a7101 \u2014 abstract-idea eligibility",
+    "claim_shape": "(Currently Amended) A system, comprising:a processor; and a non-transitory memory storing instructions, that when executed, cause the processor to: obtain a search query, using an entity retrieval model:encode the search query into a normalized query embedding using a natural language model of the entity retrieval model, identify at least one normalized entity embedding among a plurality of normalized entity embeddings using the normalized query embedding, determine at least one index associated with the at least one normalized entity embedding, locate and retrieve a plurality of entities from an entity database based on the at least one index, filter the plurality of entities based on historical user engagement data to generate a plurality of filtered entities, and process the plurality of filtered entities to generate retrieve, using an entity retrieval model, at least one entity based on the search query, generate, using a neural network, query embedding data based on the search query and the at least one entity, generate, using a plurality of task-specific networks, task prediction data for a plurality of tasks based on the query embedding data, wherein each task of the plurality of tasks captures a different aspect of a user intent associated with the search query, and generate at least one search result for the search query based on the task prediction data for the plurality of tasks. Currently amended 2",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 1, 6-9, 14, 15, and 20 are rejected under 35 U.S.C. 101 because the claimed invention is directed to an abstract idea of mental processes without significantly more. As to claim 1, the claim recites the mental processes a system, comprising: a processor; and a non-transitory memory storing instructions, that when executed, cause the processor to: obtain a search query (A person can think of",
+    "source": "USPTO application 19078662, CTNF office action; claims 1, 6, 7, 8, 9, 14, 15, 20 rejected under 35 U.S.C. 101 because the claimed invention is directed to an abstract idea of mental processes without significantly more"
+  },
+  {
+    "id": "oa-19078662-c6-0faf68fa",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The system of claim 1, wherein during a training stage of the neural network and the plurality of task-specific networks:only one of the plurality of task-specific networks is activated during each training step of a plurality of training steps of the training stage; and the neural network is activated and trained during all training steps of the training stage. Original 7",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 6, 7, 14, and 20 are rejected under 35 U.S.C. 103 as being unpatentable over Wu and Dhamija as applied above, and further in view of (Zhang et al., \"A Survey on Multi-Task Learning,\" in IEEE Transactions on Knowledge and Data Engineering, vol. 34, no. 12, pp. 5586-5609, 1 Dec. 2022, doi: 10.1109/TKDE.2021.3070203.), hereinafter Zhang. As to claims 6, 14, and 20, the claims are rejected for ",
+    "source": "USPTO application 19078662, CTNF office action; claims 6, 7, 14, 20 rejected under 35 U.S.C. 103 as being unpatentable over Wu and Dhamija as applied above, and further in view of (Zhang et al"
+  }
+]

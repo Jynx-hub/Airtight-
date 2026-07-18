@@ -1,0 +1,18 @@
+[
+  {
+    "id": "oa-19213393-c1-8096232e",
+    "pattern": "\u00a7112 \u2014 written-description gap",
+    "claim_shape": "(Currently Amended) A method for generating a digital object in an extended reality environment comprising:detecting a voice command from a user using an extended reality environment via an extended reality hardware device, wherein the voice command requests creation of a digital object for display in the extended reality environment, and wherein the voice command includes an adverb of place indicating a location for creation of the digital object; detecting a pointing action from a hand of the user to a location point in the extended reality environment via the extended reality hardware device; retrieving a representation of the digital object for displaying creating the digital object at the location point; and displaying creating the representation of the digital object at the location point in the extended reality environment via the extended reality hardware device in response to both the detecting of the voice command and the pointing action from the user. Currently amended 2",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 1-18 are rejected under 35 U.S.C. 112(a) or 35 U.S.C. 112 (pre-AIA), first paragraph, as failing to comply with the written description requirement. The claim(s) contains subject matter which was not described in the specification in such a way as to reasonably convey to one skilled in the relevant art that the inventor or a joint inventor, or for applications subject to pre-AIA 35 U.S.C. 1",
+    "source": "USPTO application 19213393, CTNF office action; claims 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 rejected under 35 U.S.C. 112 (a) or 35 U"
+  },
+  {
+    "id": "oa-19213393-c16-ba067ebe",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The method of claim 1, further comprising:receiving a size gesture detected from one or more hands of the user via the extended reality hardware device that the digital object should be represented according to the size gesture; and displaying the representation of the digital object via the extended reality hardware device in the extended reality environment as including a size in accordance with the size gesture. Original 17",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 16-17 are rejected under 35 U.S.C. 103 as being unpatentable over Evertt, in view of Iskandar, in view of Maciocci and further in view of Morishita et al. (U.S. Patent Application Publication No. 2015/0277555 A1). 25. Regarding Claim 16, while the combination of Evertt, Iskandar, and Maciocci does not explicitly disclose, Morishita discloses The method of claim 1, further comprising: receiv",
+    "source": "USPTO application 19213393, CTNF office action; claims 16, 17 rejected under 35 U.S.C. 103 as being unpatentable over Evertt, in view of Iskandar, in view of Maciocci and further in view of Morishita et al"
+  }
+]

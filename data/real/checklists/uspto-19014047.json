@@ -1,0 +1,26 @@
+[
+  {
+    "id": "oa-19014047-c1-f923b3ba",
+    "pattern": "\u00a7102 \u2014 anticipation by a single reference",
+    "claim_shape": "(Currently Amended) A system for implementing coordinated cybersecurity threat detection across a distributed system, the system comprising:a non-transitory storage device configured to store computer-readable instructions; and one or more processing devices configured to execute the computer-readable instructions, which when executed cause the one or more processing devices to perform operations comprising: receiving, from each node of multiple nodes of the distributed system, a plurality of parameters representative of model updates to a corresponding machine-learning model that is trained at the corresponding node of the distributed system, wherein: the corresponding machine learning model is trained to detect cybersecurity threats within a context of the corresponding node based on local data received by the corresponding node; and the model updates are learned from the local data, generating, based on the parameters received from the multiple nodes, a set of global model parameters that represents global updates to the individual machine-learning models trained at the multiple nodes of the distributed system; and transmitting to each node of at least a subset of the multiple nodes of the distributed system, a respective selected subset of the global model SVG 19014047.10-14-2025.MGQPKU9QX134X26.CLM.1.23.1428.2154.1847.2200.svg 0.153 1.397 Chemistry Black and white the global model parameters of the respective selected subset are configured to update local model parameters of the corresponding machine learning model at the each node of the subset of multiple nodes, the size of the respective selected subset is smaller than the size of all global model parameters; and the respective selected subset is identified based at least on the context of the node. Currently amended 2",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 1-5, 8-12, 14-18 and 20 are rejected under 35 U.S.C. 102(a)(2) as being anticipated by Mckelvey et al. (US Pub. 20250068928 A1). Mckelvey discloses the following limitations: 1. A system for implementing coordinated cybersecurity threat detection across a distributed system (abstract), the system comprising: a non-transitory storage device configured to store computer-readable instructions;",
+    "source": "USPTO application 19014047, CTFR office action; claims 1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 14, 15 rejected under 35 U.S.C. 102 (a)(2) as being anticipated by Mckelvey et al"
+  },
+  {
+    "id": "oa-19014047-c6-13656b5e",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The system of claim 1, wherein data used in training the corresponding machine- learning model at the corresponding node of the distributed system is secured within a trusted execution environment (TEE) at the corresponding node. Original 7",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 6, 13, and 19 are rejected under 35 U.S.C. 103 as being unpatentable over Mckelvey and further in view of Radhakrishnan et al. (US Pub. 20220374762 A1). Regarding claim 6, Mckelvey discloses the system of claim 1, but does not specifically teach wherein data used in training the corresponding machine-learning model at the corresponding node of the distributed system is secured within a trus",
+    "source": "USPTO application 19014047, CTFR office action; claims 6, 13, 19 rejected under 35 U.S.C. 103 as being unpatentable over Mckelvey and further in view of Radhakrishnan et al"
+  },
+  {
+    "id": "oa-19014047-c7-9d80493d",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The system of claim 1, wherein the plurality of parameters representative of the model updates comprises derivatives of one or more loss functions associated with the model parameters. Original 8",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claim 7 is rejected under 35 U.S.C. 103 as being unpatentable over Mckelvey as applied to claim 1 above, and further in view of Park et al. (US Pub. 20220383197 A1). Regarding claim 7, Mckelvey discloses the system of claim 1, but does not specifically teach wherein the plurality of parameters representative of the model updates comprises derivatives of one or more loss functions associated with t",
+    "source": "USPTO application 19014047, CTFR office action; claim 7 rejected under 35 U.S.C. 103 as being unpatentable over Mckelvey as applied to claim 1 above, and further in view of Park et al"
+  }
+]

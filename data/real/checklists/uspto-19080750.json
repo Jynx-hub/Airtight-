@@ -1,0 +1,18 @@
+[
+  {
+    "id": "oa-19080750-c1-2df24df4",
+    "pattern": "\u00a7101 \u2014 abstract-idea eligibility",
+    "claim_shape": "(Currently Amended) A method of simulating testing environments for digital applications, comprising:selecting, by one or more processors, a trigger of an event scheduler, the trigger identifying a respective timestamp to communicate content corresponding to addressing a condition of a user; updating automating, by the one or more processors, a test clock on at least one of a service or a user device with a time schedule corresponding to a designated passage of time on a reference clock; causing, by the one or more processors, activation of the trigger identifying, by the one or more processors, whether the corresponding content is communicated between the service and the user device in accordance with the trigger, responsive to the clock corresponding to the respective timestamp of the trigger; identifying, by the one or more processors, any issue corresponding with the communication of content or corresponding with whether the content is communicated responsive to identifying any issue,validating or resolving, by the one or more processors, an issue and determining, by the one or more processors, the trigger of the event scheduler is validated or resolved, responsive to identifying the corresponding content is communicated. Currently amended 2",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 1-26 are rejected under 35 U.S.C. 101 because the claimed invention is directed to an abstract idea without significantly more. As per independent claim 1, it recites \u201cA method of simulating testing environments for digital applications, comprising: selecting, by one or more processors, a trigger of an event scheduler, the trigger identifying a respective timestamp to communicate a correspo",
+    "source": "USPTO application 19080750, CTNF office action; claims 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 rejected under 35 U.S.C. 101 because the claimed invention is directed to an abstract idea without significantly more"
+  },
+  {
+    "id": "oa-19080750-c8-3982350e",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The method of claim 1, wherein the event scheduler comprises a machine learning model to generate at least a portion of a plurality of triggers for the event scheduler. Original 9",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 8 and 20 are rejected under 35 U.S.C. 103 as being unpatentable over Leeb et al. (herein called Leeb) (US Patent 10,021,214 B2) and Castaldo et al. (herein called Castaldo) (US Patent 8,250,163 B2) in further view of Alberico (US PG Pub. 2022/0122721 A1). As per claim 8, Leeb and Castaldo do not explicitly state, however Alberico teaches: wherein the event scheduler comprises a machine lear",
+    "source": "USPTO application 19080750, CTNF office action; claims 8, 20 rejected under 35 U.S.C. 103 as being unpatentable over Leeb et al"
+  }
+]

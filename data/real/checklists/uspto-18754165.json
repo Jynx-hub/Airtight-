@@ -1,0 +1,42 @@
+[
+  {
+    "id": "oa-18754165-c1-99c3ede9",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently Amended) A computer-implemented method in a network management device for using machine learning to dynamically adjust multicast data rates for SVG 18754165.08-18-2025.MEI07C0O168X198.CLM.1.8.2055.1085.2085.1121.svg 0.12 0.10 Chemistry Black and white service set identifier (SSID) SSID connections based on real-time network statistics for an enterprise network, the method comprising: monitoring an SSID, with an exchange of data packets over the enterprise network between network devices, to collect real-time network traffic statistics associated with the SSID as a whole and each station utilizing the SSID; deriving, with a processor of the network management device, a baseline throughput and a baseline multicast traffic for the SSID from the network traffic statistics using unsupervised machine learning, wherein deriving comprises training machine learning with K-means clustering of the network statistics to determine modulation and coding scheme (MCS) MCS score; detecting a deterioration in the real-time network traffic statistics for the SSID in relation to the baseline throughput and the baseline multicast traffic; responsive to the deterioration detection, determining if a lowest unicast data rate is higher than a current multicast data rate for the SSID; and responsive to the lowest unicast data rate being higher than the current multicast data rate for the SSID, adjusting the multicast data rate to match the lowest unicast data rate for the SSID. Currently amended 2",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 1, 6-8, and 11-14 are rejected under 35 U.S.C. 103 as being unpatentable over Kneckt et al (US 20080049703 A1, hereinafter, Kneckt) in view of Jupudi et al. (US 20220321422 A1, hereinafter, Jupudi), Kozin et al. (US 20240373194 A1, hereinafter, Kozin), and Oikawa, Tomoya (US 20120314595 A1, hereinafter Oikawa). Regarding claim 1, Kneckt discloses, a method in a network management device for",
+    "source": "USPTO application 18754165, CTNF office action; claims 1, 6, 7, 8, 11, 12, 13, 14 rejected under 35 U.S.C. 103 as being unpatentable over Kneckt et al (US 20080049703 A1, hereinafter, Kneckt) in view of Jupudi et al"
+  },
+  {
+    "id": "oa-18754165-c2-bebea069",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently Amended) The method of claim 1, further comprising determining a modulation and coding scheme (MCS) an 4CS index during association of stations to the SSID and using the MCS index for the step of deriving the baseline throughput and the baseline multicast traffic. Currently amended 3",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 2, 3 are rejected under 35 U.S.C. 103 as being unpatentable over Kneckt, Jupudi, Kozin and Oikawa in view of Wu et al. (US 20230361910 A1, hereinafter, Wu). Regarding claim 2, combination of Kneckt, Jupudi, Kozin and Oikawa teach the method of claim 1. Kneckt, Jupudi, Kozin and Oikawa do not explicitly disclose, further comprising determining an MCS index during association of stations to t",
+    "source": "USPTO application 18754165, CTNF office action; claims 2, 3 rejected under 35 U.S.C. 103 as being unpatentable over Kneckt, Jupudi, Kozin and Oikawa in view of Wu et al"
+  },
+  {
+    "id": "oa-18754165-c5-00047484",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently Amended) The method of claim 4, wherein the network statistics considered for the [[an]] the MCS score include data rate, retries and discards. Currently amended 6",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 5 is rejected under 35 U.S.C. 103 as being unpatentable over Kneckt, Nandy, Jupudi, Kozin, and Oikawa in view of Sullivan et al. (US 20160057647 A1, hereinafter, Sullivan). Regarding claim 5, Nandy discloses the method of claim 4. Kneckt, Jupudi, Kozin, Oikawa, and Nandy do not explicitly disclose, wherein the network statistics considered for the MCS score include data rate, retries and di",
+    "source": "USPTO application 18754165, CTNF office action; claim 5 rejected under 35 U.S.C. 103 as being unpatentable over Kneckt, Nandy, Jupudi, Kozin, and Oikawa in view of Sullivan et al"
+  },
+  {
+    "id": "oa-18754165-c9-6e7d7a2d",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The method of claim 1, wherein the step of determining if the lowest unicast data rate is higher than the current multicast data rate for the SSID comprises determining if the lowest unicast data rate is stable. Original 10",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 9 is rejected under 35 U.S.C. 103 as being unpatentable over Kneckt, Jupudi, Kozin, and Oikawa in view of Kish et al. (US 20110096712 A1, hereinafter, Kish). Regarding claim 9, combination of Kneckt, Jupudi, Kozin and Oikawa teach the method of claim 1. Combination of Kneckt, Jupudi, Kozin and Oikawa do not teach, wherein the step of rate determining if the lowest unicast data is higher tha",
+    "source": "USPTO application 18754165, CTNF office action; claim 9 rejected under 35 U.S.C. 103 as being unpatentable over Kneckt, Jupudi, Kozin, and Oikawa in view of Kish et al"
+  },
+  {
+    "id": "oa-18754165-c10-2b7b98ca",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently Amended) The method of claim 1, further comprising: detecting a new client association; and responsive to the new client association detection,determining whether the multicast data rate changed from a basic rate; responsive determining change, determining whether a unicast data rate negotiated by the new client is less than the multicast data rate; and responsive to the new client unicast data rate being less than the multicast date rate, reverting the multicast rate to the basic rate and chanin the Currently amended 11",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 10 is rejected under 35 U.S.C. 103 as being unpatentable over Kneckt, Jupudi, Kozin, and Oikawa in view of Moscibroda et al. (US 20110211517 A1, hereinafter, Moscibroda). Regarding claim 10, combination of Kneckt, Jupudi, Kozin and Oikawa teach the method of claim 1. Kneckt, Jupudi, Kozin, and Oikawa do not explicitly teach, further comprising: detecting a new client association; and respon",
+    "source": "USPTO application 18754165, CTNF office action; claim 10 rejected under 35 U.S.C. 103 as being unpatentable over Kneckt, Jupudi, Kozin, and Oikawa in view of Moscibroda et al"
+  }
+]

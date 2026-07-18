@@ -1,0 +1,34 @@
+[
+  {
+    "id": "oa-19217047-c3-b0b190ce",
+    "pattern": "\u00a7112 \u2014 indefiniteness",
+    "claim_shape": "(Currently Amended) The method of claim 2, wherein the computing device continually captures the video data via the camera, and wherein the computing device interrupts until interrupting operation of the camera in response to validating the document of the selected frame. Currently amended 4",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 3 and 13 are rejected under 35 U.S.C. 112(b) or 35 U.S.C. 112 (pre-AIA), second paragraph, as being indefinite for failing to particularly point out and distinctly claim the subject matter which the inventor or a joint inventor (or for applications subject to pre-AIA 35 U.S.C. 112, the applicant), regards as the invention. Regarding claim 3, the limitations \u201cthe computing device continually",
+    "source": "USPTO application 19217047, CTNF office action; claims 3, 13 rejected under 35 U.S.C. 112 (b) or 35 U"
+  },
+  {
+    "id": "oa-19217047-c1-d10cd797",
+    "pattern": "\u00a7102 \u2014 anticipation by a single reference",
+    "claim_shape": "(Currently Amended) A method for client-side processing and validation of document imagery, the method comprising:obtaining, by a computing device associated with an end-user, video data comprising a plurality of frames from a camera of the computing device; at a predetermined interval, selecting, by the computing device, a frame from a plurality of frames of the video data obtained during a predetermined interval for processing at an imaging software program locally executed on the computing device in response to a completion of the predetermined interval; [[and]] obtaining, by the computing device[[,]] from the imaging software program, a set of boundaries corresponding to one or more edges of a document in the selected frame according to pixel intensity of a set of pixels containing the document in the selected frame that was selected in response to the completion of the predetermined interval;identifying, by the computing device, one or more dimensions of the document based upon the set of boundaries of the document, the one or more dimensions including an aspect ratio of the document; and in response to determining that the one or more dimensions of the document satisfies a preconfigured aspect ratio threshold, validating, by the computing device, the one or more dimensions of the document as a document type. Currently amended 2",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 1-3, 5-7, 11-13, and 15-17 are rejected under 35 U.S.C. 102(a)(1) as being anticipated by Eid et al. (USPAPN 2016/0253569). Regarding claim 1, Eid discloses: obtaining, by a computing device associated with an end-user, video data comprising a plurality of frames from a camera of the computing device (see para [23], obtaining, by a mobile device of a user, a video sequence comprised of fram",
+    "source": "USPTO application 19217047, CTNF office action; claims 1, 2, 3, 5, 6, 7, 11, 12, 13, 15, 16, 17 rejected under 35 U.S.C. 102 (a)(1) as being anticipated by Eid et al"
+  },
+  {
+    "id": "oa-19217047-c8-86ee1092",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The method of claim 1, wherein the computing device determines an area ratio between an area of portion of the image having the document and a total area of the selected frame and wherein the computer validates the document based upon the area ratio of the document satisfying a document area threshold. Original 9",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 8, 9, 18, and 19 are rejected under 35 U.S.C. 103 as being unpatentable over Eid in view of Bueche, Jr. (USPN 11,900,755). Regarding claim 8, Eid discloses everything claimed as applied above (see rejection of claim 1), however, does not disclose: wherein the computing device determines an area ratio between an area of portion of the image having the document and a total area of the selecte",
+    "source": "USPTO application 19217047, CTNF office action; claims 8, 9, 18, 19 rejected under 35 U.S.C. 103 as being unpatentable over Eid in view of Bueche, Jr"
+  },
+  {
+    "id": "oa-19217047-c4-198976fb",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The method of claim 1, further comprising: encrypting, by the computing device, the validated selected frame; and transmitting, by the computing device, the encrypted validated selected frame and mobile client device metadata to a backend server. Original 5",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 4 and 14 are rejected under 35 U.S.C. 103 as being unpatentable over Eid in view of Nepomniachtci et al. (USPAPN 2013/0022231). Regarding claim 4, Eid discloses everything claimed as applied above (see rejection of claim 1), however, does not disclose: encrypting, by the computing device, the validated selected frame; and transmitting, by the computing device, the encrypted validated select",
+    "source": "USPTO application 19217047, CTNF office action; claims 4, 14 rejected under 35 U.S.C. 103 as being unpatentable over Eid in view of Nepomniachtci et al"
+  }
+]

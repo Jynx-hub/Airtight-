@@ -1,0 +1,10 @@
+[
+  {
+    "id": "oa-19038099-c1-b4ee3420",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently Amended) A computer-implemented method, the method comprising:issuing one or more transactions from an account, the account comprising a bond balance and each transaction associated with a transaction identification (ID) and an expiry time; partitioning the transactions to a set [[a]] of validators based on a temporal partitioning scheme, wherein each validator is authorized to replicate transactions for the account during a corresponding epoch, each transaction ass ociated w ith a transaction identification (ID) and an expiry time; producing, at the set of validators, chunks including the transactions; replicating the chunks to nodes in a blockchain network; generating, based on receiving at least a threshold of stake signatures from the nodes, blocks that reference the replicated chunks; and distributing, from the bond balance, funds to the nodes for including the replicated chunks in the blocks, wherein the funds are distributed either as transaction fees for valid transactions or as compensation for invalid transactions. Currently amended 2",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: CLAIMS 1-20 are rejected under 35 U.S.C. 103(a) as being unpatentable over SIEBENBRUNNER et al (US 2025/0106188) in view of CONLEY et al (US 2021/0073212). a. Per claim 1, SIEBENBRUNNER et al teach a computer-implemented method, the method comprising: issuing one or more transactions from an account (paras 0068-69, 0074, 0078\u2014transactions issued from an account); partitioning the transactions to a",
+    "source": "USPTO application 19038099, CTFR office action; claims 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 rejected under 35 U.S.C. 103 (a) as being unpatentable over SIEBENBRUNNER et al (US 2025/0106188) in view of CONLEY et al (US 2021/0073212)"
+  }
+]

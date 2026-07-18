@@ -1,0 +1,10 @@
+[
+  {
+    "id": "oa-19032884-c1-e2f31fee",
+    "pattern": "\u00a7102 \u2014 anticipation by a single reference",
+    "claim_shape": "(Currently amended) A system, comprising:non-transitory computer-readable media storing instructions; and an electronic processor configured to execute the instructions to: receive a query from a user device, generate a query embedding based on the query, select artifact embeddings from a set of artifact embeddings based on a closeness between each artifact embedding and the query embedding, the query embedding and the set of artifact embeddings being in a same feature space, retrieve a knowledge graph from a data store, the knowledge graph including nodes representing artifacts corresponding to the selected artifact embeddings and edges representing semantic relationships between the artifacts, provide an input including a representation of the query, the selected artifact embeddings, and the knowledge graph to a generative model to generate an output, and output, perform a postprocessing operation on the output by comparing the output with the selected artifact embedding s to determine whether the output alig ns with the selected artifact embedding s, and in response to determining that the output alig ns with the selected artifact embeddings, transmit the output to the user device. Currently amended 2",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 1-20 are rejected under 35 U.S.C. 102(a)(2) as being anticipated by Ho et al (Pub No. US 2025/0291854, hereinafter Ho). With respect to claim 1, Ho discloses a system (abstract), comprising: non-transitory computer-readable media storing instructions (Fig 1); and an electronic processor configured to execute the instructions (Fig 1) to: receive a query from a user device ([0017], [0029], [0",
+    "source": "USPTO application 19032884, CTNF office action; claims 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 rejected under 35 U.S.C. 102 (a)(2) as being anticipated by Ho et al (Pub No"
+  }
+]

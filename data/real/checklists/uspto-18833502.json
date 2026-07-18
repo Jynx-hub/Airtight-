@@ -1,0 +1,50 @@
+[
+  {
+    "id": "oa-18833502-c25-c3048707",
+    "pattern": "\u00a7101 \u2014 abstract-idea eligibility",
+    "claim_shape": "(Currently Amended) A non-transitory computer readable medium comprising program instructions stored thereon, wherein the program instructions are configured to control an apparatus to: receive an indication of any of a requirement and a constraint associated with one or more WTRU applications; based on any of the requirement and the constraint associated with the one or more WTRU applications, determine one or more machine learning (ML)-based analytics to request or subscribe from a network element; send, to the network element, a request or a subscription for the one or more ML-based analytics; and receive a response indicating the one or more ML-based analytics from the network element; modify, by a protocol data unit (PDU) session modifier (PSM) entity, a PDU session associated with the one or more WTRU applications; receive, by the PSM, one or more application resource requirements from at least one of the one or more WTRU applications; select, by the PSM, at least one prediction module relevant to a determination of suitable PDU session parameters for a PDU session associated with the at least one of the one or more WTRU applications; and activate the at least one selected prediction module to generate a prediction of the determined suitable PDU session parameters. Currently amended 2 3 4 5 6 7",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claim 25 is rejected under 35 U.S.C. 101 because the claimed invention is directed to non-statutory subject matter because of the following reasons: \u201cthe claim is directed to computer-readable medium which is interpreted as non-statutory as being directed to transitory medium. The specification is silent regarding the meaning of this term. Thus, applying the broadest reasonable interpretation in l",
+    "source": "USPTO application 18833502, CTNF office action; claim 25 rejected under 35 U.S.C. 101 because the claimed invention is directed to non-statutory subject matter because of the following reasons: \u201cthe claim is directed to computer-readable medium which is interpreted as non-statutory as being directed to transitory medium"
+  },
+  {
+    "id": "oa-18833502-c1-6dcb84fb",
+    "pattern": "\u00a7102 \u2014 anticipation by a single reference",
+    "claim_shape": "(Currently Amended) A Wireless Transmit/Receive Unit (WTRU), comprising:a transceiver; and a processor configured to: receive an indication of any of a requirement and a constraint associated with one or more WTRU applications; based on any of the requirement and the constraint associated with the one or more WTRU applications, determine one or more machine learning (ML)-based analytics to request or subscribe from a network element; send, to the network element, a request or a subscription for the one or more ML- based analytics; and receive a response indicating the one or more ML-based analytics from the network element; and a protocol data unit (PDU) session modifier (PSM) entity configured to modify a PDU session associated with the one or more WTRU applications, wherein the PSM is configured to:receive one or more application resource requirements from at least one of the one or more WTRU applications, select at least one prediction module relevant to a determination of suitable PDU session parameters for a PDU session associated with the at least one of the one or more WTRU applications, and activate the at least one selected prediction module to generate a prediction of the determined suitable PDU session parameters. Currently amended 2",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 1-2, 4-5, 13-14, 16-17 and 25 are rejected under 35 U.S.C. 102(a)(2) as being anticipated by Fiorese et al Pub. No.: (US 2020/0288296 A1) (hereinafter \u201cFiorese\u201d). With respect to claim 1: Fiorese discloses a wireless Transmit/Receive Unit (WTRU), comprising: a transceiver (UE comprising a transceiver [0185]); and a processor configured to (UE comprising a processor [0185]); receive an indic",
+    "source": "USPTO application 18833502, CTNF office action; claims 1, 2, 4, 5, 13, 14, 16, 17, 25 rejected under 35 U.S.C. 102 (a)(2) as being anticipated by Fiorese et al Pub"
+  },
+  {
+    "id": "oa-18833502-c6-19683059",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Previously Presented) The WTRU of claim 1, comprising: a predictor engine coordinator (PEC) entity configured to:generate the request or the subscription; andSVG 18833502.04-07-2026.MNP1N80QX17X173.CLM.2.19.534.2135.550.2158.svg 0.077 0.053 Chemistry Black and white send the generated request or the generated subscription to the network element via non-access stratum (NAS) signaling. Previously presented 7",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 6 and 18 are rejected under 35 U.S.C. 103 as being unpatentable over Fiorese et al Pub. No.: (US 2020/0288296 A1) (hereinafter \u201cFiorese\u201d) as applied to claims 1-2, 4-5, 13-14, 16-17 and 25 above, in view of Yang et al Pub. No.: (US 2023/0164690 A1) (hereinafter \"Yang\u201d). With respect to claim 6: Fiorese discloses the WTRU of claim 1 a set forth above, comprising: However, Fiorese does not ex",
+    "source": "USPTO application 18833502, CTNF office action; claims 6, 18 rejected under 35 U.S.C. 103 as being unpatentable over Fiorese et al Pub"
+  },
+  {
+    "id": "oa-18833502-c7-42046b9a",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Previously Presented) The WTRU of claim 6, wherein the PEC entity is configured to operate as part of a NAS-session management (NAS-SM) layer or to operate standalone on a layer above a NAS-mobility management (NAS-MM) layer. Previously presented 8",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 7 and 19 are rejected under 35 U.S.C. 103 as being unpatentable over Fiorese et al Pub. No.: (US 2020/0288296 A1) (hereinafter \u201cFiorese\u201d) in view of Yang et al Pub. No.: (US 2023/0164690 A1) (hereinafter \"Yang\u201d) as applied to claims 6 and 18 above, further in view of Takakura et al Pub. No.: (US 2024/0340643 A1) (hereinafter \"Takakura\u201d). With respect to claim 7: Fiorese-Yang discloses the W",
+    "source": "USPTO application 18833502, CTNF office action; claims 7, 19 rejected under 35 U.S.C. 103 as being unpatentable over Fiorese et al Pub"
+  },
+  {
+    "id": "oa-18833502-c9-0010e14e",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Previously Presented) The WTRU of claim 1, comprising one or more internal WTRU ML modules configured to generate the one or more ML-based analytics relating to operation of the WTRU, wherein the one or more internal WTRU ML modules comprise any of: a ML module configured to generate a prediction of available bit rate at the WTRU; a ML module configured to generate a prediction of a mobility condition of the WTRU; or a ML module configured to generate a prediction of a usage rate of the processor. Previously presented 10",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 9 and 21 are rejected under 35 U.S.C. 103 as being unpatentable over Fiorese et al Pub. No.: (US 2020/0288296 A1) (hereinafter \u201cFiorese\u201d) as applied to claims 1-2, 4-5, 13-14, 16-17 and 25 above, in view of McGavran et al Pub. No.: (US 2014/0278051 A1) (hereinafter \"McGavran\u201d). With respect to claim 9: Fiorese discloses the WTRU of claim 1 a set forth above. However, However, Fiorese does n",
+    "source": "USPTO application 18833502, CTNF office action; claims 9, 21 rejected under 35 U.S.C. 103 as being unpatentable over Fiorese et al Pub"
+  },
+  {
+    "id": "oa-18833502-c11-1e63ab85",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently Amended) The WTRU of claim 481, wherein the PSM is configured to modify the PDU session to satisfy a capacity requirement of an associated application or to improve usage of WTRU resources. Currently amended 12",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 10-11 and 22-23 are rejected under 35 U.S.C. 103 as being unpatentable over Fiorese et al Pub. No.: (US 2020/0288296 A1) (hereinafter \u201cFiorese\u201d) as applied to claims 1-2, 4-5, 13-14, 16-17 and 25 above, in view of Lee et al Pub. No.: (US 2021/0212136 A1) (hereinafter \"Lee\u201d). With respect to claim 10: Fiorese discloses the WTRU of claim 1 a set forth above, comprising: However, However, Fior",
+    "source": "USPTO application 18833502, CTNF office action; claims 11, 23 rejected under 35 U.S.C. 103 as being unpatentable over Fiorese et al Pub"
+  }
+]

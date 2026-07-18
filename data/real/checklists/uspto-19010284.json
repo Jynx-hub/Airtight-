@@ -1,0 +1,18 @@
+[
+  {
+    "id": "oa-19010284-c4-281d9f8e",
+    "pattern": "\u00a7112 \u2014 written-description gap",
+    "claim_shape": "(Currently amended) The method of claim 1, wherein implementing gesture-based segment control further comprises:providing visual feedback indicating an active segment during playback through waveform highlighting; maintaining consistent segment start and end boundaries during the repeated playback cycles; and enabling configuration of repetition parameters including number of loops for continuous playback the repeated playback to continue across multiple iterations. Currently amended 5",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 4,5,9,10 are rejected under 35 U.S.C. 112(a) or 35 U.S.C. 112 (pre-AIA), first paragraph, as failing to comply with the written description requirement. The claim(s) contains subject matter which was not described in the specification in such a way as to reasonably convey to one skilled in the relevant art that the inventor or a joint inventor, or for applications subject to pre-AIA 35 U.S.",
+    "source": "USPTO application 19010284, CTFR office action; claims 4, 5, 9, 10 rejected under 35 U.S.C. 112 (a) or 35 U"
+  },
+  {
+    "id": "oa-19010284-c2-bf0b2ef9",
+    "pattern": "\u00a7112 \u2014 antecedent-basis gap",
+    "claim_shape": "(Currently amended) The method of claim 1, wherein said receiving, by a processor, audio content comprises at least one of: recording audio through a recording interface of a mobile application; and importing audio files through a file import interface of the mobile application. Currently amended 3",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 2,4-6,9-11,14,15 are rejected under 35 U.S.C. 112(b) or 35 U.S.C. 112 (pre-AIA), second paragraph, as being indefinite for failing to particularly point out and distinctly claim the subject matter which the inventor or a joint inventor (or for applications subject to pre-AIA 35 U.S.C. 112, the applicant), regards as the invention. Regarding Claim 2, the structural and functional relationshi",
+    "source": "USPTO application 19010284, CTFR office action; claims 2, 4, 5, 6, 9, 10, 11, 14, 15 rejected under 35 U.S.C. 112 (b) or 35 U"
+  }
+]

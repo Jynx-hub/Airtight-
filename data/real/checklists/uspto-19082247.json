@@ -1,0 +1,10 @@
+[
+  {
+    "id": "oa-19082247-c1-a5a02ea2",
+    "pattern": "\u00a7101 \u2014 abstract-idea eligibility",
+    "claim_shape": "(Currently Amended) A computer-implemented method for detecting mechanical damage to a machine based on a performance indicator present at a rotation speed of the machine, comprising: receiving calibration data points during a calibration period, each comprising a value of the rotation speed of the machine and a performance characteristic value associated with the rotation speed, and which have been determined from sensor data of the machine operated at one or more operating points, calibrating an AI -based Gaussian process regressor, by inputting the calibration data points received during the calibration period and outputting an estimated performance curve and an uncertainty range assigned to each value of the performance curve for all rotation speed values in a specified rotation speed range which indicate a normal state of the machine, receiving a data point to be evaluated in an evaluation period after the calibration period, and comparing the data point to be evaluated with the estimated performance curve, and outputting an anomaly message if the data point to be evaluated is outside at least one specified limit value, which is dependent on the uncertainty range of the performance characteristic value. Currently amended 2",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 1-13 are rejected under 35 U.S.C. 101 because the claimed invention is directed to a judicial exception (i.e., a law of nature, a natural phenomenon, or an abstract idea) without significantly more. Regarding claim 1, Step 1: Is the claim to a process, machine, manufacture or composition of matter? Yes. Step 2A: Is the claim directed to a law of nature, a natural phenomenon, or an abstract ",
+    "source": "USPTO application 19082247, CTNF office action; claims 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 rejected under 35 U.S.C. 101 because the claimed invention is directed to a judicial exception (i"
+  }
+]

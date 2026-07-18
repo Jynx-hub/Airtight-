@@ -1,0 +1,10 @@
+[
+  {
+    "id": "oa-18975506-c2-32eb8b11",
+    "pattern": "\u00a7101 \u2014 abstract-idea eligibility",
+    "claim_shape": "(Previously Presented) A computer-implemented method comprising:creating an unlocking transaction that includes: a transaction input comprising a hash that is a transaction ID (TxI D) of a previous transaction (Tx Z) and an output (n) of the previous transaction; an unlocking script, the unlocking script comprising: a serialized version of the previous transaction (TxZ); a serialized version of a further previous transaction (TxZ') with an output that was transferred by the previous transaction (TxZ); a set of serialized unlocking transaction fields of the unlocking transaction; and a byte that indicates which unlocking transaction fields of the unlocking transaction have been included in the unlocking script; and an output comprising a locking script of the unlocking transaction. Previously presented 3",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 2-21 are rejected under 35 U.S.C. 101 because the claims are directed to a judicial exception (i.e., an abstract idea) without significantly more. Independent Claims 1 and 14 recite creating an unlocking transaction that includes a transaction ID of a previous transaction and an output of the previous transaction (i.e., the transaction input hash), an unlocking script comprising a serialize",
+    "source": "USPTO application 18975506, CTNF office action; claims 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 rejected under 35 U.S.C. 101 because the claims are directed to a judicial exception (i"
+  }
+]

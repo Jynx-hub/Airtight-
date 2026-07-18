@@ -1,0 +1,10 @@
+[
+  {
+    "id": "oa-19345616-c1-53fd9ce4",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently Amended) A method for automated fraud detection using retrieval augmented generation and machine learning models, comprising:creating a directed graph for each of a plurality of interactive sessions based on attributes associated with the plurality of interactive sessions; generating an embedding of the directed graph for each of the plurality of interactive sessions; storing the embedding of the directed graph for each of the plurality of interactive sessions in a vector database; retrieving, in response to an input session, one or more embeddings related to the input session from the vector database; selecting, using a language processing machine learning model, a subset of the one or more embeddings based on a prompt provided to the language processing machine learning model, wherein the selecting comprises determining K-most similar embeddings of the one or more embeddings by calculating distance scores between an embedding of the input session and each of the one or more embeddings; comparing features associated with the subset of the one or more embeddings to features associated with [[an]]t he embedding of the input session; and performing an action based on the comparing. Currently amended 2",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 1-20 are rejected under 35 U.S.C. 103 as being unpatentable over Crabtree et al. (US 2025/0258685 A1) in view of Foley et al. (US 2023/0224493 A1). Regarding claim 1, Crabtree teaches a method for automated fraud detection, (See Crabtree paragraph [0148], a fraud detection system), using retrieval augmented generation and machine learning models, comprising, (See Crabtree paragraph [0162], ",
+    "source": "USPTO application 19345616, CTNF office action; claims 1, 2, 3, 5, 6, 7, 8, 9, 10, 12, 13, 14 rejected under 35 U.S.C. 103 as being unpatentable over Crabtree et al"
+  }
+]

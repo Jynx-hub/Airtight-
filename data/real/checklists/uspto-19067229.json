@@ -1,0 +1,10 @@
+[
+  {
+    "id": "oa-19067229-c1-e28a8b4d",
+    "pattern": "\u00a7112 \u2014 indefiniteness",
+    "claim_shape": "(Currently Amended) A method for training a machine-learned module, the method comprising: evaluating the machine-learned module using a two-phase evaluation process, the evaluating comprising:performing, using pre-segmented data, a segmented classification task using the machine-learned module to evaluate an error associated with classification of multiple gestures, the pre-segmented data comprising complex radar data having multiple gesture segments, each gesture segment of the multiple gesture segments comprising a gesture motion, centers of gesture motions across the multiple gesture segments having a same relative timing alignment within each gesture segment each gesture segment of the multiple gesture segments representing a window of time that is centered based on a center of the gesture motion;performing, using continuous time-series data, an unsegmented recognition task using the machine-learned module to evaluate a false positive rate, the continuous time-series data comprising other complex radar data corresponding to an absence of the multiple gestures; andadjusting one or more elements of the machine-learned module to reduce the error and the false positive rate. Currently amended 2",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 1-20 are rejected under 35 U.S.C. 112(b) or 35 U.S.C. 112 (pre-AIA), second paragraph, as being indefinite for failing to particularly point out and distinctly claim the subject matter which the inventor or a joint inventor (or for applications subject to pre-AIA 35 U.S.C. 112, the applicant), regards as the invention. Claim 1 recites \u201ccenters of gesture motions\u201d in ll. 8, but fails to prov",
+    "source": "USPTO application 19067229, CTNF office action; claims 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 rejected under 35 U.S.C. 112 (b) or 35 U"
+  }
+]
