@@ -43,6 +43,12 @@ now triggered by a real socket-level denial.
   binary.** That preview is gated to hosted DGX Spark; this reproduces the *same graded
   four-tier architecture* with gVisor-class container isolation + a policy egress gate, which
   the research notes keeps the judging story intact. It is real enforcement, not the vendor product.
+- **Enforcement is per-endpoint, not blanket.** `ENFORCE=enforce` honors each endpoint's
+  `enforcement:` field in the YAML (A2), so the inference hop and the filing host default-deny
+  unmatched requests, while **read-only discovery hosts (`patent_sources`, `client_datastore`)
+  remain in `audit`** — an unmatched request there is observed-and-forwarded, by design, until
+  the A5 full-agent sweep records their real egress set and flips them. "Real 403" means the
+  policy-as-written is enforced on real sockets, not that every unmatched request is denied.
 - **Local is for build/rehearsal.** The judged demo deploys this same compose to a **remote**
   Linux host — never the presenter's laptop, never venue hardware (`docs/WORKSTREAMS.md` §A1).
   Running it here is the "build against the mock first" rule applied to containment.
