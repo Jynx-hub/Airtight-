@@ -1,7 +1,10 @@
 # Airtight OpenShell sandbox policy — DRAFT, schema per research/nemoclaw-openshell.md §3/§5.
-# Starts in audit (observe, don't block) per the audit→enforce convention; flip each
-# `enforcement: audit` to `enforce` for the judged run after reviewing the denial log.
-# UNVERIFIED against the live early-preview schema — validate on DGX Spark (ONBOARDING.md).
+# A2: the per-endpoint `enforcement:` field DRIVES the decision (containment/policy.py reads
+# it; containment/planb/ enforces it for real). Sensitive endpoints — the inference hop and
+# the filing host — ship `enforce` now. Read-only discovery endpoints (patent_sources,
+# client_datastore) stay `audit` until the A5 full-agent sweep observes their real egress set,
+# then flip them too (one-liner, ONBOARDING.md step 6). Validate structure with
+# `python -m inference.policy.validate_policy`; live-schema check is on DGX (ONBOARDING.md).
 
 version: 1
 
@@ -20,11 +23,30 @@ process:
 network_policies:
   inference_gateway:
     name: inference_gateway
+    # A2: enforce, with BOTH inference destinations (Modal PRIMARY + NIM FALLBACK) enumerated.
+    # inference.local is the A4 host-side gateway — the preferred single hop once deployed
+    # (creds host-side; the sandbox holds a dummy token). Modal and NIM are the two
+    # operator-selectable backends (INFERENCE_BACKEND=modal|nim); only ONE is live at a time and
+    # the OPERATOR pins it — the agent cannot choose. All three enforce. Tradeoff (owner-accepted):
+    # listing the two backends here also permits the pre-gateway direct path; the A4 gateway is
+    # what keeps creds host-side once it is deployed.
     endpoints:
-      - host: inference.local           # gateway forwards to vLLM-on-Brev (NIM fallback); creds host-side
+      - host: inference.local           # A4 gateway → forwards to the pinned backend; creds host-side
         port: 443
         protocol: rest
-        enforcement: audit              # -> enforce for the judged run
+        enforcement: enforce            # A2: the inference hop enforces — decide() reads this field now
+      - host: airtight-nemotron-serve.modal.run   # PRIMARY — self-hosted vLLM on Modal ($500 bounty path)
+        port: 443                                  # operator replaces with their <workspace>-- serve URL
+        protocol: rest
+        enforcement: enforce
+        rules:
+          - allow: { method: POST, path: "/v1/**" }   # OpenAI-compatible inference only
+      - host: integrate.api.nvidia.com              # FALLBACK — NVIDIA NIM hosted endpoint (hosted; no bounty)
+        port: 443
+        protocol: rest
+        enforcement: enforce
+        rules:
+          - allow: { method: POST, path: "/v1/**" }
     binaries:
       - { path: /usr/local/bin/agent }
 
@@ -58,7 +80,7 @@ network_policies:
       - host: api.uspto.gov
         port: 443
         protocol: rest
-        enforcement: audit
+        enforcement: enforce            # A2: sensitive filing host enforces — unmatched paths default-deny
         rules:
           - allow: { method: GET, path: "/search/**" }
         deny_rules:
