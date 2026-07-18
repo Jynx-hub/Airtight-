@@ -7,6 +7,10 @@ open — so nobody wires against the wrong thing or loses work.*
 ## Merge state — clean
 
 - **`main` is the integrated superset.** `origin/Runtime` (0 ahead / 42 behind) and `feat/data-groundtruth` (0 ahead / 11 behind) are both **fully merged**; their unique work is on `main`. Those branches are now stale — safe for their owners (Steven, Sreesanth) to delete.
+- **The three containment branches are absorbed by PR #6 (`a071e61`) — CLOSED, safe to delete.** PR #6 landed a *better* consolidated A-track (real socket-level 403, not `[SIM]`) that supersedes all three; the branches' commits are not ancestors of `main`, so this is functional absorption, verified file-by-file 2026-07-18:
+  - `feat/a4-inference-local-gateway` (tip `3e37eb7`) — every net-new file (gateway, `inference/policy/validate_policy.py`) is on `main`. Fully absorbed.
+  - `feat/a3-a6-policy-advisor-fusion` (tip `aaa5e52`) — strict subset of a4; every net-new file on `main`. Fully absorbed.
+  - `feat/a1-a5-planb-enforcement` (tip on `origin`) — all net-new *files* (`containment/planb/**`, `containment/live/**`) are on `main` via PR #6. Its only non-absorbed content is two test files (`tests/test_recursion.py`, `tests/test_retrieval.py`) that **re-test behaviors main already covers** — revise convergence/cap (`test_revise.py`), B3 defect-line filtering (`test_episodes.py`), IDF-beats-length (`test_retrieval_ranking.py`), write-API dedup (`test_memory_write.py`). Nothing unique is lost.
 - **Green:** `pytest tests/` → 66 passed, 1 skipped (the skip is the real-pull split test, needs local `data/real`), 0 failures.
 - **Demo runs end-to-end:** `bash scripts/demo.sh` drives all three beats offline.
 
