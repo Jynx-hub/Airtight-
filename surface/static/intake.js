@@ -14,6 +14,10 @@ const el = (tag, cls, text) => {
 
 const POLL_MS = 400;
 let polling = null;
+// The job the UI is currently showing. An in-flight poll from a previous job can
+// resolve after a new one starts; without this it would clearInterval the *new*
+// job's timer and render the *old* job's claims as the new run's result.
+let activeJob = null;
 
 /* ---------------- status bar ---------------- */
 
@@ -182,6 +186,12 @@ function renderPipeline(snap) {
     box.append(el("p", "empty pulsing", "Matching the disclosure against memory…"));
     return;
   }
+  if (snap.status === "queued") {
+    // Drafts are serialized process-wide so guardrail findings stay attributable
+    // to the request that caused them. Say that rather than looking hung.
+    box.append(el("p", "empty pulsing", "Queued — another draft holds the model hop."));
+    return;
+  }
 
   for (const s of snap.stages) {
     const row = el("div");
@@ -323,6 +333,7 @@ async function draft() {
     });
     if (!res.ok) throw new Error(await res.text());
     const { job_id } = await res.json();
+    activeJob = job_id;
     $("status").textContent = "";
     polling = setInterval(() => poll(job_id), POLL_MS);
     poll(job_id);
@@ -335,6 +346,7 @@ async function draft() {
 async function poll(jobId) {
   try {
     const snap = await (await fetch(`/api/draft/${jobId}`)).json();
+    if (jobId !== activeJob) return;  // a superseded job's response — drop it
     if (snap.retrieval) renderRetrieval(snap.retrieval);
     renderPipeline(snap);
 
@@ -348,6 +360,7 @@ async function poll(jobId) {
       $("btn-draft").disabled = false;
     }
   } catch (e) {
+    if (jobId !== activeJob) return;
     clearInterval(polling);
     $("status").textContent = "Lost the job: " + e.message;
     $("btn-draft").disabled = false;

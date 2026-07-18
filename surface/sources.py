@@ -48,18 +48,34 @@ def _read_json(path: pathlib.Path):
         return None
 
 
+def _as_dict(value) -> dict:
+    """Coerce to a dict for `.get()` chaining.
+
+    `data.get("summary", {})` returns None — not {} — when the key is *present
+    and null*, which is what a run killed between emitting a key and filling it
+    leaves behind. Every nested read goes through here so a half-written
+    artifact degrades to a seam instead of an AttributeError on the panel that
+    carries a headline number.
+    """
+    return value if isinstance(value, dict) else {}
+
+
 def _read_jsonl(path: pathlib.Path) -> list[dict]:
-    if not path.exists():
-        return []
+    try:
+        text = path.read_text()
+    except (OSError, ValueError, UnicodeDecodeError):
+        return []  # unlike _read_json this one used to read outside the try
     rows = []
-    for line in path.read_text().splitlines():
+    for line in text.splitlines():
         line = line.strip()
         if not line:
             continue
         try:
-            rows.append(json.loads(line))
+            row = json.loads(line)
         except ValueError:
             continue  # a torn last line mid-write shouldn't lose the other 200
+        if isinstance(row, dict):
+            rows.append(row)
     return rows
 
 
@@ -87,7 +103,7 @@ def ablation_runs() -> dict:
             continue
         data = _read_json(d / "results.json")
         transcripts = sorted((d / "transcripts").glob("*.json")) if (d / "transcripts").exists() else []
-        if data is None:
+        if not isinstance(data, dict):  # missing, null, or a bare list
             # Killed mid-run: transcripts exist, the file the chart needs doesn't.
             runs.append({
                 "id": d.name,
@@ -102,7 +118,9 @@ def ablation_runs() -> dict:
             })
             continue
 
-        fp = data.get("fingerprint", {})
+        fp = _as_dict(data.get("fingerprint"))
+        results = data.get("results") or []
+        results = [r for r in results if isinstance(r, dict)]
         runs.append({
             "id": d.name,
             "complete": True,
@@ -110,9 +128,9 @@ def ablation_runs() -> dict:
             "corpus_size": data.get("corpus_size"),
             "disclosures_completed": data.get("disclosures_completed"),
             "stopped_early": data.get("stopped_early", False),
-            "results": data.get("results", []),
-            "pairs": data.get("pairs", []),
-            "totals": _ablation_totals(data.get("results", [])),
+            "results": results,
+            "pairs": [p for p in (data.get("pairs") or []) if isinstance(p, dict)],
+            "totals": _ablation_totals(results),
             "fingerprint": {
                 "timestamp": fp.get("timestamp"),
                 "mode": fp.get("mode"),
@@ -124,7 +142,7 @@ def ablation_runs() -> dict:
                 # "—" rather than implying 0 rounds were configured.
                 "revise_rounds": fp.get("revise_rounds"),
                 "base_url_host": fp.get("base_url_host"),
-                "has_revise_prompt": "REVISE_SYSTEM" in fp.get("prompt_sha256", {}),
+                "has_revise_prompt": "REVISE_SYSTEM" in _as_dict(fp.get("prompt_sha256")),
             },
         })
 
@@ -177,6 +195,12 @@ def _is_live(row: dict) -> bool:
     return bool(_UUID_RE.match(str(row.get("event_id") or "")))
 
 
+def _categories(row: dict) -> list:
+    """`categories` is absent on some writers and explicitly null on others."""
+    value = row.get("categories")
+    return value if isinstance(value, list) else []
+
+
 def security_events(tail: int = 40) -> dict:
     """Hop x action counts plus the recent tail, from the three JSONL logs.
 
@@ -217,10 +241,12 @@ def security_events(tail: int = 40) -> dict:
             "synthetic": len(synthetic),
         },
         "by_action": dict(Counter(r.get("action") for r in audit)),
-        "by_category": dict(Counter(c for r in audit for c in r.get("categories", []))),
+        "by_category": dict(Counter(c for r in audit for c in _categories(r))),
         "events": [
             {**r, "live": _is_live(r)}
-            for r in sorted(audit, key=lambda r: r.get("ts", ""), reverse=True)[:tail]
+            # str() not r.get("ts", ""): an explicit null ts makes sorted() compare
+            # None to str and raise. Several writers append to this log.
+            for r in sorted(audit, key=lambda r: str(r.get("ts") or ""), reverse=True)[:tail]
         ],
         # A real AIDR event_id is the difference between "we called the API" and
         # "we say we called the API". Surface the sample so the panel can prove it.
@@ -253,16 +279,25 @@ def throughput_sweeps() -> dict:
     sweeps = []
     for path in sorted(BENCH_DIR.glob("sweep-*.json"), reverse=True):
         data = _read_json(path)
-        if data is None:
+        if not isinstance(data, dict):
             continue
-        prov, summary = data.get("provenance", {}), data.get("summary", {})
+        prov, summary = _as_dict(data.get("provenance")), _as_dict(data.get("summary"))
+        # A level needs both axes to be plottable; the chart divides by
+        # (count - 1), so a one-level smoke sweep must not reach it.
+        levels = [
+            lv for lv in (data.get("levels") or [])
+            if isinstance(lv, dict)
+            and isinstance(lv.get("concurrency"), (int, float))
+            and isinstance(lv.get("aggregate_tok_s"), (int, float))
+        ]
         sweeps.append({
             "id": path.stem,
             "captured_utc": prov.get("captured_utc"),
             "gpu": prov.get("gpu_reported_by_operator"),
             "notes": prov.get("notes"),
             "max_num_seqs": prov.get("max_num_seqs_deployed"),
-            "levels": data.get("levels", []),
+            "levels": levels,
+            "plottable": len(levels) >= 2,
             "summary": summary,
             # knee_concurrency is null on the L40S profile — C=32 still adds
             # +16.6% there, so the "plateaus at the pinned max-num-seqs" story is
@@ -273,10 +308,19 @@ def throughput_sweeps() -> dict:
     # Default to the quotable headline: of the runs that actually kneed, the
     # strongest. THROUGHPUT.md is explicit that the knee claim belongs to the
     # A100 profile only, so a sweep without one must never be the default view.
-    kneed = [s for s in sweeps if s["has_knee"]]
-    selected = (max(kneed, key=lambda s: s["summary"].get("headline_speedup_x", 0))
-                if kneed else (sweeps[0] if sweeps else None))
-    return {"sweeps": sweeps, "selected": selected}
+    plottable = [s for s in sweeps if s["plottable"]]
+    kneed = [s for s in plottable if s["has_knee"]]
+    selected = (max(kneed, key=lambda s: s["summary"].get("headline_speedup_x") or 0)
+                if kneed else (plottable[0] if plottable else None))
+    out = {"sweeps": sweeps, "selected": selected}
+    if selected is None and sweeps:
+        out["seam"] = seam(
+            "NO PLOTTABLE SWEEP",
+            f"{len(sweeps)} sweep file(s) on disk, none with two or more complete levels — "
+            "a single-level smoke run or an aborted sweep has nothing to curve.",
+            "python runtime/bench.py --levels 1,2,4,8,16,32",
+        )
+    return out
 
 
 # --------------------------------------------------------------------------
@@ -284,28 +328,53 @@ def throughput_sweeps() -> dict:
 # --------------------------------------------------------------------------
 
 def _load_store(directory: pathlib.Path):
-    """LoopholeStore.load, but tolerant of a missing dir.
+    """LoopholeStore.load, but per-file and per-record tolerant.
 
-    Loading through the store (not json.load) is mandatory: `statute` and
+    Loading through the model (not json.load) is mandatory: `statute` and
     `extraction_confidence` are absent from every on-disk record and are derived
     by a model_validator. Read the files raw and the whole corpus shows a blank
     statute.
+
+    Per *file* matters more than it looks. `LoopholeStore.load` raises on the
+    first bad record, so wrapping the whole call means one truncated file empties
+    the entire corpus — and an empty corpus doesn't fail loudly, it silently
+    drafts every patent in the ablation's control arm with nothing on screen
+    saying so. That is precisely the bug this lane exists to fix, re-entering
+    through a different door. Skip the bad file, keep the other 192, and report
+    the count so the caller can raise a seam.
     """
-    from agent.memory import LoopholeStore
+    from agent.memory import LoopholeRecord, LoopholeStore
 
     if not directory.exists():
-        return LoopholeStore([], None)
-    try:
-        return LoopholeStore.load(directory)
-    except (OSError, ValueError):
-        return LoopholeStore([], None)
+        return LoopholeStore([], None), []
+
+    records, skipped = [], []
+    for path in sorted(directory.glob("*.json")):
+        try:
+            data = json.loads(path.read_text())
+        except (OSError, ValueError) as exc:
+            skipped.append({"file": path.name, "error": f"{type(exc).__name__}: {exc}"})
+            continue
+        for item in (data if isinstance(data, list) else [data]):
+            try:
+                records.append(LoopholeRecord.model_validate(item))
+            except Exception as exc:  # pydantic ValidationError is not a ValueError
+                skipped.append({"file": path.name, "error": type(exc).__name__})
+    return LoopholeStore(records, directory), skipped
 
 
 def corpus_store():
-    """Ground truth + anything distilled from ingested documents, id-deduped."""
+    """Ground truth + anything distilled from ingested documents, id-deduped.
+
+    This is *the* retrievable set. The stats panel, the record browser and the
+    drafting turn all resolve through here, so the count on screen is the count
+    that gets ranked.
+    """
     from agent.memory import merged_store
 
-    return merged_store(_load_store(CORPUS_DIR), _load_store(ROOT / config.INGESTED_DIR))
+    ground, _ = _load_store(CORPUS_DIR)
+    ingested, _ = _load_store(ROOT / config.INGESTED_DIR)
+    return merged_store(ground, ingested)
 
 
 def episode_store():
@@ -329,17 +398,33 @@ def retrieval_store():
 
 
 def memory_stats() -> dict:
-    ground = _load_store(CORPUS_DIR)
-    ingested = _load_store(ROOT / config.INGESTED_DIR)
+    ground, ground_skipped = _load_store(CORPUS_DIR)
+    ingested, ingested_skipped = _load_store(ROOT / config.INGESTED_DIR)
     episodes = episode_store()
     lessons = [rec for ep in episodes.episodes for rec in ep.distilled]
 
+    # Facets come off the merged store, not ground truth alone. memory_records()
+    # browses the merged store, so counting only ground truth here made the stat
+    # tile and the browser disagree the moment anything was ingested — and left
+    # an ingested record's CPC class unreachable from the filter dropdown.
+    retrievable = corpus_store()
+    skipped = ground_skipped + ingested_skipped
+
     return {
         "corpus": {
-            "count": len(ground),
-            "by_statute": dict(Counter(r.statute or "?" for r in ground.records)),
-            "by_class": dict(Counter(r.technology_class for r in ground.records)),
-            "source": "data/real/groundtruth/loopholes.json",
+            "count": len(retrievable),
+            "by_statute": dict(Counter(r.statute or "?" for r in retrievable.records)),
+            "by_class": dict(Counter(r.technology_class for r in retrievable.records)),
+            "ground_truth": len(ground),
+            "source": "data/real/groundtruth/ + memory/ingested/",
+            # A record that failed to parse is a silently smaller corpus, which
+            # silently weakens every draft. Never let that pass unremarked.
+            "seam": seam(
+                "RECORDS SKIPPED",
+                f"{len(skipped)} record(s) on disk failed to parse and are not retrievable: "
+                + ", ".join(sorted({s['file'] for s in skipped}))[:200],
+                "data/real/groundtruth/ · memory/ingested/",
+            ) if skipped else None,
         },
         "ingested": {
             "count": len(ingested),
@@ -468,20 +553,32 @@ def containment_policy() -> dict:
         import yaml
 
         policy = yaml.safe_load(POLICY_PATH.read_text())
-    except (OSError, ValueError, ImportError) as exc:
-        error = str(exc)
+    except Exception as exc:
+        # Deliberately broad. yaml.YAMLError descends straight from Exception —
+        # it is not a ValueError — so the obvious tuple silently lets a mistyped
+        # indent 500 the panel. And this panel actively invites the operator to
+        # edit that file, so a syntax error there is expected, not exotic.
+        error = f"{type(exc).__name__}: {exc}"
+
+    def rule_str(rule, *keys) -> str:
+        """A rule with a missing method/path is malformed, not a crash."""
+        rule = _as_dict(rule)
+        for key in keys:
+            rule = _as_dict(rule.get(key))
+        method, path = rule.get("method"), rule.get("path")
+        return f"{method or 'ANY'} {path or '**'}" if (method or path) else ""
 
     endpoints = []
-    for name, block in (policy or {}).get("network_policies", {}).items():
-        for ep in block.get("endpoints", []):
+    for name, block in _as_dict(_as_dict(policy).get("network_policies")).items():
+        for ep in _as_dict(block).get("endpoints") or []:
+            ep = _as_dict(ep)
             endpoints.append({
                 "policy": name,
                 "host": ep.get("host"),
                 "enforcement": ep.get("enforcement"),
                 "access": ep.get("access"),
-                "allow": [f"{r['allow']['method']} {r['allow']['path']}"
-                          for r in ep.get("rules", []) if "allow" in r],
-                "deny": [f"{r['method']} {r['path']}" for r in ep.get("deny_rules", [])],
+                "allow": [s for s in (rule_str(r, "allow") for r in (ep.get("rules") or [])) if s],
+                "deny": [s for s in (rule_str(r) for r in (ep.get("deny_rules") or [])) if s],
             })
 
     return {

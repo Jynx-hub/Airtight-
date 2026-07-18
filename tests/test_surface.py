@@ -292,11 +292,13 @@ def test_throughput_defaults_to_a_run_that_kneed(monkeypatch, tmp_path):
     must never become the default view."""
     d = tmp_path / "bench"
     d.mkdir()
+    levels = [{"concurrency": 1, "aggregate_tok_s": 90.0},
+              {"concurrency": 16, "aggregate_tok_s": 800.0}]
     (d / "sweep-20260718T065759Z.json").write_text(json.dumps({
-        "provenance": {"gpu_reported_by_operator": "L40S"}, "levels": [],
+        "provenance": {"gpu_reported_by_operator": "L40S"}, "levels": levels,
         "summary": {"knee_concurrency": None, "headline_speedup_x": 9.42}}))
     (d / "sweep-20260718T055914Z.json").write_text(json.dumps({
-        "provenance": {"gpu_reported_by_operator": "A100"}, "levels": [],
+        "provenance": {"gpu_reported_by_operator": "A100"}, "levels": levels,
         "summary": {"knee_concurrency": 16, "headline_speedup_x": 10.67}}))
     monkeypatch.setattr(sources, "BENCH_DIR", d)
 
@@ -305,6 +307,126 @@ def test_throughput_defaults_to_a_run_that_kneed(monkeypatch, tmp_path):
     assert out["selected"]["has_knee"] is True
     assert {s["id"] for s in out["sweeps"]} == {
         "sweep-20260718T065759Z", "sweep-20260718T055914Z"}
+
+
+def test_concurrent_drafts_do_not_cross_attribute_findings(monkeypatch):
+    """The offset slice is only a correct attribution if nothing interleaves.
+
+    Sequential requests were fixed by the offset; overlapping ones were not —
+    two worker threads append to g.AUDIT_LOG interleaved, so A's report picked up
+    B's blocks. Drafts are now serialized process-wide.
+    """
+    import concurrent.futures
+
+    hl_pii(monkeypatch)
+    disclosure = client.get("/api/sample").json()
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=4) as pool:
+        reports = [f.result()["report"]["security_findings"] for f in [
+            pool.submit(lambda: client.post("/api/draft", json=disclosure).json())
+            for _ in range(4)
+        ]]
+
+    counts = [len(r) for r in reports]
+    assert all(c == counts[0] for c in counts), (
+        f"concurrent drafts reported differing finding counts {counts} — audit log interleaved"
+    )
+    assert counts[0] > 0
+
+
+def test_job_report_findings_are_captured_under_the_lock(monkeypatch):
+    hl_pii(monkeypatch)
+    disclosure = client.get("/api/sample").json()
+    a = poll_job(client.post("/api/draft/start", json=disclosure).json()["job_id"])
+    b = poll_job(client.post("/api/draft/start", json=disclosure).json()["job_id"])
+    assert a["report"]["security_findings"], "expected redact findings with the bus on"
+    assert len(a["report"]["security_findings"]) == len(b["report"]["security_findings"])
+
+
+def test_one_bad_record_does_not_empty_the_corpus(tmp_path):
+    """An empty corpus fails silently — it drafts the control arm with no seam.
+
+    LoopholeStore.load raises on the first bad record, so wrapping the whole
+    call meant one truncated file zeroed the retrievable set.
+    """
+    d = tmp_path / "corpus"
+    d.mkdir()
+    (d / "good.json").write_text(json.dumps([{
+        "id": "keep-me", "pattern": "§101 abstract idea", "claim_shape": "c",
+        "technology_class": "G06F", "remedy": "r", "source": "s"}]))
+    (d / "torn.json").write_text('{"id": "half-writt')
+    (d / "invalid.json").write_text(json.dumps([{"id": "missing-fields"}]))
+
+    store, skipped = sources._load_store(d)
+    assert len(store) == 1 and store.records[0].id == "keep-me"
+    assert {s["file"] for s in skipped} == {"torn.json", "invalid.json"}
+
+
+def test_memory_stats_and_records_count_the_same_store():
+    """Both panels resolve through corpus_store(); a mismatch makes the stat tile
+    and the browser under it disagree, and hides a CPC class from the filter."""
+    stats = client.get("/api/memory/stats").json()
+    records = client.get("/api/memory/records?limit=1").json()
+    assert stats["corpus"]["count"] == records["total"]
+    # Every class present in the browsable set must be reachable from a facet.
+    for cpc in stats["corpus"]["by_class"]:
+        assert client.get(f"/api/memory/records?cpc={cpc}&limit=1").json()["total"] > 0
+
+
+def test_readers_survive_null_and_wrong_typed_fields(monkeypatch, tmp_path):
+    """`.get(k, {})` returns None when k is present-and-null — the shape a run
+    killed between emitting a key and filling it leaves behind."""
+    bench = tmp_path / "bench"
+    bench.mkdir()
+    (bench / "sweep-a.json").write_text(json.dumps(
+        {"provenance": {}, "summary": None, "levels": []}))
+    monkeypatch.setattr(sources, "BENCH_DIR", bench)
+    out = sources.throughput_sweeps()
+    assert out["selected"] is None and out["seam"]["label"] == "NO PLOTTABLE SWEEP"
+
+    abl = tmp_path / "abl"
+    (abl / "r1").mkdir(parents=True)
+    (abl / "r1" / "results.json").write_text(json.dumps(["not", "a", "dict"]))
+    monkeypatch.setattr(sources, "ABLATION_DIR", abl)
+    assert sources.ablation_runs()["runs"][0]["complete"] is False
+
+    sec = tmp_path / "sec"
+    sec.mkdir()
+    (sec / "audit.jsonl").write_text(json.dumps(
+        {"ts": None, "hop": "tool_call", "action": "block", "categories": None}) + "\n")
+    monkeypatch.setattr(sources, "SECURITY_DIR", sec)
+    assert sources.security_events()["counts"]["audit"] == 1  # sorted() on a null ts
+
+
+def test_containment_survives_malformed_yaml_and_partial_rules(monkeypatch, tmp_path):
+    """yaml.YAMLError is not a ValueError, and this panel invites YAML edits."""
+    broken = tmp_path / "broken.yaml"
+    broken.write_text("network_policies:\n  a:\n   endpoints:\n  - bad: [")
+    monkeypatch.setattr(sources, "POLICY_PATH", broken)
+    out = sources.containment_policy()
+    assert out["error"] and len(out["tiers"]) == 4  # degrades, never raises
+
+    partial = tmp_path / "partial.yaml"
+    partial.write_text(
+        'network_policies:\n  f:\n    endpoints:\n      - host: h\n'
+        '        deny_rules:\n          - {path: "/x"}\n')
+    monkeypatch.setattr(sources, "POLICY_PATH", partial)
+    assert sources.containment_policy()["endpoints"][0]["deny"] == ["ANY /x"]
+
+
+def test_retrieval_explain_does_not_overclaim_diversification():
+    """runners_up are the next records in rank order, not records that beat a
+    pick — the panel used to assert the latter unconditionally."""
+    from airtight import Disclosure
+    from surface import jobs
+
+    disclosure = Disclosure.model_validate(client.get("/api/sample").json())
+    _, payload = jobs.retrieve_for(disclosure, k=5)
+
+    claimed = payload["runners_up_outscored_a_pick"]
+    worst_pick = min(r["score"] for r in payload["selected"])
+    actually = any(u["score"] > worst_pick for u in payload["runners_up"])
+    assert claimed is actually
 
 
 def test_containment_exposes_tiers_and_the_hard_deny():

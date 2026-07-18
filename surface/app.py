@@ -24,7 +24,6 @@ from pydantic import BaseModel
 
 from agent.loop import draft_patent
 from airtight import Disclosure, Draft, config
-from airtight import guardrails as g
 from surface import jobs, sources
 
 STATIC = pathlib.Path(__file__).resolve().parent / "static"
@@ -97,10 +96,12 @@ def draft(disclosure: Disclosure) -> DraftResponse:
     synchronous path silently ran the ablation's *control* arm and reported it as
     the product.
     """
-    offset = len(g.AUDIT_LOG)  # findings from this request only, not the session
     guardrails, _ = jobs.retrieve_for(disclosure)
-    result = draft_patent(disclosure, guardrails=guardrails)
-    findings = [SecurityFinding(**f) for f in jobs.security_findings(offset)]
+    # Serialized, and the findings slice is taken inside the lock — otherwise a
+    # concurrent draft's blocks land in this request's report. See jobs.py.
+    with jobs.exclusive_draft() as offset:
+        result = draft_patent(disclosure, guardrails=guardrails)
+        findings = [SecurityFinding(**f) for f in jobs.security_findings(offset)]
     report = LoopholeReport(
         smart_catches=result.critique_notes,
         loopholes_closed=result.loopholes_closed,

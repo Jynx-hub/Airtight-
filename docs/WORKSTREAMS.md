@@ -22,7 +22,7 @@ What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.m
 | **Containment** | ⚠️ simulated | `policy.py` decision logic is real, and now so is an escalation client — but enforcement is still a `print()`. No OpenShell exists |
 | **Surface** | ✅ two frames | intake (retrieval → live pipeline → grant) + engine panel over every committed artifact; D3's dishonest edit boxes replaced with a labelled seam |
 
-Suite: `.venv/bin/pytest tests/` → **149 passed**, 0 skipped, stub mode, no network.
+Suite: `.venv/bin/pytest tests/` → **156 passed**, 0 skipped, stub mode, no network.
 
 📌 **Unrecorded on this board:** `main` gained live USPTO prior-art search
 (`agent/prior_art.py`) and an MPEP statute reference grounding the draft/critique/revise
@@ -383,6 +383,23 @@ the retrieved set, displacing `lh-w-006`; after ingesting the poisoned PDF with
   - **`◐` D3 is still `◐`, deliberately.** Claims render read-only behind an
     `EDITING NOT WIRED` seam naming `PATCH /api/draft/{job_id}`. The textareas that
     silently ate every edit are gone; real editing is still unbuilt.
+  - **Ten defects found by review and fixed, with regression tests.** The offset fix
+    above was only correct for *sequential* requests — two overlapping drafts interleave
+    in `AUDIT_LOG` and cross-attribute, which is worse than the original bug because it is
+    wrong *and* plausible. Drafts are now serialized process-wide (`jobs.exclusive_draft`);
+    per-job attribution would have to come from the guardrails bus, which this lane does
+    not touch. Confirmed failing with the lock removed. The rest were the read layer
+    breaking its own "nothing raises" contract on plausible on-disk shapes — malformed
+    YAML (`yaml.YAMLError` is not a `ValueError`), null-valued keys (`.get(k, {})` returns
+    `None`, not `{}`), a `results.json` holding a bare list, a null `ts` breaking
+    `sorted()`, a one-level sweep dividing by zero in the chart. Worst of them:
+    `_load_store` wrapped the whole directory load, so **one truncated record emptied the
+    corpus** — and an empty corpus does not fail loudly, it silently drafts every patent
+    in the control arm. Loading is now per-file with a skipped-record seam.
+  - **Two panels were stating things that were not true** and now compute them: the
+    retrieval inspector asserted the passed-over rows had out-scored a pick (only true
+    when diversification actually cost something), and the score column could contradict
+    its own rank column because `_rank` sorts on class-match *before* BM25.
   - **Found, not fixed:** `guardrails._persist()` writes unconditionally, so `pytest`
     appends to the same `results/security/*.jsonl` the demo reads. All 130 audited hops in
     the current log are fixtures (`e`, `evt-test`, `fake-*`) — **zero** carry a real AIDR

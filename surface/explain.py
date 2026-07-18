@@ -127,6 +127,23 @@ def explain_retrieval(records: list[LoopholeRecord], disclosure: Disclosure, k: 
     runners_up = [row(r, rank_of[id(r)]) for r in ranked if id(r) not in picked_ids][:5]
 
     statutes = sorted({r["statute"] for r in selected})
+
+    # `_rank` sorts on (class_match, score, id) — class match first. So the rank
+    # column can legitimately disagree with the score column, and a panel drawing
+    # bars from score alone would look like a broken ranker. Detect it instead of
+    # letting the viewer infer it: if the ranked order isn't score-descending,
+    # something other than score decided, and the only other term is class match.
+    scores_in_rank_order = [r["score"] for r in (selected + runners_up)]
+    class_reordered = any(
+        b > a for a, b in zip(scores_in_rank_order, scores_in_rank_order[1:])
+    )
+    # runners_up are simply the next records in rank order — NOT, as the panel
+    # used to assert, records that beat a pick. When retrieval collapses onto one
+    # statute, diversification is a no-op and every runner-up scores at or below
+    # every pick. Compute the claim rather than printing it unconditionally.
+    outscored_a_pick = bool(selected and runners_up) and any(
+        u["score"] > min(s["score"] for s in selected) for u in runners_up
+    )
     return {
         "k": k,
         "corpus_size": len(records),
@@ -137,6 +154,10 @@ def explain_retrieval(records: list[LoopholeRecord], disclosure: Disclosure, k: 
         # primed with five §103 records just because keyword overlap said so.
         "diversified": len(statutes) > 1,
         "self_retrieval_warning": any(r["self_retrieval"] for r in selected),
+        # Both are claims the UI would otherwise state unconditionally and be
+        # wrong about roughly half the time.
+        "class_reordered": class_reordered,
+        "runners_up_outscored_a_pick": outscored_a_pick,
         "ranking": {
             "algorithm": "BM25 (BM25+ IDF), class-match first, id tiebreak",
             "k1": _BM25_K1,

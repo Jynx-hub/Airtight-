@@ -247,10 +247,23 @@ async function runInspector() {
   table.append(tb);
   body.append(table);
 
+  // Only claim diversification cost something if it actually did. runners_up are
+  // the next records in rank order, not by construction records that beat a pick.
   const n = el("div", "note");
-  n.textContent = `${r.ranking.algorithm}, k1=${r.ranking.k1} b=${r.ranking.b}. Dimmed rows out-scored `
-    + `at least one selected record and were still passed over — their statute bucket was already served. `
-    + `That trade is the point: breadth across failure modes beats depth in one.`;
+  let why = `${r.ranking.algorithm}, k1=${r.ranking.k1} b=${r.ranking.b}. `;
+  if (r.runners_up_outscored_a_pick) {
+    why += "Dimmed rows out-scored at least one selected record and were still passed over — "
+      + "their statute bucket was already served. That trade is the point: breadth across "
+      + "failure modes beats depth in one.";
+  } else {
+    why += "Dimmed rows are the next records in rank order; none out-scored a pick, so "
+      + "diversification cost nothing here — the top k already spanned the statutes it found.";
+  }
+  if (r.class_reordered) {
+    why += " Score is BM25 only; CPC-class match sorts ahead of it, so a lower-scoring "
+      + "in-class record can outrank a higher-scoring one.";
+  }
+  n.textContent = why;
   body.append(n);
 }
 
@@ -383,7 +396,9 @@ async function loadThroughput() {
   body.innerHTML = "";
 
   if (!t.selected) {
-    body.append(seam(t.seam));
+    body.append(seam(t.selected === null && t.seam ? t.seam : {
+      label: "NO SWEEP", detail: "No benchmark on disk.", source: "python runtime/bench.py",
+    }));
     return;
   }
 
@@ -423,8 +438,14 @@ async function loadThroughput() {
 /** Throughput curve as inline SVG — no chart library, no CDN (CSP-proof, offline). */
 function curve(sw) {
   const W = 460, H = 170, PAD = 34;
-  const levels = sw.levels;
-  const maxTok = Math.max(...levels.map((l) => l.aggregate_tok_s));
+  const levels = sw.levels || [];
+  // A one-level smoke sweep divides by zero here and a zero-level one throws on
+  // levels[0]; either way the panel silently dies. The server already marks
+  // these unplottable — this is the belt to that braces.
+  if (levels.length < 2) {
+    return el("p", "empty", `Only ${levels.length} concurrency level in this sweep — nothing to curve.`);
+  }
+  const maxTok = Math.max(...levels.map((l) => l.aggregate_tok_s)) || 1;
   const xs = levels.map((_, i) => PAD + (i * (W - PAD * 2)) / (levels.length - 1));
   const ys = levels.map((l) => H - PAD - (l.aggregate_tok_s / maxTok) * (H - PAD * 2));
 
