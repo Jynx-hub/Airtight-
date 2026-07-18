@@ -53,13 +53,13 @@ Airtight/
 ├── surface/                          ← Person 3: applicant surface (FastAPI starter; Next.js later)
 ├── tests/                            ← stub-mode smoke tests (no network needed)
 ├── docs/
-│   ├── ARCHITECTURE.md               ← full spec: concept, layers, FIG.1, 3 claims, model, judge's read, build & demo, sources
-│   ├── BUILD-PLAN.md                 ← milestones M1–M6, demo script, self-assessment
+│   ├── WORKSTREAMS.md                ← THE TASK BOARD — current work, honest status, start here
+│   ├── ARCHITECTURE.md               ← full spec: concept, layers, FIG.1, 3 claims, model, judge's read, sources
 │   ├── INFERENCE-LOCAL.md            ← the one boundary: wiring, invariant, shared-doorway contract
 │   ├── JUDGING-RUBRIC.md             ← official 100-pt scorecard + how Airtight maps to it
-│   ├── WORKSTREAMS.md                ← plain-English who-builds-what plan
-│   ├── SESSIONS.md                   ← per-milestone Claude Code kickoff prompts
-│   └── COSTS.md                      ← free-tier hosting plan (Modal + NIM) + deploy flags
+│   ├── DEMO-RUNBOOK.md               ← the three-beat demo (driver: scripts/demo.sh)
+│   ├── THROUGHPUT.md                 ← $500 vLLM bounty evidence: 10.67× continuous batching
+│   └── COSTS.md                      ← free-tier hosting plan (Modal + NIM) + spend ledger
 └── research/                         ← grounded briefings (verified 2026-07-17)
     ├── hiddenlayer.md                ← AIDR Interactions API: endpoints, payloads, auth, SDK
     ├── nemoclaw-openshell.md         ← blueprint tiers, policy YAML schema, Policy Advisor, CLI
@@ -104,4 +104,4 @@ use it if you need a byte-identical env rather than a working one.
 
 **If you just need to call the model,** start at `runtime/RUNBOOK.md` — the consumer quickstart and the demo-day operator card. You do not need a Modal account.
 
-Next highest-leverage step: run the **M4 ablation live** against the Modal endpoint on real PTAB data — same invention, same model, memory empty vs. warmed. It's the Track-1 proof and the best demo moment (`docs/BUILD-PLAN.md`).
+Next highest-leverage work: the four blocks in `docs/WORKSTREAMS.md` — make OpenShell actually enforce, make the loop recursive, fix statute-aware retrieval, and connect ingest to memory.

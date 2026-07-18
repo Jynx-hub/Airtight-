@@ -1,6 +1,6 @@
 # agent/ — Person 4's lane (Anudeep)
 
-The robot: work loop, memory, guardrails, eval harness. Tasks G0-G5: `docs/WORKSTREAMS.md` · session scripts: `docs/SESSIONS.md`.
+The robot: work loop, memory, guardrails, eval harness. Current tasks: `docs/WORKSTREAMS.md` (blocks B, C, D).
 
 **The one rule:** import from `airtight` (the doorway + shapes). Never construct a model client anywhere else — `airtight/doorway.py` is the single hop that inference.local pins, HiddenLayer analyzes, and OpenShell contains.
 

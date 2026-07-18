@@ -1,6 +1,6 @@
 # M1 sandbox onboarding (hosted DGX Spark)
 
-Stand up the NemoClaw/OpenShell sandbox **remotely** — nothing runs on a laptop (`docs/BUILD-PLAN.md` §Deployment). OpenShell needs Linux (Landlock + seccomp), so this happens on the hosted run pages, not macOS.
+Stand up the NemoClaw/OpenShell sandbox **remotely** — nothing runs on a laptop (`docs/WORKSTREAMS.md` §A1). OpenShell needs Linux (Landlock + seccomp), so this happens on the hosted run pages, not macOS.
 
 **Every CLI verb below is from `research/nemoclaw-openshell.md` (early preview, 2026-03). Tagged UNVERIFIED — confirm each against the live repo/docs before relying on it.**
 

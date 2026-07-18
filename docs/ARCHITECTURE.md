@@ -2,7 +2,9 @@
 
 *Draft v0.1 · 2026-07-17 · Provisional specification for a 3-track hackathon build.*
 
-> Structured as a patent spec on purpose: the three tracks are the three **Claims**, the judge's read is the **Examiner's Report** (§08), and the build order is **Reduction to Practice** (§09; milestone detail + self-assessment in `BUILD-PLAN.md`).
+> Structured as a patent spec on purpose: the three tracks are the three **Claims**, the judge's read is the **Examiner's Report** (§08), and the build order is **Reduction to Practice** (§09).
+>
+> ⚠️ **This is the design spec, not a status report.** Several claims here — real Landlock enforcement (§95), real Policy-Advisor HITL (§236), a persistent knowledge graph (§80, §105-110) — describe the intended system, not the current code. `docs/WORKSTREAMS.md` is the honest state.
 
 ---
 
@@ -243,7 +245,7 @@ Honest read against each track's published rubric. Scores are where the concept 
 
 ## § Reduction to Practice — Build & Demo (09)
 
-Hackathon-scoped. Build the containment + security scaffold once, then spend your remaining time making the delta undeniable. (Milestone detail + self-assessment in `BUILD-PLAN.md`.)
+Hackathon-scoped. Build the containment + security scaffold once, then spend your remaining time making the delta undeniable. (Current tasks: `docs/WORKSTREAMS.md`.)
 
 ### Milestones
 
