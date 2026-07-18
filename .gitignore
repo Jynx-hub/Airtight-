@@ -8,5 +8,12 @@
 # Env / secrets (none tracked yet — keep it that way)
 .env
 .env.*
+# ...but DO track the config template
+!.env.example
 *.key
 *.pem
+
+# Python
+__pycache__/
+*.pyc
+.venv/

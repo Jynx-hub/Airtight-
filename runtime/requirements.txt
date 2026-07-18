@@ -1,0 +1,7 @@
+# Airtight runtime — the "one doorway" inference client (inference_local.py).
+# Nemotron is served OpenAI-compatible, so we speak to it with the OpenAI SDK.
+openai>=1.40
+python-dotenv>=1.0
+# Deploy the vLLM server to Modal's free tier (runtime/modal_app.py). The Modal SDK
+# is only needed on the machine that runs `modal deploy`, not by the client/agent.
+modal>=0.64
