@@ -79,5 +79,12 @@ spend approaches $0 with headroom to spare.
   `nano_v3` is **not** built-in for the pinned vLLM, so keep `USE_REASONING_PLUGIN=True`.
 - **vLLM version pin** — ✅ resolved: `modal_app.py` pins `vllm==0.12.0` (recipe-recommended;
   0.11.2 is the minimum). Re-check the recipe if you change the checkpoint.
-- **NIM Nano slug + reasoning toggle** — verify `nvidia/nemotron-3-nano-30b-a3b` and whether
-  NIM honors `chat_template_kwargs.enable_thinking` or expects a `/no_think` directive.
+- **NIM Nano slug + reasoning toggle** — ✅ resolved (F3, 2026-07-18): the slug
+  `nvidia/nemotron-3-nano-30b-a3b` is live, and NIM accepts
+  `chat_template_kwargs.enable_thinking` in `extra_body` without a 400 — no `/no_think`
+  directive needed. The doorway's `chat()` runs unchanged against both backends: both
+  reasoning modes and tool-calling verified green on Modal *and* NIM.
+- **NIM rate limit** — free tier is 1,000 inference credits and **40 requests/minute**. That
+  RPM cap is why NIM is break-glass rather than a performance-equivalent swap: Modal's vLLM
+  serves 16 concurrent requests with continuous batching (10.67×, `docs/THROUGHPUT.md`),
+  so a fallback during a fan-out heartbeat will rate-limit, not merely run slower.
