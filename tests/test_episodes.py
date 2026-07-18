@@ -5,12 +5,12 @@ import pathlib
 
 import pytest
 
-from airtight import Disclosure, Draft, config
+from airtight import Disclosure, Draft, LoopholeRecord, config
 from agent.episodes import (CompositeStore, DISTILL_CAP, Episode, EpisodeStore,
                             compress_run, material_defects)
 from agent.eval.harness import run_ablation
 from agent.loop import draft_patent
-from agent.memory import LoopholeStore
+from agent.memory import _TRUSTED_CONFIDENCE, LoopholeStore, diversify_by_statute
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
@@ -141,3 +141,39 @@ def test_ablation_uncontaminated_by_episodes(tmp_path, monkeypatch):
     assert all(p["defect_count_delta"] == 0 for p in seeded["pairs"])
     # retrieved ids identical between the two runs — episodes never entered the ablation
     assert [p["disclosure_id"] for p in baseline["pairs"]] == [p["disclosure_id"] for p in seeded["pairs"]]
+
+
+def _lesson_bearing_draft():
+    """A draft whose critique names a statute, so compress_run actually mints an
+    ep-* record. The stub critique has no statute-bearing lines, which is why the
+    trust collision below survived both blocks' suites."""
+    return Draft(disclosure_id=DISC.id, claims=["c"], specification="s",
+                 critique_notes=["Claim 1 is indefinite under §112 for the relative "
+                                 "term 'substantially'."])
+
+
+def test_minted_lessons_are_not_ground_truth():
+    """A lesson the agent wrote about its own draft must not claim corpus trust."""
+    ep = compress_run(DISC, [], _lesson_bearing_draft(), "stub")
+    minted = [r for r in ep.distilled if r.id.startswith("ep-")]
+    assert minted, "fixture no longer mints a lesson — the regression below is vacuous"
+    assert all(r.extraction_confidence < _TRUSTED_CONFIDENCE for r in minted)
+
+
+def test_minted_lesson_cannot_take_a_reserved_statute_slot():
+    """The collision B and C/D could not see in each other's trees: compress_run
+    minted at the 1.0 default, which diversify_by_statute reads as ground truth
+    and hands a reserved bucket slot — so a self-generated record evicted a real
+    PTAB one. Fails if compress_run stops setting extraction_confidence."""
+    ep = compress_run(DISC, [], _lesson_bearing_draft(), "stub")
+    lesson = next(r for r in ep.distilled if r.id.startswith("ep-"))
+    assert lesson.statute == "112", "fixture must own a sparse bucket to be a real test"
+
+    # Four trusted §101 records, all ranked above the lesson. Under round-robin the
+    # lesson owns §112 alone, so it takes slot 2 of 4 on provenance rather than rank.
+    trusted = [LoopholeRecord(id=f"lh-{i}", pattern="§101 abstract idea", claim_shape="c",
+                              technology_class=DISC.technology_class, remedy="r", source="PTAB")
+               for i in range(4)]
+    got = [r.id for r in diversify_by_statute(trusted + [lesson], k=4)]
+    assert lesson.id not in got, f"self-generated lesson took a reserved slot: {got}"
+    assert got == [r.id for r in trusted]

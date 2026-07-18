@@ -30,6 +30,16 @@ _DEFECT_KEYWORDS = {  # keyword -> statute it implies
 }
 _BULLET_RE = re.compile(r"^\s*(?:[-*•]|\d+[.)])\s*")
 DISTILL_CAP = 3  # synthetic per-run lessons must never flood the real PTAB records
+
+# A lesson the agent minted from its own critique is not ground truth, so it must
+# not get a reserved statute bucket in memory.diversify_by_statute — owning a
+# sparse statute is worth more than ranking well, and a self-generated record
+# taking that slot evicts a real PTAB one. Below the trust threshold it competes
+# on rank alone. Higher than agent/distill.py's 0.3 because the provenance is
+# better: this came from critiquing a real draft in a real run, not from an
+# arbitrary untrusted document. The gate is binary today (>= 1.0), so the exact
+# value records intent rather than changing behaviour.
+EPISODE_CONFIDENCE = 0.5
 _REMEDY = {
     "112": "add explicit antecedent basis and definite structure for the recited element",
     "102": "add a novel limitation the cited art does not disclose",
@@ -97,6 +107,7 @@ def compress_run(
                 technology_class=disclosure.technology_class,
                 remedy=_REMEDY[st],
                 source=f"episode:{disclosure.id}",
+                extraction_confidence=EPISODE_CONFIDENCE,
             )
         )
     return Episode(
