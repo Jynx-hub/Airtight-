@@ -15,11 +15,15 @@ The four files in `research/` were produced from live web research on **2026-07-
 - **HiddenLayer** — there is no product literally called "Runtime Security API." It's **AI Runtime Security**, powered by the **AIDR** engine, called through the **Interactions** API (`client.interactions.analyze(...)`). The response has **no scalar `verdict`** — derive the action from per-category `detected` flags in `analysis[]`. See `research/hiddenlayer.md`.
 - **NemoClaw + OpenShell** are **real, shipping NVIDIA projects** (early preview, March 2026), not conceptual. OpenShell has **no `require_approval:` YAML key** — the human-in-the-loop boundary is a separate **Policy Advisor** flow (default-deny → agent proposes `addRule` → operator approves out-of-band → hot-reload → agent retries). The blueprint is graded as **four enforcement tiers** (filesystem / process / network / inference). See `research/nemoclaw-openshell.md`.
 - **Model** — primary is **Nemotron 3 Super** (120B-A12B, **1M context**). Use reasoning-OFF / capped thinking budget on tool-call turns for deterministic function calling; reasoning-ON for claim drafting. See `research/nemotron.md`.
-- **Serving** — Nemotron is served by **vLLM** (OpenAI-compatible) on a rented Brev GPU behind `inference.local`; day-0 Nemotron 3 support confirmed. Nano is the guaranteed path (VRAM); NIM cloud API is the fallback. See `research/vllm.md`.
+- **Serving** — Nemotron is served by **vLLM** (OpenAI-compatible) on **Modal's free tier** (serverless, scale-to-zero) behind `inference.local`; day-0 Nemotron 3 support confirmed. Still self-hosted vLLM, so the $500 bounty holds. Nano is the guaranteed path (L40S/FP8 fits VRAM); the free **NVIDIA NIM hosted endpoint** is the one-env-flip fallback. Brev is no longer available to us. See `research/vllm.md` + `docs/COSTS.md`.
 
 ## Design invariant (do not break)
 
 Inference is **pinned to `inference.local`** and chosen by operator policy, not the agent. This is what lets HiddenLayer and OpenShell both enforce on the same model hop. Any change that lets the agent pick its own model endpoint breaks both the security and containment stories. Full wiring + the shared-doorway code contract: `docs/INFERENCE-LOCAL.md`.
+
+Swapping backends is the operator's single env var — `INFERENCE_BACKEND=modal|nim` in `runtime/.env` — and **never automatic**. Do not add failover-on-error: a silent hop to the hosted NIM endpoint mid-demo swaps the judged self-hosted vLLM path for one that earns nothing, quietly voiding the $500 bounty evidence. Two gaps are recorded honestly in `docs/INFERENCE-LOCAL.md` rather than claimed: `inference.local` is still a naming contract with no gateway process, and provider creds are still read inside the sandbox. Both close at **F5**.
+
+Shell scripts in `runtime/` load `.env` **non-destructively** — an already-exported var wins, matching `python-dotenv`'s default in the doorway. Never revert one to `set -a; . ./.env`: that overwrites exports, which silently made `INFERENCE_BACKEND=nim bash verify.sh` test Modal and pass.
 
 ## Conventions
 
@@ -41,6 +45,10 @@ Benchmark stays on loophole-finding (PTAB ground truth). Opportunity/whitespace 
 
 ## Current status
 
-**Architecture / planning phase — nothing built.** Build order and the winning demo are in `docs/BUILD-PLAN.md`. Start with the eval-harness ablation (M4): same invention, same Nemotron model, memory graph empty vs. warmed — it's the Track-1 proof and the strongest demo moment.
+**Build started — inference spine is up and measured.** Lane A (Person 2 · Inference) has landed **F1** (Nemotron 3 Nano on vLLM → Modal free tier, `inference.local` reachable) and **F2** (the $500 vLLM bounty evidence): **10.67× aggregate throughput from continuous batching — 65.2 tok/s single-stream → 695.8 tok/s at concurrency 16**, with the curve kneeing at exactly the pinned `--max-num-seqs 16`. Numbers, method, and reproduction: `docs/THROUGHPUT.md`; harness `runtime/bench.py`; raw JSON `runtime/bench-results/`. That's **M1b** complete. **F3** is done too: backend routing is a single env var, `INFERENCE_BACKEND=modal|nim`, with all three paths (legacy/modal/nim) verified green end-to-end — models, chat, and tool-calling, with the doorway's `chat()` running unchanged across backends. Still open on Lane A: **F4** team handoff via the secrets file + keep-warm runbook, then the OpenShell locks **F5–F7**.
+
+**Known bug (found during F2, not blocking):** with reasoning off, the *streaming* path routes all output to `reasoning_content` and leaves `content` empty — `runtime/nano_v3_reasoning_parser.py` only overrides the non-streaming `extract_reasoning`. Non-streaming callers (including the doorway's `chat()`) are fine. Anything streaming `delta.content` — Lane C's UI — will read empty. See `docs/THROUGHPUT.md` §Open issue. Lanes Data / Surface / Agent are still architecture/planning — nothing built there yet. The live checklist of record is `docs/WORKSTREAMS.md`.
+
+Build order and the winning demo are in `docs/BUILD-PLAN.md`. After the inference spine, the highest-leverage build is the eval-harness ablation (M4): same invention, same Nemotron model, memory graph empty vs. warmed — it's the Track-1 proof and the strongest demo moment.
 
 The official 100-point judging rubric — and how each Airtight decision maps to a scoring line — is in `docs/JUDGING-RUBRIC.md`. Optimize build effort against it; M4 scores on four lines at once.
