@@ -142,6 +142,15 @@ def config_fingerprint(k: int, runs: int, draft_gen: dict = DRAFT_GEN, split: di
         ).stdout.strip()
     except OSError:
         git_sha = "unknown"
+    # Hash the ranker's actual on-disk source, not its git blob: git_sha only pins
+    # the ranker if the tree is clean, but a dirty agent/memory.py changes retrieval
+    # while HEAD looks unchanged. This makes every results.json self-document which
+    # ranker produced it — the GPU-re-run freeze (docs/GPU-RERUN-RUNBOOK.md) checks it.
+    try:
+        memory_py = Path(__file__).resolve().parent.parent / "memory.py"
+        memory_py_sha = hashlib.sha256(memory_py.read_bytes()).hexdigest()
+    except OSError:
+        memory_py_sha = "unknown"
     return {
         "timestamp": datetime.now().astimezone().isoformat(timespec="seconds"),
         "mode": config.MODE,
@@ -154,6 +163,7 @@ def config_fingerprint(k: int, runs: int, draft_gen: dict = DRAFT_GEN, split: di
         "revise_rounds": revise_rounds,
         "split": split,  # None for the pre-split fixtures layout
         "git_sha": git_sha,
+        "memory_py_sha": memory_py_sha,  # content hash of the frozen ranker
         "prompt_sha256": {
             "PLAN_SYSTEM": hashlib.sha256(loop.PLAN_SYSTEM.encode()).hexdigest(),
             "DRAFT_SYSTEM": hashlib.sha256(loop.DRAFT_SYSTEM.encode()).hexdigest(),

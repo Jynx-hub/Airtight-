@@ -69,6 +69,12 @@ def test_ablation_end_to_end_stub(tmp_path):
     assert len(payload["results"]) == expected
     assert payload["fingerprint"]["mode"] == "stub"
     assert payload["fingerprint"]["split"] is None  # the fixtures tree is pre-split
+    # the frozen-ranker hash: content of agent/memory.py, so a results.json says
+    # which retriever produced it even when the tree is dirty (GPU-re-run freeze)
+    import hashlib
+    from agent import memory as _mem
+    expected_sha = hashlib.sha256(pathlib.Path(_mem.__file__).read_bytes()).hexdigest()
+    assert payload["fingerprint"]["memory_py_sha"] == expected_sha
     assert payload["corpus_size"] >= 6
     assert (results_path.parent / "chart.html").exists()
     assert len(list((results_path.parent / "transcripts").glob("*.json"))) == expected
