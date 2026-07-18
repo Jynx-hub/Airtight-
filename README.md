@@ -79,13 +79,18 @@ Quick start (Python 3.10+; 3.12 is what the suite is verified on):
 
 ```bash
 python3 -m venv .venv && .venv/bin/pip install -e ".[dev,web]" && .venv/bin/pytest tests/
-# expect: 48 passed — no network, no .env, no GPU
+# expect: 55 passed, 1 skipped — no network, no .env, no GPU
 ```
 
 Take the `web` extra even if you aren't touching the surface. `tests/test_surface.py`
-`importorskip`s fastapi *by design*, so a `.[dev]`-only clone reports a green **44 passed,
-1 skipped** — green, but with the four surface tests silently not run. 48 is the number
-that means "everything ran."
+`importorskip`s fastapi *by design*, so a `.[dev]`-only clone reports a green **51 passed,
+2 skipped** — green, but with the four surface tests silently not run. **55 passed, 1
+skipped** is the number that means "everything a fresh clone can run, ran."
+
+The one remaining skip is `test_real_pull_splits_cleanly`, which needs `data/real/` — a
+local USPTO pull (`data/pull_uspto.py --groundtruth`, gitignored, needs a free
+`USPTO_API_KEY`). With that data present the suite reports **56 passed**, and that test
+proves the real 10-of-38 holdout doesn't leak into its warming corpus.
 
 Two things that quick start deliberately leaves out: `requirements.txt` (aiohttp/duckdb/
 pdfplumber — these belonged to the quarantined `attic/` pipeline; the live puller

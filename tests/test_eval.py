@@ -63,12 +63,15 @@ def test_ablation_end_to_end_stub(tmp_path):
     results_path = run_ablation(DATA, k=3, runs=1, out_root=tmp_path)
     payload = json.loads(results_path.read_text())
 
-    # 2 disclosures x 2 conditions
-    assert len(payload["results"]) == 4
+    # every fixture disclosure x 2 conditions — derived, so adding a fixture can't
+    # silently shrink what this asserts
+    expected = 2 * len(list((DATA / "fixtures" / "disclosures").glob("*.json")))
+    assert len(payload["results"]) == expected
     assert payload["fingerprint"]["mode"] == "stub"
+    assert payload["fingerprint"]["split"] is None  # the fixtures tree is pre-split
     assert payload["corpus_size"] >= 6
     assert (results_path.parent / "chart.html").exists()
-    assert len(list((results_path.parent / "transcripts").glob("*.json"))) == 4
+    assert len(list((results_path.parent / "transcripts").glob("*.json"))) == expected
 
     # stub mode must NEVER fabricate a delta — both conditions score identically
     for pair in payload["pairs"]:
@@ -79,3 +82,99 @@ def test_ablation_end_to_end_stub(tmp_path):
     transcript = json.loads(next((results_path.parent / "transcripts").glob("*warmed.json")).read_text())
     assert transcript["retrieved_ids"]
     assert transcript["scaffold_proof"]["warmed_slot"] != transcript["scaffold_proof"]["empty_slot"]
+
+
+# ---------- pooled layout (data/real is gitignored, so build the tree from tracked fixtures) ----------
+
+def _pool(tmp_path, n_pairs: int = 6, n_unpaired: int = 0) -> pathlib.Path:
+    """A disclosures/ + checklists/ pool shaped like the puller's output."""
+    root = tmp_path / "pool"
+    (root / "disclosures").mkdir(parents=True)
+    (root / "checklists").mkdir()
+    base = _disclosure("disc-0001")
+    for i in range(n_pairs + n_unpaired):
+        disc_id = f"app-{i:04d}"
+        (root / "disclosures" / f"{disc_id}.json").write_text(
+            base.model_copy(update={"id": disc_id}).model_dump_json()
+        )
+        if i < n_pairs:
+            # claim_shape must stay well clear of the 0.8 Jaccard guard across records
+            rec = LoopholeRecord(
+                id=f"oa-{disc_id}-c1", pattern=f"§101 pattern {i}",
+                claim_shape=f"claim {i} " + " ".join(f"w{i}x{j}" for j in range(12)),
+                technology_class="G06F", remedy=f"remedy {i}", source=f"source {i}",
+            )
+            (root / "checklists" / f"{disc_id}.json").write_text(
+                json.dumps([rec.model_dump()])
+            )
+    return root
+
+
+def test_pooled_split_is_deterministic_and_disjoint(tmp_path):
+    from agent.eval.harness import holdout_split, load_pairs
+
+    root = _pool(tmp_path)
+    pairs, unpaired = load_pairs(root / "disclosures", root / "checklists")
+    assert not unpaired
+
+    first, corpus = holdout_split(pairs, n=2, seed=1234)
+    again, _ = holdout_split(pairs, n=2, seed=1234)
+    assert [d.id for d, _ in first] == [d.id for d, _ in again]
+
+    held = {r.id for _, checklist in first for r in checklist}
+    assert held and not (held & {r.id for r in corpus.records})
+    # the split partitions the pool — no record is lost or double-counted
+    assert len(held) + len(corpus) == sum(len(c) for _, c in pairs)
+
+
+def test_pooled_skips_disclosures_without_checklists(tmp_path):
+    root = _pool(tmp_path, n_pairs=4, n_unpaired=2)
+    results_path = run_ablation(root, k=1, runs=1, out_root=tmp_path / "out", layout="pooled", n=2)
+    split = json.loads(results_path.read_text())["fingerprint"]["split"]
+
+    assert split["paired"] == 4
+    assert len(split["unpaired_disclosure_ids"]) == 2  # visible, never silent
+    assert not set(split["unpaired_disclosure_ids"]) & set(split["holdout_ids"])
+
+
+def test_pooled_orphan_checklist_raises(tmp_path):
+    root = _pool(tmp_path, n_pairs=3)
+    (root / "checklists" / "app-9999.json").write_text("[]")  # no matching disclosure
+    with pytest.raises(RuntimeError, match="no matching disclosure"):
+        run_ablation(root, k=1, out_root=tmp_path / "out", layout="pooled", n=1)
+
+
+def test_holdout_too_large_leaves_nothing_to_warm(tmp_path):
+    root = _pool(tmp_path, n_pairs=3)
+    with pytest.raises(RuntimeError, match="fewer than k"):
+        run_ablation(root, k=1, out_root=tmp_path / "out", layout="pooled", n=3)
+
+
+def test_fixtures_layout_tolerates_k_above_corpus_size(tmp_path):
+    """The holdout guard is pooled-only — the fixtures corpus is a fixed file, so a
+    large k just retrieves everything rather than being refused."""
+    results_path = run_ablation(DATA, k=99, runs=1, out_root=tmp_path)
+    assert json.loads(results_path.read_text())["results"]
+
+
+def test_n_bounds_the_run(tmp_path):
+    """The cost-control knob is itself tested — a metered run depends on it."""
+    results_path = run_ablation(DATA, k=3, runs=1, out_root=tmp_path, n=1)
+    assert len(json.loads(results_path.read_text())["results"]) == 2  # 1 disclosure x 2 conditions
+
+
+def test_unknown_layout_raises(tmp_path):
+    with pytest.raises(ValueError, match="unknown layout"):
+        run_ablation(DATA, out_root=tmp_path, layout="bogus")
+
+
+@pytest.mark.skipif(not (DATA / "real" / "checklists").exists(),
+                    reason="data/real is a local pull (gitignored); run data/pull_uspto.py --groundtruth")
+def test_real_pull_splits_cleanly():
+    """The real holdout must not leak into the real warming corpus. No model calls."""
+    from agent.eval.harness import holdout_split, load_pairs
+
+    pairs, _ = load_pairs(DATA / "real" / "disclosures", DATA / "real" / "checklists")
+    graded, corpus = holdout_split(pairs, n=10, seed=1234)
+    for _, checklist in graded:
+        assert_no_overlap(corpus, checklist)  # raises on id collision or >0.8 Jaccard
