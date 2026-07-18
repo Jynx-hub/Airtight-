@@ -20,7 +20,13 @@ from agent.eval import judge
 from agent.eval.chart import write_chart
 from agent.memory import LoopholeStore, tokens
 
+# Default: reasoning-on, uncapped drafting (the intended experiment, per ARCHITECTURE).
 DRAFT_GEN = {"temperature": 0.0, "seed": 1234}
+# --fast: reasoning off + capped drafts. An uncapped reasoning-on draft ran ~50s /
+# ~7k tokens, making a full run 15+ min; this trades draft depth for a quick,
+# still-valid ablation (same setting on both arms). Recorded in the fingerprint.
+FAST_DRAFT_GEN = {**DRAFT_GEN, "max_tokens": 1100,
+                  "extra_body": {"chat_template_kwargs": {"enable_thinking": False}}}
 OVERLAP_JACCARD_MAX = 0.8
 
 
@@ -78,7 +84,7 @@ def scaffold_proof(retrieved: list[LoopholeRecord]) -> dict:
     return proof
 
 
-def config_fingerprint(k: int, runs: int) -> dict:
+def config_fingerprint(k: int, runs: int, draft_gen: dict = DRAFT_GEN) -> dict:
     try:
         git_sha = subprocess.run(
             ["git", "rev-parse", "HEAD"], capture_output=True, text=True, cwd=Path(__file__).parent
@@ -90,7 +96,7 @@ def config_fingerprint(k: int, runs: int) -> dict:
         "mode": config.MODE,
         "model": config.MODEL,
         "base_url_host": urlparse(config.BASE_URL).hostname or "(none)",
-        "draft_gen": DRAFT_GEN,
+        "draft_gen": draft_gen,
         "judge_gen": judge.JUDGE_GEN,
         "k": k,
         "runs": runs,
@@ -115,12 +121,13 @@ def run_condition(
     k: int,
     transcript_dir: Path,
     run_idx: int,
+    draft_gen: dict = DRAFT_GEN,
 ) -> EvalResult:
     retrieved = store.retrieve(disclosure, k)  # executes in BOTH conditions (empty store -> [])
     transcript: list = []
 
     t0 = time.perf_counter()
-    draft = loop.draft_patent(disclosure, guardrails=retrieved, transcript=transcript, **DRAFT_GEN)
+    draft = loop.draft_patent(disclosure, guardrails=retrieved, transcript=transcript, **draft_gen)
     seconds = time.perf_counter() - t0
 
     claims_text = "\n".join(f"{i + 1}. {c}" for i, c in enumerate(draft.claims))
@@ -152,7 +159,8 @@ def run_condition(
     return result
 
 
-def run_ablation(data_root: Path, k: int = 5, runs: int = 1, out_root: Path = Path("results/ablation")) -> Path:
+def run_ablation(data_root: Path, k: int = 5, runs: int = 1, out_root: Path = Path("results/ablation"),
+                 draft_gen: dict = DRAFT_GEN) -> Path:
     data_root = Path(data_root)
     disclosures = load_disclosures(data_root / "fixtures" / "disclosures")
     warmed = LoopholeStore.load(data_root / "corpus" / "loopholes")
@@ -174,12 +182,13 @@ def run_ablation(data_root: Path, k: int = 5, runs: int = 1, out_root: Path = Pa
             # paired, back-to-back: empty then warmed on the same disclosure
             for condition, store in (("empty", empty), ("warmed", warmed)):
                 results.append(
-                    run_condition(disclosure, store, checklist, condition, k, transcript_dir, run_idx)
+                    run_condition(disclosure, store, checklist, condition, k, transcript_dir,
+                                  run_idx, draft_gen)
                 )
 
     pairs = _pair_deltas(results)
     payload = {
-        "fingerprint": config_fingerprint(k, runs),
+        "fingerprint": config_fingerprint(k, runs, draft_gen),
         "corpus_size": len(warmed),
         "overlap_guard": guard_reports,
         "results": [r.model_dump() for r in results],

@@ -26,7 +26,9 @@ def _reasoning_params(role: Role) -> dict:
     # thinking-budget param) — confirm against the vLLM Nemotron 3 cookbook
     # (research/vllm.md sources) and fix HERE only.
     thinking = role == "draft"  # tool turns run deterministic, draft turns think deep
-    return {"extra_body": {"chat_template_kwargs": {"thinking": thinking}}}
+    # Verified key is `enable_thinking` (runtime/inference_local.py, docs/THROUGHPUT.md);
+    # `thinking` was a no-op that left reasoning ON.
+    return {"extra_body": {"chat_template_kwargs": {"enable_thinking": thinking}}}
 
 
 def _analyze(hop: str, payload):
@@ -73,7 +75,9 @@ def call_model(
         return ModelReply(text=text, raw={"stub": True, "role": role}, mode="stub")
 
     client = _client()
-    params = dict(model=config.MODEL, messages=messages, **_reasoning_params(role), **gen_kwargs)
+    # dict-literal merge (not dict(**...)) so a caller's gen_kwargs can override
+    # the role defaults (e.g. extra_body) instead of raising on a duplicate key.
+    params = {"model": config.MODEL, "messages": messages, **_reasoning_params(role), **gen_kwargs}
 
     if stream:
         def _gen() -> Iterator[str]:

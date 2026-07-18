@@ -1,6 +1,7 @@
 """CLI for the M4 ablation.
 
     python -m agent.eval --data-root data --k 5 --runs 1
+    python -m agent.eval --data-root data --fast   # reasoning-off + capped drafts (quick)
 
 Stub mode exercises all plumbing (delta = 0 by construction); set
 AIRTIGHT_MODE=live for the real ablation.
@@ -10,7 +11,7 @@ import argparse
 import json
 from pathlib import Path
 
-from agent.eval.harness import run_ablation
+from agent.eval.harness import DRAFT_GEN, FAST_DRAFT_GEN, run_ablation
 
 
 def main() -> None:
@@ -19,9 +20,13 @@ def main() -> None:
     ap.add_argument("--k", type=int, default=5)
     ap.add_argument("--runs", type=int, default=1)
     ap.add_argument("--out", type=Path, default=Path("results/ablation"))
+    ap.add_argument("--fast", action="store_true",
+                    help="reasoning-off + capped drafts — quicker, shallower (same setting both arms)")
     args = ap.parse_args()
 
-    results_path = run_ablation(args.data_root, k=args.k, runs=args.runs, out_root=args.out)
+    draft_gen = FAST_DRAFT_GEN if args.fast else DRAFT_GEN
+    results_path = run_ablation(args.data_root, k=args.k, runs=args.runs, out_root=args.out,
+                                draft_gen=draft_gen)
     payload = json.loads(results_path.read_text())
 
     print(f"results:  {results_path}")
