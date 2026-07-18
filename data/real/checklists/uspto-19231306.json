@@ -1,0 +1,42 @@
+[
+  {
+    "id": "oa-19231306-c2-eb7dd44d",
+    "pattern": "\u00a7112 \u2014 indefiniteness",
+    "claim_shape": "(Currently Amended) The system of claim 1, wherein the nonlinear transformations include one or more of: identity, rectified linear unit (ReLU), leaky rectified linear unit (leaky ReLU), sigmoid, hyperbolic tangent (tanh ), sigmoid-weighted linear unit (SiLU), Gaussian error linear unit (GELU ), or other continuous or piecewise-continuous nonlinear functions. Currently amended 3",
+    "technology_class": "G06N",
+    "remedy": "Examiner's ground: Claims 2, 4, 9, and 15 are rejected under 35 U.S.C. 112(b) or 35 U.S.C. 112 (pre-AIA), second paragraph, as being indefinite for failing to particularly point out and distinctly claim the subject matter which the inventor or a joint inventor (or for applications subject to pre-AIA 35 U.S.C. 112, the applicant), regards as the invention. Claims 2 and 15 recite wherein the nonlinear transformation \u2026",
+    "source": "USPTO application 19231306, CTNF office action; claims 2, 4, 9, 15 rejected under 35 U.S.C. 112 (b) or 35 U"
+  },
+  {
+    "id": "oa-19231306-c18-6a041fcf",
+    "pattern": "\u00a7112 rejection",
+    "claim_shape": "(Currently Amended) The computer-implemented method of claim 13, further comprising:performing, based on the output activation, a training operation, wherein the training operation comprises an iterative process converging after a first number of iterations, wherein performing a second training operation in which the ephaptic coupling coefficient is set to zero results in deterioration in at least one of accuracy, perplexity, convergence speed, energy efficiency, or robustness to input perturbations. w herein a combined effect of sy naptic and ephaptic components res ults in improv ed performance metrics relativ e to an effect of synaptic components alone, wherein the performance metrics include at leas t one of accuracy, perplexity, conv ergence speed, energy efficiency, or robus tness to input perturbations.",
+    "technology_class": "G06N",
+    "remedy": "Examiner's ground: Claim 18 is rejected under 35 U.S.C. 112(d) or pre-AIA 35 U.S.C. 112, 4th paragraph, as being of improper dependent form for failing to further limit the subject matter of the claim upon which it depends, or for failing to include all the limitations of the claim upon which it depends. The additional limitations in Claim 18 consist entirely of an intended result of positively recited steps in the ",
+    "source": "USPTO application 19231306, CTNF office action; claim 18 rejected under 35 U.S.C. 112 (d) or pre-AIA 35 U"
+  },
+  {
+    "id": "oa-19231306-c13-310afb6d",
+    "pattern": "\u00a7101 \u2014 abstract-idea eligibility",
+    "claim_shape": "(Currently Amended) A computer-implemented method for operating an artificial neural network that integrates ephaptic coupling, the computer-implemented method comprising:initializing an Ephaptic Coupling Matrix (ECM) engine based on a transpose of a synaptic weight matrix of weights of at least a neural lay er of the artificial neural network; receiving one or more input signals into a into the neural layer of the artificial neural network; and for each neuron in the neural layer: computing a synaptic input term based on a weighted combination of signals from neurons in a preceding layer and an associated bias term, retrieving a corresponding ephaptic coupling coefficient from the ECM engine, computing an ephaptic coupling term based on a nonlinear transformation of activation states of other neurons within the neural layer, each activation state scaled by aby the corresponding ephaptic coupling coefficient; combining the synaptic input term and the ephaptic coupling term to generate a total input signal for the neuron; applying an activation function to the total input signal to produce an output activation for the neuron; and propagating the output activation to a subsequent neural network layer or to an output layer for use in inference or training operations. Currently amended 14",
+    "technology_class": "G06N",
+    "remedy": "Examiner's ground: Claims 13-18 are rejected under 35 U.S.C. 101 because the claims are directed towards an abstract idea, without significantly more. Claim 13 recites a method, one of the four statutory categories of patentable subject matter. However, the claim further recites steps of computing a synaptic input term based on a weighted combination of signals from neurons in a preceding layer and an associated bia",
+    "source": "USPTO application 19231306, CTNF office action; claims 13, 14, 15, 16, 17, 18 rejected under 35 U.S.C. 101 because the claims are directed towards an abstract idea, without significantly more"
+  },
+  {
+    "id": "oa-19231306-c1-f4c38431",
+    "pattern": "\u00a7102 \u2014 anticipation by a single reference",
+    "claim_shape": "(Currently Amended) A system comprising:one or more computers, each including at least one processor; and one or more storage devices storing instructions that, when executed by the at least one processor, cause the system to implement, train, or use an artificial neural network that integrates an ephaptic coupling mechanism, wherein: an artificial neuron in a hidden layer of the artificial neural network generates an output activation based on a combination of a synaptic input term and an ephaptic coupling term; the synaptic input term is computed from a weighted combination of signals received from neurons in a preceding layer together with a corresponding bias; the ephaptic coupling term is computed based on nonlinear transformations of post-synaptic activation states of other artificial neurons within the hidden layer, each transformation scaled by a corresponding ephaptic coupling coefficient that defines a strength of lateral influence between the artificial neuron and another artificial neuron within the hidden layer; an ephaptic factor is applied to regulate an overall strength of the ephaptic coupling term; and the ephaptic coupling mechanism is governed by a switchable, scalable, learnable, and tunable Ephaptic Coupling Matrix (ECM) engine initialized based on a transpose operation of a matrix of synaptic weights of at least one lay er, that dynamically modifies activation states of artificial neurons through intra-layer interactions based on column-wise modulation, independently of and/or in conjunction with synaptic weights. Currently amended 2",
+    "technology_class": "G06N",
+    "remedy": "Examiner's ground: Claims 1, 2, 5-16, and 18 are rejected under 35 U.S.C. 102(a)(1) as being anticipated by Usama et al., \u201cDeep Feature Learning for Disease Risk Assessment Based on Convolutional Neural Network with Intra-Layer Recurrent Connection by Using Hospital Big Data.\u201d Regarding Claim 1, Usama teach a system comprising: one or more computers, each including at least one processor; and one or more storage dev",
+    "source": "USPTO application 19231306, CTNF office action; claims 1, 2, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14 rejected under 35 U.S.C. 102 (a)(1) as being anticipated by Usama et al"
+  },
+  {
+    "id": "oa-19231306-c3-8f4fa792",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The system of claim 1, wherein ephaptic coupling coefficients are stored in an ECM engine that is initialized with random values sampled from a uniform or Gaussian distribution. Original 4",
+    "technology_class": "G06N",
+    "remedy": "Examiner's ground: Claim 3 is rejected under 35 U.S.C. 103 as being unpatentable over Usama et al., \u201cDeep Feature Learning for Disease Risk Assessment Based on Convolutional Neural Network with Intra-Layer Recurrent Connection by Using Hospital Big Data,\u201d in view of Yang, US PG Pub 2023/0038310. Regarding Claim 3, Usama teaches the system of Claim 1 (and thus the rejection of Claim 1 is incorporated). Usama further ",
+    "source": "USPTO application 19231306, CTNF office action; claim 3 rejected under 35 U.S.C. 103 as being unpatentable over Usama et al"
+  }
+]

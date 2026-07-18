@@ -1,6 +1,9 @@
-# Person 1 data pipeline output — pulled bulk data stays local (data/real/…).
-# Tracked fixtures and the committed puller scripts are unaffected (already tracked).
-data/
+# All of data/ is the shared contract, including the real USPTO pull (~1.1M, public
+# domain) — so the ablation runs off the same claims for everyone. Two earlier rules
+# hid it: `data/` (01f4daf) swallowed the whole tree, so a new fixture or checklist
+# committed nowhere and still passed tests locally; `data/real/` then kept the pull
+# local, so the one input the M4 numbers depend on lived on a single laptop.
+# Only re-derivable build artifacts stay ignored:
 *.duckdb
 checkpoint.json
 

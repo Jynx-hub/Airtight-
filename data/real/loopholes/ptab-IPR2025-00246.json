@@ -1,8 +1,0 @@
-{
-  "id": "ptab-IPR2025-00246",
-  "pattern": "overbroad functional language",
-  "claim_shape": "means-plus-function claim of 'computer configured to adjust gain based on ambient signal quality'",
-  "technology_class": "TC3700",
-  "remedy": "replace functional language with concrete algorithmic structures tied to voltage thresholds and digital lookup tables",
-  "source": "PTAB IPR2025-00246 FWD, patent 11857333, grounds ['112', '120', '103']"
-}

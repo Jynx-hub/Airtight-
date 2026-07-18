@@ -1,0 +1,10 @@
+[
+  {
+    "id": "oa-18723793-c1-827c7005",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently amended) A computer-implemented method for classifying network traffic using machine learning, the computer-implemented method including:accessing processed network data, wherein: the processed network data includes a plurality of groups, each group includes a plurality of URL data objects, and each group is associated with an entity; generating a dynamic intent score for each group of the plurality of groups by: generating a comparison value for each URL data object within the group by: extracting data from a webpage associated with a URL data object, generating a first scraped text data object based on the extracted data, creating an embedding vector by providing the scraped text data object to a machine learning module, and generating a comparison value by comparing the embedding vector with a reference embedding vector, wherein the reference embedding vector is based on at least one of text input by a user at a user interface or text extracted from a file uploaded by the user at the user interface, selecting comparison values for the URL data objects within the group, and generating the dynamic intent score by averaging the selected comparison values; and ranking groups of the plurality of groups according to their respective dynamic intent scores. Currently amended 2",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 1-35 are rejected under 35 U.S.C. 103(a) as being unpatentable over U.S. Patent PgPub. No. 20220188698 to Halecky in view of Farber et al. U.S. Patent No. 11527092. As to claim 1, Halecky discloses a computer-implemented method for classifying network traffic using machine learning, the computer-implemented method including: accessing processed network data, wherein: the processed network d",
+    "source": "USPTO application 18723793, CTFR office action; claims 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 rejected under 35 U.S.C. 103 (a) as being unpatentable over U"
+  }
+]

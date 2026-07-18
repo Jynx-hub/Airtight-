@@ -1,8 +1,0 @@
-{
-  "id": "ptab-IPR2025-00253",
-  "pattern": "Broad functional reliance",
-  "claim_shape": "Phrasing that defines claim scope by functional outcomes (e.g., 'operable to…') rather than structural elements",
-  "technology_class": "TC2100",
-  "remedy": "Tie the function to specific structure independent of prior art, ensuring claim language uses concrete means-plus-minus constraints and avoids purely outcome-based language",
-  "source": "PTAB IPR2025-00253 FWD, patent 7370035, grounds ['103']"
-}

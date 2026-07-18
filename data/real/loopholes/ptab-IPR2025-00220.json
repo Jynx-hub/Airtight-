@@ -1,8 +1,0 @@
-{
-  "id": "ptab-IPR2025-00220",
-  "pattern": "absence of explicit concrete functional result",
-  "claim_shape": "broad apparatus claim limiting only two substrate types and internal recording density without linking them to enhanced storage reliability or error suppression",
-  "technology_class": "TC2400",
-  "remedy": "recite the specific stability/reliability improvement achieved when recording on bit-patterned media using the disclosed realize-abstractions",
-  "source": "PTAB IPR2025-00220 FWD, patent 11206670, grounds ['102', '103']"
-}

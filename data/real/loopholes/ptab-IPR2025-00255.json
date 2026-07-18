@@ -1,8 +1,0 @@
-{
-  "id": "ptab-IPR2025-00255",
-  "pattern": "failed to anchor secondary consideration to claimed inventive concept",
-  "claim_shape": "broad functional claim language tying secondary considerations to the invention itself",
-  "technology_class": "TC2100",
-  "remedy": "anchor obviousness reasoning to the specific inventive concept—include structural/functional nexus statements in claims and specification",
-  "source": "PTAB IPR2025-00255 FWD, patent 9633139, grounds ['103']"
-}

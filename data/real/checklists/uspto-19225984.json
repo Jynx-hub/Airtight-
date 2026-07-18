@@ -1,0 +1,50 @@
+[
+  {
+    "id": "oa-19225984-c13-0bc73da1",
+    "pattern": "\u00a7101 \u2014 abstract-idea eligibility",
+    "claim_shape": "(Currently Amended) A computer-implemented method to compute queries for data associated with heterogenous hierarchical metalabels using a data processor for operating a neural network, the method comprising: receiving a query from a user, wherein the query is specified in natural language; using the neural network to analyze the heterogenous hierarchical metalabels assigned to the data to determine corresponding structure; wherein the hierarchical metalabel is an ordered sequence of atomic labels; using the neural network to convert the user query to a heterogenous range-tree search query; wherein the neural network uses the metalabel rang e structures and a loss function to op timize the metalabel range q uery; using the heterogenous range-tree search query to search for user-defined metalabels matching the hierarchical search term in the heterogeneous range-tree structure that stores the data; wherein the search structure for subsequent atomic labels is embedded in the search structure of the p revious atomic label in the ordered sequence, each data item being identified by a p lurality of hierarchical metalabels, and returning at least one data item matching the user query. Currently amended 14",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 13-14 are rejected under 35 U.S.C. 101 because the claimed invention is directed to an abstract idea without significantly more. The claim(s) recite(s) the abstract idea as indicated below in Step 2A Prong One. This judicial exception is not integrated into a practical application because of the reasons state below for Step 2A Prong Two. The claim(s) does/do not include additional elements ",
+    "source": "USPTO application 19225984, CTNF office action; claims 13, 14 rejected under 35 U.S.C. 101 because the claimed invention is directed to an abstract idea without significantly more"
+  },
+  {
+    "id": "oa-19225984-c1-ae8e5b1a",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently Amended) A computer-implemented method comprising a data processor for organizing and storing available data using metalabelst he method comprising:organizing the data using a plurality of heterogeneous hierarchical metalabels, associated with each data item wherein a heterogeneous hierarchical metalabel comprises an ordered sequence of a plurality of atomic-labels separated by a delimiter, each atomic-label being either an element or an n-dimensional vector of elements, the elements chosen from an ordinal set; storing the data using a plurality of nodes in a heterogeneous-range-tree structure; wherein the search structure for subsequent atomic labels sep arated by delimiters is embedded in the search structure of the p revious atomic label in the ordered seq uence, each data item being identified by a plurality of metalabels, with all the metalabels identifying a common data item linked together;receiving a heterogenous-range query from a user, the query comprising a plurality of atomic-labels or range atomic-labels separated by a delimiter; wherein a range atomic- label is an ordered pair chosen from an ordinal set; searching the heterogeneous range-tree structure for user-defined metalabels matching the hierarchical search term; wherein every atomic-label is matched with the corresponding node in the tree structure, and every range atomic-label in the metalabel is matched with at least one range structure nodes in an n-dimensional range structure wherein for each dimension, the range of the heterogenous range query matches the range of each of the corresponding dimensions at the range structure node; and returning at least one data item from the matched nodes to the user. Currently amended 2",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 1-3, 5-6, and 20 are rejected under 35 U.S.C. 103 as being unpatentable over Hasan et al. US 9965793 B1 (hereinafter referred to as \u201cHasan\u201d) in view of Huber et al. US 7689621 B1 (hereinafter referred to as \u201cHuber\u201d). As per claim 1, Hasan teaches: A computer-implemented method comprising a data processor for organizing and storing data using metalabels the method comprising: organizing the ",
+    "source": "USPTO application 19225984, CTNF office action; claims 1, 2, 3, 5, 6, 20 rejected under 35 U.S.C. 103 as being unpatentable over Hasan et al"
+  },
+  {
+    "id": "oa-19225984-c7-71f283db",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Previously Presented) The method of Claim 1, wherein the heterogeneous range-tree structure is created by a neural network trained using access patterns that optimize the computation time or space required. Previously presented 8",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 4, 7, 8, and 17-19 are rejected under 35 U.S.C. 103 as being unpatentable over Hasan in view of Huber and further in view of Krishnaswamy et al. US 20160283494 A1 (hereinafter referred to as \u201cKrishnaswamy\u201d). As per claim 4, Hasan as modified doesn\u2019t teach embedded tree structures, however, Krishnaswamy teaches: The method of Claim 1, wherein a plurality of heterogenous range-tree structures",
+    "source": "USPTO application 19225984, CTNF office action; claims 7, 8, 17, 18, 19 rejected under 35 U.S.C. 103 as being unpatentable over Hasan in view of Huber and further in view of Krishnaswamy et al"
+  },
+  {
+    "id": "oa-19225984-c9-b89d4b6f",
+    "pattern": "\u00a7103 \u2014 obviousness over combined prior art",
+    "claim_shape": "(Previously Presented) The method of Claim 1, wherein the data item has an assigned scoring function and the data item is returned as a result of the search if the associated scoring function exceeds or equals a threshold. Previously presented 10",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 9-12 are rejected under 35 U.S.C. 103 as being unpatentable over Hasan in view of Huber and further in view of Ford et al. US 20030195877 A1 (hereinafter referred to as \u201cFord\u201d). As per claim 9, Hasan as modified doesn\u2019t explicitly teach a scoring function, however, Ford teaches: The method of Claim 1, wherein the data item has an assigned scoring function and the data item is returned as a ",
+    "source": "USPTO application 19225984, CTNF office action; claims 9, 10, 11, 12 rejected under 35 U.S.C. 103 as being unpatentable over Hasan in view of Huber and further in view of Ford et al"
+  },
+  {
+    "id": "oa-19225984-c15-37d4b306",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently amended) A computer-implemented method comprising a data processor for storing and searching data using metalabelst he method comprising: storing the metalabels that are range-strings, wherein a range-string comprises an ordered sequence of at least one string and at least one n-dimensional range, each range represented by at least a minimum and maximum value and each string and range separated from preceding string or range by a delimiter; storing the data using a plurality of nodes in a range-string tree structure; wherein a plurality of n-dimensional range search data structures is embedded at each of a plurality of nodes of the string search tree structure. receiving a shape range-string query from a user, wherein the shape range-string search comprises at least one string term and at least one geometric structure; Covering the received shape range by a plurality of n-dimensional ranges and using these ranges to search for metalabels satisfying the shape range-string query for user-defined metalabels; and returning at least one data items of the matched range structure nodes to the user. Currently amended 16",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claim 15 is rejected under 35 U.S.C. 103 as being unpatentable over Hasan in view of Huber. As per claim 15, Hasan teaches: A computer-implemented method comprising a data processor for storing and searching data using metalabelsthe method comprising: storing the data using a plurality of nodes in a range-string tree structure (Hasan, column 2, lines 20-40 \u2013 The systems and methods described herei",
+    "source": "USPTO application 19225984, CTNF office action; claim 15 rejected under 35 U.S.C. 103 as being unpatentable over Hasan in view of Huber"
+  },
+  {
+    "id": "oa-19225984-c16-d6f46e08",
+    "pattern": "\u00a7103 \u2014 obviousness over combined prior art",
+    "claim_shape": "(Currently Amended) The method ofClaim 15 wherein the query received from the user is specified in a natural language and translated into a geometric query using a neural network trained to transform the query into a geometric structure. Currently amended 17",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claim 16 is rejected under 35 U.S.C. 103 as being unpatentable over Hasan in view of Huber and further in view of Saldanha. As per claim 16, Hasan as modified doesn\u2019t teach natural language queries being converted into proper database searches, however, Saldanha teaches: The method Claim 15 wherein the query received from the user is specified in a natural language and translated into a geometric ",
+    "source": "USPTO application 19225984, CTNF office action; claim 16 rejected under 35 U.S.C. 103 as being unpatentable over Hasan in view of Huber and further in view of Saldanha"
+  }
+]

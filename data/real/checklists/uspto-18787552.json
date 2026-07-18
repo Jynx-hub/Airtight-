@@ -1,0 +1,34 @@
+[
+  {
+    "id": "oa-18787552-c1-dbf6abf6",
+    "pattern": "\u00a7102 \u2014 anticipation by a single reference",
+    "claim_shape": "(Previously Presented) A system comprising: a processor circuit; and a memory comprising machine-readable instructions that, when executed by the processor circuit, cause the processor circuit to:receive a request from an Electronic Gaming Machine (EGM) to access a casino operator management function via a casino communication network, the casino operator management function comprising a dispute resolution function to modify a game result at the EGM; authenticate the request; and based on successful authentication of the request, provide the casino operator management function to a Graphical User Interface (GUI) of the EGM via the casino communication network. Previously presented 2",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 1, 2, 5, 8, 13-15, and 18-20 are rejected under 35 U.S.C. 102(a)(1) as being unpatentable by Dwayne R. Nelson et al (US 20130165208 A1), hereinafter \u201cNelson\u201d. Regarding Claim 1, Nelson discloses a system and an Electronic Gaming Machine (EGM) (Nelson, Abstract, electronic gaming machine (EGM)) comprising: a processor circuit (Nelson, Paragraph 0015, processor); and a memory comprising machi",
+    "source": "USPTO application 18787552, CTNF office action; claims 1, 2, 13, 14, 18, 19, 20 rejected under 35 U.S.C. 102 (a)(1) as being unpatentable by Dwayne R"
+  },
+  {
+    "id": "oa-18787552-c3-3ff69c79",
+    "pattern": "\u00a7103 \u2014 obviousness over combined prior art",
+    "claim_shape": "(Original) The system of claim 2, wherein the identification device is an identification card and the device reader is a card reader. Original 4",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 3 and 4 are rejected under 35 U.S.C. 103 as being unpatentable over Nelson in view of Philippe A. Charrin (US 20030014370 A1), hereinafter \u201cCharrin\u201d. Regarding Claim 3, Nelson discloses the system of claim 2 above. However, Nelson fails to explicitly disclose wherein the identification device is an identification card and the device reader is a card reader. Charrin, from the same or similar",
+    "source": "USPTO application 18787552, CTNF office action; claims 3, 4 rejected under 35 U.S.C. 103 as being unpatentable over Nelson in view of Philippe A"
+  },
+  {
+    "id": "oa-18787552-c16-04ed2906",
+    "pattern": "\u00a7103 \u2014 obviousness over combined prior art",
+    "claim_shape": "(Previously Presented) The EGM of claim 13, wherein the employee management function comprises a clock in and/or clock out function for a casino employee. Previously presented 17",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 6, 7, 16, and 17 are rejected under 35 U.S.C. 103 as being unpatentable over Nelson in view of John F. Acres et al (US 20150045122 A1), hereinafter \u201cAcres\u201d. Regarding Claim 6, Nelson discloses the system of claim 5 above. However, Nelson fails to explicitly disclose wherein the employee management function comprises a clock in and/or clock out function for a casino employee. Acres, from the",
+    "source": "USPTO application 18787552, CTNF office action; claims 16, 17 rejected under 35 U.S.C. 103 as being unpatentable over Nelson in view of John F"
+  },
+  {
+    "id": "oa-18787552-c9-39fcab63",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Previously Presented) The system of claim 1, wherein the dispute resolution function comprises a dispute management interface to resolve disputes between a customer at the EGM and the casino. Previously presented 10",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 9-12 are rejected under 35 U.S.C. 103 as being unpatentable over Nelson in view of Steven G. LeMay et al (US 20130084991 A1), hereinafter \u201cLeMay\u201d. Regarding Claim 9, Nelson discloses the system of claim 8 above. However, Nelson fails to explicitly disclose wherein the customer management function comprises a dispute management interface to resolve disputes between the customer and the casin",
+    "source": "USPTO application 18787552, CTNF office action; claims 9, 10, 11, 12 rejected under 35 U.S.C. 103 as being unpatentable over Nelson in view of Steven G"
+  }
+]

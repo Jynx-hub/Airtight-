@@ -1,8 +1,0 @@
-{
-  "id": "ptab-IPR2025-00217",
-  "pattern": "No real-time permissible headline update",
-  "claim_shape": "Conditional functional language requiring user perception or selection specificity",
-  "technology_class": "TC2600",
-  "remedy": "Include live open-source activity as deterministic lookup parameter within single claim construction",
-  "source": "PTAB IPR2025-00217 FWD, patent 10952153, grounds ['102', '103']"
-}

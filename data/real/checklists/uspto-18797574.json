@@ -1,0 +1,26 @@
+[
+  {
+    "id": "oa-18797574-c2-ceb3f6f2",
+    "pattern": "\u00a7112 \u2014 indefiniteness",
+    "claim_shape": "(Currently Amended) The computer-implemented method of claim 1, wherein the Power SoftMax function replaces the non-polynomial terms, in a SoftMax function of a self- attention layer of the original DL computer model architecture, with the polynomial terms. Currently amended 3",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 2-4, 10, and 12-14 are rejected under 35 U.S.C. 112(b) or 35 U.S.C. 112 (pre-AIA), second paragraph, as being indefinite for failing to particularly point out and distinctly claim the subject matter which the inventor or a joint inventor (or for applications subject to pre-AIA 35 U.S.C. 112, the applicant), regards as the invention. Claims 2 and 12 recite: \u201cin a SoftMax function of a self-a",
+    "source": "USPTO application 18797574, CTNF office action; claims 2, 3, 10, 12, 13 rejected under 35 U.S.C. 112 (b) or 35 U"
+  },
+  {
+    "id": "oa-18797574-c1-73f0dc6a",
+    "pattern": "\u00a7102 \u2014 anticipation by a single reference",
+    "claim_shape": "(Currently Amended) A computer-implemented method for optimizing a deep learning (DL) computer model for homomorphic encryption (HE) workload processing, the computer- implemented method comprising:receiving an original DL computer model architecture that is to be optimized for HE workload processing; modifying the original DL computer model architecture by replacing a self-attention layer of the original DL computer model with a HE friendly self-attention layer that comprises a Power SoftMax function that does not have exponent terms, to thereby generate a modified DL computer model architecture; executing a machine learning training of the modified DL computer model architecture; approximating one or more elements of the Power SoftMax function with polynomials to generate a trained HE optimized DL computer model; and outputting the trained HE optimized DL computer model for execution on HE workloads; wherein the Power SoftMax function comprises polynomial terms to replace non- polynomial terms, the non-polynomial terms being exponent terms, the polynomial terms being power terms; and wherein the Power SoftMax function employs an approximation of division terms over a scale-agnostic range. Currently amended 2",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 1-3, 10-13, and 20 are rejected under 35 U.S.C. 102(a)(1) as being anticipated by US 2023/01536861 to Waller et al. (hereinafter, \u201cWaller\u201d). As per claim 1: Waller discloses: A computer-implemented method for optimizing a deep learning (DL) computer model for homomorphic encryption (HE) workload processing (a method for training a machine learning model, such as a convolutional neural netwo",
+    "source": "USPTO application 18797574, CTNF office action; claims 1, 2, 3, 10, 11, 12, 13, 20 rejected under 35 U.S.C. 102 (a)(1) as being anticipated by US 2023/01536861 to Waller et al"
+  },
+  {
+    "id": "oa-18797574-c8-d05e32ef",
+    "pattern": "\u00a7103 \u2014 obviousness over combined prior art",
+    "claim_shape": "(Original) The computer-implemented method of claim 1, wherein the original DL computer model architecture is a Transformer DL computer model architecture. Original 9",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 8, 9, 18, and 19 are rejected under 35 U.S.C. 103 as being unpatentable over Waller in view of T. Chen et al. (hereinafter, \u201cChen\u201d), \u201cThe-x: Privacy-preserving transformer inference with homomorphic encryption,\" arXiv preprint arXiv:2206.00216. 2022 Jun 1. As per claim 8: Waller discloses all limitations of claim 1. Waller does not explicitly disclose, but Chen discloses: wherein the origin",
+    "source": "USPTO application 18797574, CTNF office action; claims 8, 9, 18, 19 rejected under 35 U.S.C. 103 as being unpatentable over Waller in view of T"
+  }
+]

@@ -1,0 +1,34 @@
+[
+  {
+    "id": "oa-19313189-c1-49d21357",
+    "pattern": "\u00a7102 \u2014 anticipation by a single reference",
+    "claim_shape": "(Currently Amended) A computer-implemented method comprising:obtaining, from one or more image sensors, a first set of image data corresponding to an environment; processing the first set of image data using a first machine learning algorithm to yield annotated image data that identifies at least one object within the environment; processing the annotated image data using a second machine learning algorithm to determine one or more attributes associated with the at least one object within the environment; [[and]] generating, based on the one or more attributes, an evidence package corresponding to the at least one object within the environment, the evidence package being configured to facilitate a determination of one or more action items associated with the at least one object[[.fl; obtaining , from one or more imag e sensors, a second set of imag e data corresponding to the environment; processing the second set of imag e data to identify a change in the one or more attributes associated with the at least one object within the environment; and determining, based on the chang e in the one or more attributes, that the one or more action items associated with the at least one object are complete. Currently amended 2",
+    "technology_class": "G06N",
+    "remedy": "Examiner's ground: Claims 1-2, 6-7, 10, 14-15, and 18-19 are rejected under 35 U.S.C. 102(a)(1) as being anticipated by Yuan et al. (\u201cPatrol Agent: An Autonomous UAV Framework for Urban Patrol Using on board Vision Language Model and on cloud Large Language Model\u201d). Regarding claim 1, Yuan discloses, a computer-implemented method comprising: obtaining, from one or more image sensors, a first set of image data corres",
+    "source": "USPTO application 19313189, CTNF office action; claims 1, 2, 6, 7, 10, 14, 15, 18, 19 rejected under 35 U.S.C. 102 (a)(1) as being anticipated by Yuan et al"
+  },
+  {
+    "id": "oa-19313189-c4-06487470",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The computer-implemented method of claim 1, further comprising:capturing the first set of image data in response to a trigger condition. Original 5",
+    "technology_class": "G06N",
+    "remedy": "Examiner's ground: Claims 4 and 13 are rejected under 35 U.S.C. 103 as being unpatentable over Yuan et al. (\u201cPatrol Agent: An Autonomous UAV Framework for Urban Patrol Using on board Vision Language Model and on cloud Large Language Model\u201d) in view of Djiofack (US Pub. No. 2019/0164019 A1). Regarding claim 4, Yuan disclose, the computer-implemented method of claim 1, but he fails to disclose, further comprising: cap",
+    "source": "USPTO application 19313189, CTNF office action; claims 4, 13 rejected under 35 U.S.C. 103 as being unpatentable over Yuan et al"
+  },
+  {
+    "id": "oa-19313189-c8-380f4562",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The computer-implemented method of claim 1, further comprising:sending the first set of image data from an edge device to a cloud server, wherein the cloud server is configured to implement at least one of the first machine learning algorithm and the second machine learning algorithm. Original 9",
+    "technology_class": "G06N",
+    "remedy": "Examiner's ground: Claims 8 and 16 are rejected under 35 U.S.C. 103 as being unpatentable over Yuan et al. (\u201cPatrol Agent: An Autonomous UAV Framework for Urban Patrol Using on board Vision Language Model and on cloud Large Language Model\u201d) in view of Ding et al. (\u201cUrban Road Anomaly Monitoring Using Vision\u2013Language Models for Enhanced Safety Management.\u201d) Regarding claim 8, Yuan disclose, the computer-implemented m",
+    "source": "USPTO application 19313189, CTNF office action; claims 8, 16 rejected under 35 U.S.C. 103 as being unpatentable over Yuan et al"
+  },
+  {
+    "id": "oa-19313189-c9-10270b7c",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The computer-implemented method of claim 1, further comprising:sending the evidence package to a third-party system corresponding to an entity that is responsible for addressing the one or more action items. Original 10",
+    "technology_class": "G06N",
+    "remedy": "Examiner's ground: Claims 9, 17, and 19 are rejected under 35 U.S.C. 103 as being unpatentable over Yuan et al. (\u201cPatrol Agent: An Autonomous UAV Framework for Urban Patrol Using on board Vision Language Model and on cloud Large Language Model\u201d) in view of Ahmed et al. (\u201cFrom Detection to Action: A Multimodal AI Framework for Traffic Incident Response\u201d). Regarding claim 9, Yuan disclose, the computer-implemented met",
+    "source": "USPTO application 19313189, CTNF office action; claims 9, 17, 19 rejected under 35 U.S.C. 103 as being unpatentable over Yuan et al"
+  }
+]

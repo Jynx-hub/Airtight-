@@ -1,0 +1,26 @@
+[
+  {
+    "id": "oa-18747116-c1-b2049c8f",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently Amended) A method of dynamic channel allocation for an internet of things (IoT) device, the method comprising: monitoring activity of one or more devices wirelessly communicating with a node; determining, based on the monitored activity, an amount of unallocated spectrum in a communications channel used by the node to wirelessly communicate with the one or more devices; determining for a first device of the one or more devices, a bandwidth requirement associated with a first communication protocol used by the first device; determining that the amount of unallocated spectrum is less than the bandwidth requirement associated with the first communication protocol; comparing the amount of unallocated spectrum to the bandwidth requirement associated with the communication protocol; and based on the comparisondetermination, dynamically allocating at least a portion of the unallocated spectrum to a second device of the one or more devices, wherein the second device uses a second communication protocol that is different from the first communication protocol used by the first device. Currently amended 2",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 1, 3, 4 and 6-17 are rejected under 35 U.S.C. 103 as being unpatentable over Bye et al. (US 2022/0132320), hereinafter Bye in view of Gupta et al. (US 2018/0270820), hereinafter Gupta further in view of Pikkarainen et al. (US 2011/0255425), hereinafter Pikkarainen. As for claim 1 Bye teaches a method of dynamic channel allocation for an internet of things (IoT) device (Fig. 1; paragraphs [0",
+    "source": "USPTO application 18747116, CTFR office action; claims 1, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14 rejected under 35 U.S.C. 103 as being unpatentable over Bye et al"
+  },
+  {
+    "id": "oa-18747116-c2-810cb6e1",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The method of claim 1 , wherein the first protocol uses a greater amount of the unallocated spectrum than the second protocol. Original 3",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 2 and 5 are rejected under 35 U.S.C. 103 as being unpatentable over Bye (US 2022/0132320) in view of Gupta (US 2018/0270820) and Pikkarainen (US 2011/0255425) further in view of Astrom et al. (US 2020/0267670), hereinafter Astrom. As for claim 2, the combined system of Bye, Gupta and Pikkarainen fails to teach wherein a first protocol uses a greater amount of unallocated spectrum than a sec",
+    "source": "USPTO application 18747116, CTFR office action; claims 2, 5 rejected under 35 U.S.C. 103 as being unpatentable over Bye (US 2022/0132320) in view of Gupta (US 2018/0270820) and Pikkarainen (US 2011/0255425) further in view of Astrom et al"
+  },
+  {
+    "id": "oa-18747116-c18-5361ee74",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently Amended) The non-transitory computer storage media of claim 17 , wherein the first protocol uses a greater amount of the unallocated spectrumbandwidth than the second protocol. Currently amended 19",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 18, 19 and 20 are rejected under 35 U.S.C. 103 as being unpatentable over Bye (US 2022/0132320) in view of Gupta (US 2018/0270820) and Pikkarainen (US 2011/0255425) further in view of Tran et al. (US 2018/0255175), hereinafter Tran. As for claim 18, the combined system of Bye, Gupta and Pikkarainen teaches the non-transitory computer storage media (Bye: paragraph [0077] describes processors",
+    "source": "USPTO application 18747116, CTFR office action; claims 18, 19, 20 rejected under 35 U.S.C. 103 as being unpatentable over Bye (US 2022/0132320) in view of Gupta (US 2018/0270820) and Pikkarainen (US 2011/0255425) further in view of Tran et al"
+  }
+]

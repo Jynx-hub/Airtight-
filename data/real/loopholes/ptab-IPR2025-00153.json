@@ -1,8 +1,0 @@
-{
-  "id": "ptab-IPR2025-00153",
-  "pattern": "overly generic functional language without structural anchoring",
-  "claim_shape": "means-plus-function phrasing coupled with indefinite breadth (e.g., 'means for administering antibody therapy in mammals' without specifying antibody type, dosage form, or delivery method)",
-  "technology_class": "TC3600",
-  "remedy": "replace functional phrases with explicit structural embodiments, define antibody isoform, administration route, dosage, and clinical context, and tie claim scope to disclosed embodiments rather than guarantee of novel function",
-  "source": "PTAB IPR2025-00153 FWD, patent 11631987, grounds ['112', '103']"
-}

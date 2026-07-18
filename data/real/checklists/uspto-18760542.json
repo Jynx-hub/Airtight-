@@ -1,0 +1,18 @@
+[
+  {
+    "id": "oa-18760542-c1-9be25647",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently Amended) A system for communication data identification and alert generation via a machine learning framework, the system comprising: a processing device; a non-transitory storage device containing instructions when executed by the processing device, causes the processing device to perform the steps of:determining a first status of an underlying service, wherein the first status is determined based on at least one selected from the group consisting of (i) communication with at least one external interface, (ii) communication with at least one repository database; receiving a stream of interaction data from a first user via at least one channel; classifying an interaction via a first machine learning model, wherein classifying the interaction comprises: identifying an identity of the first user based on the interaction; and determining an interaction pattern associated with the identity of the first user; generating a first notification signal via a second machine learning model, wherein the second machine learning model is provided, as inputs, the first status of the underlying service and the interaction pattern associated with the identity; [[and]] transmitting the first notification signal via the at least one channel to a first endpoint device associated with the first user; andreceiving, after transmitting the first notification signal, a disposition signal from the first endpoint device via the at least one channel, wherein the disposition signal comprises a disposition input. Currently amended 2",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 1, 4-6, 9-14, 17 and 20 are rejected under 35 U.S.C. 103 as being unpatentable over Bonam (US 2024/0296086 A1) and further in view of Pannu (US 2024/0364581 A1). With regards to Claim 1, Bonam teaches a system for communication data identification and alert generation via a machine learning framework (i.e., Methods may include monitoring one or more applications, systems or features for inc",
+    "source": "USPTO application 18760542, CTNF office action; claims 1, 4, 5, 6, 9, 10, 11, 12, 13, 14, 17, 20 rejected under 35 U.S.C. 103 as being unpatentable over Bonam (US 2024/0296086 A1) and further in view of Pannu (US 2024/0364581 A1)"
+  },
+  {
+    "id": "oa-18760542-c2-2ed09eac",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The system of claim 1, wherein the first notification signal comprises a splash banner. Reply to Office Action dated October 1, 2025 Page 3 of 8 Original 3",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 2-3, 15-16 and 18-19 are rejected under 35 U.S.C. 103 as being unpatentable over Bonam (US 2024/0296086 A1) and further in view of Pannu (US 2024/0364581 A1) and further in view of Momchilov (US 2022/0050699 A1). With regards to Claim 2, Bonam and Pannu teach the above disclosed subject matter. However, Bonam and Pannu do not explicitly disclose wherein the first notification signal compris",
+    "source": "USPTO application 18760542, CTNF office action; claims 2, 3, 15, 16, 18, 19 rejected under 35 U.S.C. 103 as being unpatentable over Bonam (US 2024/0296086 A1) and further in view of Pannu (US 2024/0364581 A1) and further in view of Momchilov (US 2022/0050699 A1)"
+  }
+]

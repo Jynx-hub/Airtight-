@@ -1,0 +1,34 @@
+[
+  {
+    "id": "oa-19221862-c9-15cb20aa",
+    "pattern": "\u00a7112 \u2014 written-description gap",
+    "claim_shape": "(Currently Amended) The digital circuit of claim 2 wherein the data is split into either a disj oint set or an overlapping set depending on a machine learning modelin one or more of the input layer, the one or more intermediate layers, and the output layer, there are multiple hubs that split in any proportion the w ork of a single hub. Currently amended 10",
+    "technology_class": "G06N",
+    "remedy": "Examiner's ground: Claims 9-10, 12, 23-24, 26, 37-38 and 40 are rejected under 35 U.S.C. 112(a) as failing to comply with the written description requirement. Claims 9, 23, and 37 contain subject matter which was not described in the specification in such a way as to reasonably convey to one skilled in the relevant art that the inventor or a joint inventor, at the time the application was filed, had possession of th",
+    "source": "USPTO application 19221862, CTNF office action; claims 9, 10, 12, 23, 24, 26, 37, 38, 40 rejected under 35 U.S.C. 112 (a) as failing to comply with the written description requirement"
+  },
+  {
+    "id": "oa-19221862-c10-114b0aad",
+    "pattern": "\u00a7112 \u2014 written-description gap",
+    "claim_shape": "(Currently Amended) The digital circuit of claim 2, further comprising each neuron of the plurality of neurons is processed serially to output only high order bits of any computation, the high order bits being shifted to the right to avoid overflow.w herein ov erflow w ork that a given hub of the plurality of hub nodes lacks capacity is configured to serv e as redundant backup hubs for error-checking, error-correcting, or for recov ery from one or more hub failures. Currently amended 11",
+    "technology_class": "G06N",
+    "remedy": "Examiner's ground: claims 10, 24, and 38 are rejected under 35 U.S.C. 112(a) as failing to comply with the written description requirement. Appropriate correction is required. Claims 12, 26, and 40 contain subject matter which was not described in the specification in such a way as to reasonably convey to one skilled in the relevant art that the inventor or a joint inventor, at the time the application was filed, ha",
+    "source": "USPTO application 19221862, CTNF office action; claims 10, 24, 38 rejected under 35 U.S.C. 112 (a) as failing to comply with the written description requirement"
+  },
+  {
+    "id": "oa-19221862-c12-d7741ebb",
+    "pattern": "\u00a7112 \u2014 written-description gap",
+    "claim_shape": "(Currently Amended) The digital circuit of claim 2 z wherein the plurality of hub nodes are implemented on an application-specific integrated circuit or on a non-field-programmable gate arrayan operation of a giv en layer of the input layer, the one or more intermediate layers , or the output layer, and an operation of the plurality of neurons for the giv en layer take place v ia digital circuits including one or more of the follow ing: input and output line s electors , input and output line gates , multiplexers , demultiplexers , logical and arithmetic circuits , and direct memory access controllers. Currently amended 13",
+    "technology_class": "G06N",
+    "remedy": "Examiner's ground: claims 12, 26, and 40 are rejected under 35 U.S.C. 112(a) as failing to comply with the written description requirement. Appropriate correction is required. The following is a quotation of 35 U.S.C. 112(b): (b) CONCLUSION.\u2014The specification shall conclude with one or more claims particularly pointing out and distinctly claiming the subject matter which the inventor or a joint inventor regards as t",
+    "source": "USPTO application 19221862, CTNF office action; claims 12, 26, 40 rejected under 35 U.S.C. 112 (a) as failing to comply with the written description requirement"
+  },
+  {
+    "id": "oa-19221862-c2-14a91e82",
+    "pattern": "\u00a7112 \u2014 antecedent-basis gap",
+    "claim_shape": "(Currently Amended) A digital circuit implementing a machine learning model inference engine for one or more models, the digital circuit comprising:a hub-and-spoke data transfer architecture for each of the one or more models, wherein each of the one or more models comprises a neural network having an input layer, one or more intermediate layers, and an output layer, wherein the input layer, the one or more intermediate layers, and the output layer are processed sequentially, a plurality of neurons, said plurality of neurons comprising at least a first neuron set and a second neuron set, wherein thea plurality of neurons of [[the]]a first neuron set are not directly connected to any of [[the]]a plurality of neurons of [[the]]a second neuron set; a plurality of hub nodes comprising at least a first hub node and a second hub node, wherein the plurality of neurons in the first neuron set are only connected to the first hub node, wherein the plurality of neurons in the second neuron set are only connected to the second hub node; wherein all data transfers between and among each of a first layer and a second layer take place hub-to-hub, such that the data transfers between the first layer and the second layer occur between the first hub node and the second hub node; wherein the first hub provides the first set of neurons with data needed by the first set of neurons to perform respective computations within the neural network; and wherein the second hub node provides the second set of neurons with data needed by the second set of neurons to perform respective computations within the neural network. Currently amended 3",
+    "technology_class": "G06N",
+    "remedy": "Examiner's ground: Claims 2-43 are rejected under 35 U.S.C. 112(b) as being indefinite for failing to particularly point out and distinctly claim the subject matter which the inventor or a joint inventor regards as the invention. Independent claims 2 and 30 both recite \u201cthe plurality of neurons of the first neuron set\u201d and \u201cthe plurality of neurons of the second neuron set\u201d (see, lines 10-11 of claim 2 and 30). Ther",
+    "source": "USPTO application 19221862, CTNF office action; claims 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 rejected under 35 U.S.C. 112 (b) as being indefinite for failing to particularly point out and distinctly claim the subject matter which the inventor or a joint inventor regards as the invention"
+  }
+]

@@ -1,8 +1,0 @@
-{
-  "id": "ptab-IPR2025-00254",
-  "pattern": "claims drafted as functional rationale without technical implementation limitations",
-  "claim_shape": "“[Desired outcome/function] achieved by [generic computing environment]”, e.g., “optimizing node engagement by redistributing data across servers in a peer‑to‑peer network”",
-  "technology_class": "TC2100",
-  "remedy": "require structural elements defining how the function is effected (e.g., specific data partitioning logic, adjacency criteria, or concrete algorithms) and tie the function to the structural features that ensure non‑obviousness.",
-  "source": "PTAB IPR2025-00254 FWD, patent 10552490, grounds ['103']"
-}

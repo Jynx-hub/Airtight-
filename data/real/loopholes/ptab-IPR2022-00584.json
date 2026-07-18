@@ -1,8 +1,0 @@
-{
-  "id": "ptab-IPR2022-00584",
-  "pattern": "Self-referential enablement loophole",
-  "claim_shape": "Broad functional language without provable structural distinctions tied to specific temperature/time parameters",
-  "technology_class": "TC2600",
-  "remedy": "Define exact operational boundaries in claim language and tie functional terms to reproducible physical attributes in description",
-  "source": "PTAB IPR2022-00584 FWD, patent 7623033, grounds ['103']"
-}

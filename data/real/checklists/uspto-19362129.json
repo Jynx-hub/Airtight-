@@ -1,0 +1,10 @@
+[
+  {
+    "id": "oa-19362129-c1-b56cbf28",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently Amended) A computer-implemented method comprising: generating, for a prompt received at a generative artificial intelligence (AI ) system, a stateful training trajectory for an agent model of the generative Al system, wherein the stateful training trajectory comprises a trajectory identifier and a trajectory metadata constrained within a trajectory environment; generating, utilizing the agent model to process the prompt as part of the stateful training trajectory within the trajectory environment, an agent output by calling a digital tool through a secure proxy architecture supporting encrypted communication between the agent model and the digital tool, the secure proxy architecture comprising:one or more training clusters on which the ag ent model executes; and a unified cluster boundary, separate from the one or more training clusters, config ured to receive tool-call req uests from the one or more training clusters and to communicate with an external endpoint of the dig ital tool based on the tool-call requests; determining, from a grader model, a generative reward corresponding to the agent output; and updating parameters of the agent model based on the generative reward. Currently amended 2 SVG 19362129.03-02-2026.MM9N7WYO5X15X96.CLM.2.1.297.150.2250.292.svg 0.473 6.51 Chemistry Black and white",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 1-3, 6, 10-13, 16-18 and 20 are rejected under 35 U.S.C. 103 as being unpatentable over Junwei Liao, Muning Wen, Jun Wang, Weinan Zhang. \"MARFT: Multi-Agent Reinforcement Fine-Tuning\", 42 pages, arXiv preprint arXiv:2504.16129v4, 3 Nov 2025 (Applicant\u2019s IDS) (hereinafter Liao) in view of US 2024/0388571 to Hanes et al. (hereinafter Hanes). As to claim 1, Liao teaches a computer-implemented ",
+    "source": "USPTO application 19362129, CTNF office action; claims 1, 2, 3, 6, 10, 11, 12, 13, 16, 17, 18, 20 rejected under 35 U.S.C. 103 as being unpatentable over Junwei Liao, Muning Wen, Jun Wang, Weinan Zhang"
+  }
+]

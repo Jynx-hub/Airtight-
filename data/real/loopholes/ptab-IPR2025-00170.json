@@ -1,8 +1,0 @@
-{
-  "id": "ptab-IPR2025-00170",
-  "pattern": "anticipation by identical disclosure",
-  "claim_shape": "open-ended functional language that can be mapped node-for-node onto a single prior-art reference",
-  "technology_class": "TC3600",
-  "remedy": "introduce structural differentiation or conditional language that forces a substantive mapping step, thereby preventing one-to-one anticipation",
-  "source": "PTAB IPR2025-00170 FWD, patent 9975750, grounds ['102']"
-}

@@ -1,8 +1,0 @@
-{
-  "id": "ptab-PGR2025-00009",
-  "pattern": "means-plus-function for joint control",
-  "claim_shape": "PIV nut comprises a preloadable carrying member that is constrained by a clamping mechanism where movement is governed by an actuating screw connected to an automatically sensed free play amount, wherein the clamping mechanism is configured to hold the preloadable carrying member and the actuating s",
-  "technology_class": "TC1600",
-  "remedy": "Use structural language (e.g., 'mechanical linkage', 'spring-loaded latch', or 'threaded torque transmission assembly') instead of functional phrases; explicitly describe the actuation path, interfaces, and control logic with hardware components and mathematical equivalents.",
-  "source": "PTAB PGR2025-00009 FWD, patent 12123035, grounds ['112', '103']"
-}

@@ -1,0 +1,10 @@
+[
+  {
+    "id": "oa-18794285-c1-73411508",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently Amended) A computer-implemented method comprising: processing data pertaining to one or more interactions between at least one user device and at least one artificial intelligence-based chatbot into one or more data structures; predicting at least one future task of at least a portion of the one or more interactions by processing at least portions of the one or more data structures using one or more machine learning techniques; and identifying at least one task handler component related to at least one chatbot functionality associated with the at least one predicted future task; and performing one or more automated actions related to providing dynamic and independent access to each of the at least one task handler component via the at least one artificial intelligence-based chatbot, wherein providing dynamic and independent access comprises independently plugging each of the at least one task handler component into at least one user interface associated with the at least one artificial intelligence-based chatbot; wherein the method is performed by at least one processing device comprising a processor coupled to a memory. Currently amended 2",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 1-9 and 11-20 are rejected under 35 U.S.C. 103 as being unpatentable over Anwar Batcha et al U..S. 20250111846 (referred to hereafter as Anwar in view of Moss et al. U.S. 20220244925 (referred to hereafter as Moss). Anwar teaches substantial feature of the invention including Technologies for Leveraging Machine Learning to Predict Empathy for Improved Contact Center Interactions (see abstra",
+    "source": "USPTO application 18794285, CTNF office action; claims 1, 2, 3, 6, 7, 8, 9, 11, 12, 13, 16, 17 rejected under 35 U.S.C. 103 as being unpatentable over Anwar Batcha et al U"
+  }
+]

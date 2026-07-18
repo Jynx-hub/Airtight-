@@ -44,7 +44,7 @@ Airtight/
 ├── CLAUDE.md                         ← context for Claude Code sessions in this repo
 ├── airtight/                         ← shared package: the doorway (one model hop) + data shapes
 ├── agent/                            ← Person 4: work loop, memory, guardrails, eval harness
-├── src/                              ← Person 1: USPTO/PTAB ingestion pipeline (corpus, groundtruth, loaders)
+├── attic/                            ← quarantined: the retired src/ ingestion pipeline, not on the path (see attic/README.md)
 ├── data/                            ← Person 1: corpora, ground truth, fixtures (the pipeline's output)
 ├── runtime/                          ← Person 2 (LIVE): deployed Modal/vLLM app, doorway, RUNBOOK, bench harness — F1–F4
 ├── inference/                        ← Person 2: `policy/` is the F5 OpenShell groundwork (sandbox YAML + DGX Spark
@@ -78,17 +78,27 @@ Airtight/
 Quick start (Python 3.10+; 3.12 is what the suite is verified on):
 
 ```bash
-python3 -m venv .venv && .venv/bin/pip install -e ".[dev,web]" && .venv/bin/pytest tests/
-# expect: 71 passed — no network, no .env, no GPU
+python3 -m venv .venv && .venv/bin/pip install -e ".[dev,web,poison]" && .venv/bin/pytest tests/
+# expect: 57 passed — no network, no .env, no GPU
 ```
 
-Take the `web` extra even if you aren't touching the surface. `tests/test_surface.py`
-`importorskip`s fastapi *by design*, so a `.[dev]`-only clone reports a green **67 passed,
-1 skipped** — green, but with the four surface tests silently not run. 71 is the number
-that means "everything ran."
+Take the `web` and `poison` extras even if you aren't touching the surface or the E5
+security demo. `tests/test_surface.py` `importorskip`s fastapi and the poison-PDF test
+`importorskip`s pdfplumber *by design*, so a `.[dev]`-only clone reports a green **52 passed,
+2 skipped** — green, but with the four surface tests and the poison-PDF test silently not
+run (`.[dev,web]` without `poison` is **56 passed, 1 skipped**). **57 passed** (no skips) is
+the number that means "everything a fresh clone can run, ran."
 
-Two things that quick start deliberately leaves out: `requirements.txt` (aiohttp/duckdb/
-pdfplumber — only the `scripts/` + `data/` pipeline needs those, not the test suite), and
+`test_real_pull_splits_cleanly` runs by default now: `data/real/` — the 50-patent G06N
+pull — is **tracked in the repo, so it comes with a clone**, and that test proves the real
+10-of-38 holdout doesn't leak into its warming corpus. The puller
+(`data/pull_uspto.py --groundtruth`) and a free `USPTO_API_KEY` are only needed to *extend*
+the corpus to more CPC classes, not to run the suite. It skips only if `data/real/` is deleted.
+
+Two things that quick start deliberately leaves out: `requirements.txt` (aiohttp/duckdb
+belonged to the quarantined `attic/` pipeline and the live puller `data/pull_uspto.py` is
+pure stdlib, so the core suite needs neither — `reportlab`/`pdfplumber` are the real E5
+deps, now the `poison` extra above), and
 `requirements-lock.txt`, the exact 52-package set the green run above was recorded with —
 use it if you need a byte-identical env rather than a working one.
 

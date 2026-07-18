@@ -1,0 +1,58 @@
+[
+  {
+    "id": "oa-19322207-c1-26bf4e38",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) A computer-implemented method of generating a self-learning and a self- improving dialogue system, the method comprising:receiving a first language model trained to emulate a persona of a first user of the dialogue system; receiving a second language model trained to evaluate a first dialogue system output; generating, using the first language model, a first language model output emulating the persona of the first user of the dialogue system; providing the first language model output to a third language model, wherein the third language model is trained to generate one or more dialogue system outputs from the dialogue system; responsive to the first language model output, generating, using the third language model, the first dialogue system output, thereby generating a simulated dialogue between the first language model and the third language model, the simulated dialogue comprising at least the first language model output and the first dialogue system output; evaluating, using the second language model, the first dialogue system output; and fine-tuning, using the generated simulated dialogue and the evaluation of the first dialogue system output, the third language model. Original 2",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 1, 2, 8, 11-12, 16 are rejected under 35 U.S.C. 103 as being unpatentable over Tiwari (US 20250335817 A1) in further view of Wen (US 20250337707 A1). With respect to claims 1, 11 Tiwari teaches (Claim 1) A computer-implemented method of generating a self-learning and a self- improving dialogue system, the method comprising: (Claim 11) A non-transitory computer readable storage medium compri",
+    "source": "USPTO application 19322207, CTNF office action; claims 1, 2, 8, 11, 12, 16 rejected under 35 U.S.C. 103 as being unpatentable over Tiwari (US 20250335817 A1) in further view of Wen (US 20250337707 A1)"
+  },
+  {
+    "id": "oa-19322207-c3-e3617152",
+    "pattern": "\u00a7103 \u2014 obviousness over combined prior art",
+    "claim_shape": "(Original) The method of claim 1, wherein the first language model is updated at a predetermined time intervals. Original 4",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 3 is rejected under 35 U.S.C. 103 as being unpatentable over Tiwari and Wen in further view of Franz (US 7027987 B1). With respect to claim 3 Tiwari and Wen do not explicitly disclose, however Franz teaches wherein the first language model is updated at a predetermined time intervals (Col5ll41-45 The server 120 may perform the processing described above a single time or at predetermined tim",
+    "source": "USPTO application 19322207, CTNF office action; claim 3 rejected under 35 U.S.C. 103 as being unpatentable over Tiwari and Wen in further view of Franz (US 7027987 B1)"
+  },
+  {
+    "id": "oa-19322207-c4-b2d4b96a",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The method of claim 1, wherein generating the first language model output comprises providing the first language model with a first language model prompt, wherein the first language model prompt includes instructions to guide the first language model to generate one or more first language model outputs based on a task, a scenario, or both. Original 5",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claim 4 is rejected under 35 U.S.C. 103 as being unpatentable over Tiwari and Wen in further view of Molitor (US 20240419922 A1). With respect to claim 4 Tiwari and Wen do not explicitly disclose, however Molitor teaches wherein generating the first language model output comprises providing the first language model with a first language model prompt, wherein the first language model prompt include",
+    "source": "USPTO application 19322207, CTNF office action; claim 4 rejected under 35 U.S.C. 103 as being unpatentable over Tiwari and Wen in further view of Molitor (US 20240419922 A1)"
+  },
+  {
+    "id": "oa-19322207-c5-65dfb21d",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The method of claim 1, wherein the second language model is trained using supervised fine-tuning and based on: a plurality of dialogue system outputs from the dialogue system, and feedback from a human manager to each of the plurality of dialogue system outputs. Original 6",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 5 and 13 are rejected under 35 U.S.C. 103 as being unpatentable over Tiwari and Wen in further view of Saldivar (US 20250061529 A1). With respect to claim 5 and 13 Tiwari and Wen do not explicitly disclose, however Saldivar teaches wherein the second language model is trained using supervised fine-tuning and based on: a plurality of dialogue system outputs from the dialogue system, and feed",
+    "source": "USPTO application 19322207, CTNF office action; claims 5, 13 rejected under 35 U.S.C. 103 as being unpatentable over Tiwari and Wen in further view of Saldivar (US 20250061529 A1)"
+  },
+  {
+    "id": "oa-19322207-c6-acd5b86d",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The method of claim 1, wherein evaluating the first dialogue system output further comprises:responsive to the first language model output, generating, using the third language model, the first dialogue system output and a second dialogue system output; comparing, using the second language model, the first dialogue system output and the second dialogue system output; and identifying the first dialogue system output as a preferable dialogue system output of the first dialogue system output and the second dialogue system output. Original 7",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 6, 9, 14 are rejected under 35 U.S.C. 103 as being unpatentable over Tiwari, Wen and Saldivar in further view of Ni (US 20250124340 A1) and Belvin (US 7379870 B1). With respect to claim 6 and 14 Tiwari teaches responsive to the first language model output, generating, using the third language model, the first dialogue system output [[and a second dialogue system output]] ([0028] ML model 10",
+    "source": "USPTO application 19322207, CTNF office action; claims 6, 9, 14 rejected under 35 U.S.C. 103 as being unpatentable over Tiwari, Wen and Saldivar in further view of Ni (US 20250124340 A1) and Belvin (US 7379870 B1)"
+  },
+  {
+    "id": "oa-19322207-c7-44eb8861",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The method of claim 6, further comprising:annotating, using the second language model, the first dialogue system output as a preferable dialogue system output, thereby generating an annotated first dialogue system output; and annotating, using the second language model, the second dialogue system output as a not preferable dialogue system output, thereby generating an annotated second dialogue system output,wherein fine-tuning the third language model comprises providing the third language model with the annotated first dialogue system output and the annotated second dialogue system output. Original 8",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 7 and 15 are rejected under 35 U.S.C. 103 as being unpatentable over Tiwari, Wen, Saldivar, Ni and Belvin in further view of Rollwage (US 20240404514 A1). With respect to claims 7 and 15 , Ni further teaches annotating, [[ using the second language model]], the first dialogue system output as a preferable dialogue system output, thereby generating an annotated first dialogue system output (",
+    "source": "USPTO application 19322207, CTNF office action; claims 7, 15 rejected under 35 U.S.C. 103 as being unpatentable over Tiwari, Wen, Saldivar, Ni and Belvin in further view of Rollwage (US 20240404514 A1)"
+  },
+  {
+    "id": "oa-19322207-c10-830bb7be",
+    "pattern": "\u00a7103 \u2014 obviousness over combined prior art",
+    "claim_shape": "(Original) The method of claim 1, wherein fine-tuning the third language model comprises fine-tuning based on direct preference optimisation. Original 11",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 10 is rejected under 35 U.S.C. 103 as being unpatentable over Tiwari, Wen in further view of Son (US 20250328773 A1). With respect to claim 10, Tiwari and Wen do not explicitly disclose however Son teaches wherein fine-tuning the third language model comprises fine-tuning based on direct preference optimisation ([0004] Various techniques for preference-training language models using prefere",
+    "source": "USPTO application 19322207, CTNF office action; claim 10 rejected under 35 U.S.C. 103 as being unpatentable over Tiwari, Wen in further view of Son (US 20250328773 A1)"
+  }
+]

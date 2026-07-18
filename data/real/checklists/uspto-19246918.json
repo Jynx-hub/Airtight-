@@ -1,0 +1,18 @@
+[
+  {
+    "id": "oa-19246918-c1-ab5dd11c",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently Amended) A method for optimizing resource utilization in machine learning models, comprising:receiving a plurality of data sets; altering the plurality of data sets to produce an altered plurality of data sets, wherein the altering the plurality of data sets comprises: calculating similarity scores between data sets in the plurality of data sets; if a particular similarity score of the similarity scores exceeds a threshold value, removing, from the plurality of data sets, a corresponding data set associated with the particular similarity score, wherein the threshold value is determined based on one or more features in the data sets and weights assigned to the one or more features in a machine learning model; determining anomalous data in a given data set of the plurality of data sets based on an anomaly detection technique; removing data not matching the anomalous data from the given data set in the plurality of data sets; and reducing a size of one or more data sets in the plurality of data sets based on a type of data in each data set of the one or more data sets; and performing an action using [[a]]t he machine learning model based on the altered plurality of data sets. Currently amended 2",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 1-4, 6-11, 13-18, and 20 are rejected under 35 U.S.C. 103 as being unpatentable over Griffin US 2023/0128199 (hereafter \u201cGriffin\u201d) in view of Jeyashekar et al. US 2025/0259115 (hereinafter \u201cJeyashekar\u201d). Regarding claim 1, Griffin teaches: A method for optimizing resource utilization in machine learning models, comprising: receiving a plurality of data sets; [0018: \u201cA system monitors resour",
+    "source": "USPTO application 19246918, CTNF office action; claims 1, 2, 4, 6, 7, 8, 9, 11, 13, 14, 15, 16 rejected under 35 U.S.C. 103 as being unpatentable over Griffin US 2023/0128199 (hereafter \u201cGriffin\u201d) in view of Jeyashekar et al"
+  },
+  {
+    "id": "oa-19246918-c5-21e6e363",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The method of Claim 1, wherein the reducing the size of the one or more data sets in the plurality of data sets based on the type of data in each data set of the one or more data sets comprises compressing visual media data in the one or more data sets. Original 6",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 5, 12, and 19 are rejected under 35 U.S.C. 103 as being unpatentable over the modified Griffin in view of Kumar et al. US 2024/0144712 (hereinafter \u201cKumar\u201d). Regarding claim 1, the modified Griffin teaches: The method of Claim 1, wherein the reducing the size of the one or more data sets in the plurality of data sets based on the type of data in each data set of the one or more data sets co",
+    "source": "USPTO application 19246918, CTNF office action; claims 5, 12, 19 rejected under 35 U.S.C. 103 as being unpatentable over the modified Griffin in view of Kumar et al"
+  }
+]

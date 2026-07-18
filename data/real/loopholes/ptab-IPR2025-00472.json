@@ -1,8 +1,0 @@
-{
-  "id": "ptab-IPR2025-00472",
-  "pattern": "information deletion",
-  "claim_shape": "independent claim omitting limitation that appears only in the specification",
-  "technology_class": "TC3600",
-  "remedy": "include limitation as structural feature within claim language",
-  "source": "PTAB IPR2025-00472 FWD, patent 11416898, grounds ['102', '103']"
-}

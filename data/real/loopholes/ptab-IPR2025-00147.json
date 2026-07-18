@@ -1,8 +1,0 @@
-{
-  "id": "ptab-IPR2025-00147",
-  "pattern": "overly broad WBA vs PRC comparison",
-  "claim_shape": "Reclaimed limitations in a claim-independent manner, e.g., \"a method for determining ... comprising the steps of ... where the steps include ...\"",
-  "technology_class": "TC2600",
-  "remedy": "Include explicit, contingent claim language tying subject matter to the WBA/PRC comparison so only methods practicing the specific comparison are covered; avoid dependent from independent single-step scope",
-  "source": "PTAB IPR2025-00147 FWD, patent 11188124, grounds ['102', '103']"
-}

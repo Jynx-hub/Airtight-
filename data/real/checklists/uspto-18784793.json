@@ -1,0 +1,26 @@
+[
+  {
+    "id": "oa-18784793-c1-1f005fbb",
+    "pattern": "\u00a7112 \u2014 indefiniteness",
+    "claim_shape": "(Currently Amended) A method ofoperating a device including a network data analytics function (NWDAF) that supporting supports reinforcement learning (RL) in a mobile communication system, the method comprising: receiving a subscription request to train an RL model from a consumer network function (NF); training the RL model by collecting data in response to the subscription request; and when training of the RL model is completed based on a training completion condition, transmitting a notification comprising RL model information to the consumer NF, and wherein the subscription request comprises parameters that the consumer NF is able to provide, and wherein the parameters comprise an expected RL training completion time, an expected RL training completion condition other than time, an expected RL model confidence level, an expected reward, a candidate action space, an RL model update period, an RL preparation flag, an RL correlation identifier (ID), and an available data req uirement. Currently amended 2 2.-3 (Canceled) Canceled 3 Canceled 4",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 1-18 are rejected under 35 U.S.C. 112(b) or 35 U.S.C. 112 (pre-AIA), second paragraph, as being indefinite for failing to particularly point out and distinctly claim the subject matter which the inventor or a joint inventor (or for applications subject to pre-AIA 35 U.S.C. 112, the applicant), regards as the invention. Claim 10 recites the generic limitation \u201ca processor and memory\u2026\u201d but mi",
+    "source": "USPTO application 18784793, CTNF office action; claims 1, 4, 5, 6, 7, 8, 9, 10, 13, 14, 15, 16 rejected under 35 U.S.C. 112 (b) or 35 U"
+  },
+  {
+    "id": "oa-18784793-c5-3ffbff8a",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The method of claim 1, wherein the training completion condition comprises at least one of the number of epochs, an RL training completion time, a case in which an indicator, such as a reward value or a loss function, shows a difference within or greater than or equal to a predetermined level, and an RL model confidence level. Original 6",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 5 and 14 are rejected under 35 U.S.C. 103 as being unpatentable over Bega in view of Joo et al. (US 2024/0241486 A1, hereinafter Joo). Regarding claim 14, Bega teaches the device of claim 10, Bega does not explicitly teach wherein the training completion condition comprises at least one of the a number of epochs, an RL training completion time, a case in which an indicator, such as a reward",
+    "source": "USPTO application 18784793, CTNF office action; claims 5, 14 rejected under 35 U.S.C. 103 as being unpatentable over Bega in view of Joo et al"
+  },
+  {
+    "id": "oa-18784793-c6-a59ff2c4",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently amended) The method of claim 1, further comprising: registering, to a network repository function (NRF), RL capability information comprising information indicating whether RL training is supported at the NWDAF as an RL agent. Currently amended 7",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 6, 8, 9, 15, 17, and 18 are rejected under 35 U.S.C. 103 as being unpatentable over Bega in view of Lee et al. (US 2022/0108214 A1, hereinafter Lee). Regarding claim 15, Bega teaches the device of claim 10, and does not explicitly teach wherein the plurality of operations comprises: registering, to a network repository function (NRF), RL capability information comprising information indicat",
+    "source": "USPTO application 18784793, CTNF office action; claims 6, 8, 9, 15, 17, 18 rejected under 35 U.S.C. 103 as being unpatentable over Bega in view of Lee et al"
+  }
+]

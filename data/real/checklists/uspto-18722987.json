@@ -1,0 +1,10 @@
+[
+  {
+    "id": "oa-18722987-c45-a06db04e",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently Amended) A method performed by a detector node configured to monitor messages sent between a first client node, a second client node, and a Federated Learning (FL) server in a communication network, the method comprising:receiving first information relating to a local model update, for the FL process, as sent from the first client node to the second client node; receiving second information relating to the local model update as received by the second client or forwarded by the second client node to the FL server; and comparing the first information to the second information to determine whether the second client node correctly received or forwarded the first information relating to the local model, wherein: the local model update is in the form: (P ubKey , round-no, S, , SC, U , hop-counter) round-no indicates a training round, of the FL process, that is associated with the local model update; SC, is a local model signature based on a private key of the first client node; PubKey i is a public key of the first client node, usable by the FL server to verify the local model signature, SC: U 1 is the local model; and hop-counter is a number of forwarding nodes between an originator of the local model update and the FL server. Currently amended 46",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 45-60 and 62-64 are rejected under 35 U.S.C. 103 as being unpatentable over Schechter (US 2013/0311140 A1) in view of Mortazavi et al. (US 2023/0162047 A1). INDEPENDENT: As per claim 45, Schechter teaches a method performed by a detector node configured to monitor messages sent between a first client node, a second client node, and a server in a communication network, the method comprising:",
+    "source": "USPTO application 18722987, CTNF office action; claims 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56 rejected under 35 U.S.C. 103 as being unpatentable over Schechter (US 2013/0311140 A1) in view of Mortazavi et al"
+  }
+]

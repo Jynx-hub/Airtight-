@@ -1,0 +1,10 @@
+[
+  {
+    "id": "oa-18767534-c3-307b921a",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Currently Amended) The communication method according to claim[[ 2]]_1, wherein the performing the authentication includes deleting the identification information stored in the storage, in a case where the authentication has not been performed normally by the second processor. Currently amended 4",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claim 3 is rejected under 35 U.S.C. 103 as being unpatentable over Vankirk (US2020184781) in view of Whytock (US20190334712) and in further view of Lu (CN107969001). Regarding Claim 3, Vankirk in view of Whytock discloses the communication method according to claim 2. Vankirk and Whytock do not, but in related art, Lu discloses wherein the performing the authentication includes deleting the identi",
+    "source": "USPTO application 18767534, CTNF office action; claim 3 rejected under 35 U.S.C. 103 as being unpatentable over Vankirk (US2020184781) in view of Whytock (US20190334712) and in further view of Lu (CN107969001)"
+  }
+]

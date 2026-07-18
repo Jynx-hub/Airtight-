@@ -1,0 +1,66 @@
+[
+  {
+    "id": "oa-18889227-c1-e241d277",
+    "pattern": "\u00a7102 \u2014 anticipation by a single reference",
+    "claim_shape": "(Currently Amended) An intent-based satellite management system, comprising:one or more satellites in a constellation; a ground-based control system to manage the one or more satellites; a communication module configured to transmit intent-based instruction from the ground-based control system to the one or more satellites, wherein the intent-based instruction comprises one or more predetermined outcomes; and an intent-based module, located on each satellite of the one or more satellites, configured to receive the intent-based instruction and instruct a processor to generate and execute command sequences in order to fulfill the intent-based instruction, wherein the intent- based instruction is based on coarse-grained prediction and fine-grained in-flight measurements. Currently amended 2",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 1, 2, 5-6, 12, 15 and 17 are rejected under 35 U.S.C. 102(a)(1) as being anticipated by Schmit et al (US 2021/0,303,290; hereinafter Schmit). Regarding claim 1, Schmit disclose an intent-based satellite management system, comprising: one or more satellites (10, 12, 14, 16, 18, 20, 22) in a constellation; a ground-based control system (30, 32, 50, 52, 54, 56, 60, 62, 64, 66, 68) to manage th",
+    "source": "USPTO application 18889227, CTNF office action; claims 1, 2, 5, 6, 12, 15, 17 rejected under 35 U.S.C. 102 (a)(1) as being anticipated by Schmit et al (US 2021/0,303,290; hereinafter Schmit)"
+  },
+  {
+    "id": "oa-18889227-c7-f4b582ba",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The intent-based satellite management system of claim 1, wherein the intent-based instruction comprises a set of high-level goals for the one or more satellites. Original 8",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claim 7 is rejected under 35 U.S.C. 103 as being unpatentable over Schmit et al (US 2021/0,303,290) in view of Clancy et al (US 2019/0,121,665; hereinafter Clancy). Regarding claim 7, Schmit disclose the intent-based satellite management system of claim 1, wherein Schmit do not disclose the intent-based instruction comprises a set of high-level goals for the one or more satellites. In the same fie",
+    "source": "USPTO application 18889227, CTNF office action; claim 7 rejected under 35 U.S.C. 103 as being unpatentable over Schmit et al (US 2021/0,303,290) in view of Clancy et al (US 2019/0,121,665; hereinafter Clancy)"
+  },
+  {
+    "id": "oa-18889227-c8-630a22b0",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The intent-based satellite management system of claim 7, wherein the intent-based instruction is provided by a user through a user interface, wherein the user interface includes a natural language processing module for interpreting an intent of the user. Original 9",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claim 8-9 are rejected under 35 U.S.C. 103 as being unpatentable over Schmit et al (US 2021/0,303,290) in view of Clancy et al (US 2019/0,121,665) further in view of Kannan et al (US 2016/0,225,370; hereinafter Kannan). Regarding claim 8, Schmit and Clancy disclose the intent-based satellite management system of claim 7, wherein they do not disclose the intent-based instruction is provided by a us",
+    "source": "USPTO application 18889227, CTNF office action; claims 8, 9 rejected under 35 U.S.C. 103 as being unpatentable over Schmit et al (US 2021/0,303,290) in view of Clancy et al (US 2019/0,121,665) further in view of Kannan et al (US 2016/0,225,370; hereinafter Kannan)"
+  },
+  {
+    "id": "oa-18889227-c10-8d7d6cd9",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The intent-based satellite management system of claim 1, wherein the intent-based module uses one of a deep learning model, a reinforcement learning model, a supervised learning model, an unsupervised learning model, or a semi-supervised learning model to generate the command sequences. Original 11",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claim 10 is rejected under 35 U.S.C. 103 as being unpatentable over Schmit et al (US 2021/0,303,290) in view of Jiang et al (CN 113,434,292; hereinafter Jiang). Regarding claim 10, Schmit disclose the intent-based satellite management system of claim 1, wherein Schmit disclose the satellite uses an artificial intelligence software based on a trainable classifier model (Fig. 13; \u00b6 [0072]-[0074]). S",
+    "source": "USPTO application 18889227, CTNF office action; claim 10 rejected under 35 U.S.C. 103 as being unpatentable over Schmit et al (US 2021/0,303,290) in view of Jiang et al (CN 113,434,292; hereinafter Jiang)"
+  },
+  {
+    "id": "oa-18889227-c11-13dea299",
+    "pattern": "\u00a7103 \u2014 obviousness over combined prior art",
+    "claim_shape": "(Original) The intent-based satellite management system of claim 1, wherein the command sequences include telemetry tracking and control (TTC) commands. Original 12",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claim 11 is rejected under 35 U.S.C. 103 as being unpatentable over Schmit et al (US 2021/0,303,290) in view of Speidel et al (US 2022/0,052,753; hereinafter Speidel). Regarding claim 11, Schmit disclose the intent-based satellite management system of claim 1, wherein Schmit do not disclose the command sequences include telemetry tracking and control (TTC) commands. In the same field of endeavor, ",
+    "source": "USPTO application 18889227, CTNF office action; claim 11 rejected under 35 U.S.C. 103 as being unpatentable over Schmit et al (US 2021/0,303,290) in view of Speidel et al (US 2022/0,052,753; hereinafter Speidel)"
+  },
+  {
+    "id": "oa-18889227-c13-cf0fcf1f",
+    "pattern": "\u00a7103 \u2014 obviousness over combined prior art",
+    "claim_shape": "(Original) The intent-based satellite management system of claim 1, wherein the command sequences include flight dynamics commands. Original 14",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claim 13-14 are rejected under 35 U.S.C. 103 as being unpatentable over Schmit et al (US 2021/0,303,290) in view of Guiney et al (US 2024/0,267,117; hereinafter Guiney). Regarding claim 13, Schmit disclose the intent-based satellite management system of claim 1, wherein Schmit do not disclose the command sequences include flight dynamics commands. In the same field of endeavor, Guiney disclose the",
+    "source": "USPTO application 18889227, CTNF office action; claims 13, 14 rejected under 35 U.S.C. 103 as being unpatentable over Schmit et al (US 2021/0,303,290) in view of Guiney et al (US 2024/0,267,117; hereinafter Guiney)"
+  },
+  {
+    "id": "oa-18889227-c16-1146ca5b",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The intent-based satellite management system of claim 1, wherein the intent-based instruction includes an if-this-then-that configuration based on in-situ real-time measurements provided by any satellite of the one or more satellites. Original 17",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claim 16 is rejected under 35 U.S.C. 103 as being unpatentable over Schmit et al (US 2021/0,303,290) in view of Pan et al (CN 117,639,885; hereinafter Pan). Regarding claim 16, Schmit disclose the intent-based satellite management system of claim 1, wherein Schmit do not disclose the intent-based instruction includes an if-this-then-that configuration based on in-situ real-time measurements provid",
+    "source": "USPTO application 18889227, CTNF office action; claim 16 rejected under 35 U.S.C. 103 as being unpatentable over Schmit et al (US 2021/0,303,290) in view of Pan et al (CN 117,639,885; hereinafter Pan)"
+  },
+  {
+    "id": "oa-18889227-c18-f4aab15b",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The intent-based satellite management system of claim 1, wherein the command sequences are executed based on current and predicted future states of the satellite. Original 19",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claim 18-20 are rejected under 35 U.S.C. 103 as being unpatentable over Schmit et al (US 2021/0,303,290) in view of Cunningham et al (US 2021/0,318,670; hereinafter Cunningham). Regarding claim 18, Schmit disclose the intent-based satellite management system of claim 1, wherein Schmit do not disclose the command sequences are executed based on current and predicted future states of the satellite. ",
+    "source": "USPTO application 18889227, CTNF office action; claims 18, 19, 20 rejected under 35 U.S.C. 103 as being unpatentable over Schmit et al (US 2021/0,303,290) in view of Cunningham et al (US 2021/0,318,670; hereinafter Cunningham)"
+  }
+]

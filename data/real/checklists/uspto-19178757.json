@@ -1,0 +1,26 @@
+[
+  {
+    "id": "oa-19178757-c1-1291257f",
+    "pattern": "\u00a7101 \u2014 abstract-idea eligibility",
+    "claim_shape": "(Currently Amended) A system, comprising:one or more processors configured to: obtain an evaluation plan to correspond to a new question, wherein to obtain the evaluation plan further comprises to:analyze the new q uestion using a large language model (LLM) to determine key characteristics compare the key characteristics against predefined criteria associated with a library of predetermined evaluation plans to determine a set of candidate evaluation plans determine a set of accuracies corresponding to respective ones of the set of candidate evaluation plans: and select the evaluation plan from the set of candidate evaluation plans based at least in part on the set of accuracies; retrieve a representative interaction based at least in part on the new question; use a reasoning and answer language model to evaluate the representative interaction against the new question based at least in part on the evaluation plan and to provide a preview evaluation result; output, at a user interface, the new question and the preview evaluation result of the representative interaction; receive, via the user interface, user feedback to the preview evaluation result; and update the reasoning and answer language model based at least in part on the user feedback to the preview evaluation result; and a storage device configured to store a feedback data set including the user feedback. Currently amended 2",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 1-3 and 5-20 are rejected under 35 U.S.C. 101 because the claimed invention is directed to an abstract idea without significantly more. Independent claims 1 and 15 recite \u201c\u2026 evaluate the representative interaction \u2026\u201d and \u201cupdate the reasoning and answer language model \u2026\u201d. These limitations, under its broadest reasonable interpretation, cover performance of the limitation in the mind but for",
+    "source": "USPTO application 19178757, CTNF office action; claims 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13 rejected under 35 U.S.C. 101 because the claimed invention is directed to an abstract idea without significantly more"
+  },
+  {
+    "id": "oa-19178757-c8-258508d4",
+    "pattern": "\u00a7103 \u2014 obviousness over prior art",
+    "claim_shape": "(Original) The system of claim 1, wherein to retrieve the representative interaction based at least in part on the new question comprises to:determine a question embedding corresponding to the new question using an embedding model; determine interaction embeddings corresponding to historical interactions using the embedding model; and select the representative interaction by comparing the question embedding to the interaction embeddings. Original 9",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claim 8 is rejected under 35 U.S.C. 103 as being unpatentable over Alperin in view of Hackman et al. (USPG 2025/0124060, hereinafter Hackman). Regarding claim 8, Alperin fails to explicitly disclose, however, Hackman teaches the system of claim 1, wherein to retrieve the representative interaction based at least in part on the new question comprises to: determine a question embedding corresponding",
+    "source": "USPTO application 19178757, CTNF office action; claim 8 rejected under 35 U.S.C. 103 as being unpatentable over Alperin in view of Hackman et al"
+  },
+  {
+    "id": "oa-19178757-c13-f9ec6851",
+    "pattern": "\u00a7103 \u2014 obviousness over combined prior art",
+    "claim_shape": "(Original) The system of claim 12, wherein the predicted evaluation result comprises an answer to the new question, a set of reasoning that supports the answer, and a set of evidences from the new interaction that supports the set of reasoning. Original 14",
+    "technology_class": "G06F",
+    "remedy": "Examiner's ground: Claims 13-14 are rejected under 35 U.S.C. 103 as being unpatentable over Alperin in view of Birru et al. (USPN 12204524, hereinafter Birru). Regarding claim 13, Alperin fails to explicitly disclose, however, Birru teaches the system of claim 12, wherein the predicted evaluation result comprises an answer to the new question, a set of reasoning that supports the answer, and a set of evidences from ",
+    "source": "USPTO application 19178757, CTNF office action; claims 13, 14 rejected under 35 U.S.C. 103 as being unpatentable over Alperin in view of Birru et al"
+  }
+]

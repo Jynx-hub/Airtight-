@@ -1,0 +1,10 @@
+[
+  {
+    "id": "oa-18742927-c21-5f2ad469",
+    "pattern": "\u00a7102 \u2014 anticipation by a single reference",
+    "claim_shape": "(Currently Amended) A method, comprising: receiving a request, from a client device, the request comprising input data for a desired machine learning model; selecting an execution environment with a loaded instance of the desired machine learning modelby identifying one or more active virtual machines that are associated with an application programming interface (API) endpoint;determining a virtual machine of the one or more active virtual machines with an available execution environment that has the loaded instance of the desired machine learning model; and selecting the available execution environment to be the execution environment; and instructing the API an application programming interface (API) endpoint to forward the input data to the selected execution environment to obtain output data that is returned to the client device. Currently amended 22",
+    "technology_class": "H04L",
+    "remedy": "Examiner's ground: Claims 21-22, 25-28 and 31-40 are rejected under 35 U.S.C. 102(a)(2) as being anticipated by Faulhaber, Jr. U.S Patent No. 10,831,519. As to claim 21, Faulhaber, Jr. teaches a method, comprising: receiving a request, from a client device (\u2026a user device 102 can refer to trained machine learning model(s) stored in the ML scoring container(s) 150 using the endpoint\u2026, lines 36-38 column 13), the requ",
+    "source": "USPTO application 18742927, CTNF office action; claims 21, 22, 25, 26, 27, 28, 31, 32, 33 rejected under 35 U.S.C. 102 (a)(2) as being anticipated by Faulhaber, Jr"
+  }
+]
