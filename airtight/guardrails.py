@@ -113,24 +113,29 @@ def _raw_analyze(text: str, phase: str) -> dict:
     """Calls client.interactions.analyze() and returns the plain response dict
     {"metadata": {...}, "analysis": [...]}. Raises on any transport/API error.
 
-    UNVERIFIED against the login-gated Developer Portal: the /detection/v1 vs
-    /v2 endpoint split (the SDK abstracts it) and the exact output-phase
-    parameter name — confirm before the judged run and fix HERE only.
+    Verified against hiddenlayer-sdk 3.8.0: HiddenLayer(bearer_token=... |
+    client_id/client_secret=..., environment="prod-us"|"prod-eu");
+    interactions.analyze(metadata={model, requester_id}, input|output={messages},
+    hl_project_id=...). Auth is OAuth2 client-credentials or a pre-minted token.
     """
     global _client
     if _client is None:
         from hiddenlayer import HiddenLayer  # lazy: HL_ENABLED=false never reaches this
 
         kwargs = {"environment": config.HL_ENVIRONMENT}
-        if config.HL_TOKEN:
-            kwargs["token"] = config.HL_TOKEN
+        if config.HL_CLIENT_ID and config.HL_CLIENT_SECRET:
+            kwargs["client_id"] = config.HL_CLIENT_ID
+            kwargs["client_secret"] = config.HL_CLIENT_SECRET
+        elif config.HL_TOKEN:
+            kwargs["bearer_token"] = config.HL_TOKEN
         _client = HiddenLayer(**kwargs)
 
     payload = {"messages": [{"role": "user", "content": text}]}
-    resp = _client.interactions.analyze(
-        metadata={"model": config.MODEL, "requester_id": "airtight-agent"},
-        **({"input": payload} if phase == "input" else {"output": payload}),
-    )
+    call = {"metadata": {"model": config.MODEL, "requester_id": "airtight-agent"},
+            "input" if phase == "input" else "output": payload}
+    if config.HL_PROJECT_ID:
+        call["hl_project_id"] = config.HL_PROJECT_ID
+    resp = _client.interactions.analyze(**call)
     return resp.model_dump() if hasattr(resp, "model_dump") else dict(resp)
 
 
