@@ -5,6 +5,9 @@
 # runtime/modal_app.py runs on Modal's free tier (our primary host); it also works
 # as-is on any rented GPU box (Vast/RunPod/etc.) if you ever need one — just run it
 # there. Keep this file and modal_app.py in sync: one source of truth for the flags.
+# `--max-num-seqs 16` is load-bearing, not a tuning knob: the measured throughput curve
+# knees at exactly 16, and "the knee lands on the pinned cap" IS the bounty argument
+# (docs/THROUGHPUT.md). Serving a different cap here reproduces a different knee.
 #
 # GUARANTEED path is Nano on ONE GPU (fits VRAM). Bring up Super only if the box is
 # big enough. Flags from the vLLM Nemotron 3 cookbooks + HF model cards (verified
@@ -33,7 +36,7 @@ EXTRA=()
 case "$PROFILE" in
   nano-1xh100)      # GUARANTEED: Nemotron 3 Nano, single GPU (≥64GB, e.g. 1×H100)
     CKPT=nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16;  TP=1; MAXLEN=262144; REASON=nano_v3
-    EXTRA+=(--reasoning-parser-plugin nano_v3_reasoning_parser.py --max-num-seqs 8) ;;
+    EXTRA+=(--reasoning-parser-plugin nano_v3_reasoning_parser.py --max-num-seqs 16) ;;
   super-8xh100)     # Nemotron 3 Super BF16, full quality + 256k ctx (only if VRAM/credits allow)
     CKPT=nvidia/NVIDIA-Nemotron-3-Super-120B-A12B-BF16; TP=8; MAXLEN=262144; REASON=nemotron_v3
     EXTRA+=(--enable-expert-parallel) ;;

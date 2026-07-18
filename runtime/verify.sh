@@ -40,8 +40,11 @@ case "${INFERENCE_BACKEND-}" in
     echo "Unknown INFERENCE_BACKEND=${INFERENCE_BACKEND} (expected: modal | nim)" >&2; exit 1 ;;
 esac
 AUTH=(-H "Authorization: Bearer ${KEY}")
-# Fail loudly instead of hanging: a cold Modal container takes 2-5 min to wake.
-TIMEOUT=(--connect-timeout 10 --max-time "${INFERENCE_TIMEOUT:-300}")
+# Fail loudly instead of hanging, but a cold Modal container is SLOW to wake: ~1-2 min on
+# the a100-bf16 default, ~12 min on l40s-fp8 (measured — docs/THROUGHPUT.md). The old 300s
+# default was shorter than an l40s cold start, so a perfectly healthy endpoint would time
+# out and read as an outage. 900 covers both profiles.
+TIMEOUT=(--connect-timeout 10 --max-time "${INFERENCE_TIMEOUT:-900}")
 
 echo "▶ backend=${INFERENCE_BACKEND:-legacy}  ${BASE}  model=${MODEL}"
 echo "  ${NOTE}"

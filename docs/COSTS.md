@@ -26,7 +26,7 @@ act. Prove it: `bash runtime/serve-nim.sh`.
   first request and shuts down after the last one. You only spend credit while a request
   is actually running. Intermittent dev over a weekend is single-digit GPU-hours.
 - **Free monthly credit** (~$30, *verify current figure* at modal.com/pricing) buys, at the
-  default **L40S** rate (~$1.95/hr), roughly **~15 GPU-hours** — more than a hackathon of
+  default **A100** rate (~$2.50/hr), roughly **~12 GPU-hours** — more than a hackathon of
   bursty dev needs.
 - **The one paid moment is the demo.** Pin a warm replica only for the judged window
   (`MODAL_MIN_CONTAINERS=1 modal deploy`) so there's no cold-start on stage, then set it
@@ -36,10 +36,27 @@ act. Prove it: `bash runtime/serve-nim.sh`.
 
 Set `MODAL_GPU_PROFILE` in `runtime/.env`:
 
-| Profile | GPU | Precision | ~Rate | When |
+| Profile | GPU | Precision | ~Rate | tok/s @ C=16 | Cold start | When |
+|---|---|---|---|---|---|---|
+| `a100-bf16` *(default)* | A100 80 GB | BF16 | ~$2.50/hr | 695.8 | **~1–2 min** | **The judged path** — chosen for recovery time |
+| `l40s-fp8` | L40S 48 GB | FP8 | ~$1.95/hr | **865.2** | **~12 min** | Dev/bulk — cheaper *and* faster to run |
+
+Counter-intuitively the cheaper GPU is also the faster one (+24% throughput at C=16), so
+for dev and any batch work `l40s-fp8` is the better buy. It is **not** the demo profile:
+its vLLM engine init takes 494–602s versus the A100's 29s, so a preemption or an unpinned
+container costs ~12 minutes of dead air. Both measured 2026-07-18 — `docs/THROUGHPUT.md`.
+
+## Spend ledger
+
+Modal bills per-second only while a container is up. Log every metered window here.
+
+| Date (UTC) | What | GPU | Billed time | ~Cost |
 |---|---|---|---|---|
-| `l40s-fp8` *(default)* | L40S 48 GB | FP8 | ~$1.95/hr | Cheapest fit for Nano — the default |
-| `a100-bf16` | A100 80 GB | BF16 | ~$2.50/hr | Max-quality path; one env flip |
+| 2026-07-18 05:5x–06:2x | F2 throughput sweeps (runs A + B) + cold starts | A100 | ~30 min | ~$1.25 |
+| 2026-07-18 06:43–07:21 | F4 L40S re-benchmark: 2 cold starts + sweep | L40S | ~37 min | ~$1.20 |
+
+**Running total ≈ $2.45** of the ~$30 credit. The judged demo window (~1 hr pinned warm on
+A100) is budgeted at ~$2.50, leaving ample headroom for rehearsals.
 
 ## The one thing that could push cost up
 

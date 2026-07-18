@@ -46,7 +46,10 @@ Airtight/
 ├── agent/                            ← Person 4: work loop, memory, guardrails, eval harness
 ├── src/                              ← Person 1: USPTO/PTAB ingestion pipeline (corpus, groundtruth, loaders)
 ├── data/                            ← Person 1: corpora, ground truth, fixtures (the pipeline's output)
-├── inference/                        ← Person 2: Modal/vLLM runbook + template, verify script, OpenShell policy
+├── runtime/                          ← Person 2 (LIVE): deployed Modal/vLLM app, doorway, RUNBOOK, bench harness — F1–F4
+├── inference/                        ← Person 2: `policy/` is the F5 OpenShell groundwork (sandbox YAML + DGX Spark
+│                                        onboarding). Its vllm_modal.py / verify_endpoint.py / RUNBOOK.md are the
+│                                        pre-deploy sketches, now superseded by runtime/ — don't wire against them.
 ├── surface/                          ← Person 3: applicant surface (FastAPI starter; Next.js later)
 ├── tests/                            ← stub-mode smoke tests (no network needed)
 ├── docs/
@@ -68,6 +71,12 @@ Airtight/
 
 ## Status
 
-**Phase: build.** The shared scaffold is in `main`: doorway + shapes (`airtight/`), a stub-mode agent loop (`agent/`), and Person 2's vLLM/OpenShell handoff (`inference/`). Everything runs green with `pytest tests/` and `python -m agent.run_smoke` — no network needed. Next: Person 2 deploys vLLM on Modal (M1b, template in `inference/vllm_modal.py`), then the eval-harness ablation (`docs/BUILD-PLAN.md` → M4) — the Track-1 proof and the best demo moment.
+**Phase: build.** The shared scaffold is in place — doorway + shapes (`airtight/`), the agent loop with M2 guardrails, M3 memory, the **M4 ablation harness** and containment sim (`agent/`, `containment/`), a FastAPI surface starter (`surface/`), and a live USPTO ODP puller (`data/pull_uspto.py`). Everything runs green with `pytest tests/` and `python -m agent.run_smoke` — no network needed.
+
+**The inference spine is deployed and measured** (M1b): Nemotron 3 Nano served by vLLM on Modal's free tier behind the one pinned `inference.local` hop, with the $500-bounty evidence on record — **10.67× aggregate throughput from continuous batching (65.2 → 695.8 tok/s)**, the curve kneeing at exactly the pinned `--max-num-seqs 16` (`docs/THROUGHPUT.md`). Backend swapping is one operator env var (`INFERENCE_BACKEND=modal|nim`), never automatic.
 
 Quick start: `python3 -m venv .venv && .venv/bin/pip install -e ".[dev]" && .venv/bin/pytest tests/`
+
+**If you just need to call the model,** start at `runtime/RUNBOOK.md` — the consumer quickstart and the demo-day operator card. You do not need a Modal account.
+
+Next highest-leverage step: run the **M4 ablation live** against the Modal endpoint on real PTAB data — same invention, same model, memory empty vs. warmed. It's the Track-1 proof and the best demo moment (`docs/BUILD-PLAN.md`).

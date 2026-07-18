@@ -3,7 +3,7 @@
 This is where the robot's brain lives. It stands up **Nemotron** on **Modal's free tier**,
 served by **vLLM** as one OpenAI-compatible endpoint on `:8000`. That endpoint *is*
 `inference.local` — the single, operator-pinned model hop that HiddenLayer (Lane B) and
-OpenShell (Lane C) both enforce on. **One boundary, three tracks.** Nothing in Airtight
+OpenShell both enforce on. **One boundary, three tracks.** Nothing in Airtight
 talks to the model except through this hop.
 
 The **guaranteed path is Nemotron 3 Nano on one GPU** (fits VRAM; Modal scale-to-zero
@@ -23,6 +23,7 @@ retired Brev plan. Read `../docs/INFERENCE-LOCAL.md` (the contract) and `../rese
 
 | File | Runs on | What it does |
 |------|---------|--------------|
+| `RUNBOOK.md` | — | **Start here if you only need to call the model** — consumer quickstart + the demo-day operator card |
 | `.env.example` | — | Copy to `.env`; the operator-pinned config the whole system reads |
 | `modal_app.py` | Modal (cloud) | **Primary** — the vLLM/Nemotron server + web endpoint (scale-to-zero) |
 | `modal-deploy.sh` | your laptop | `modal deploy` the app; prints the endpoint URL |
@@ -61,8 +62,13 @@ It runs `modal deploy modal_app.py` and prints a web-endpoint URL. Profiles (see
 
 | MODAL_GPU_PROFILE | GPU | Model | When |
 |-------------------|-----|-------|------|
-| `l40s-fp8` *(default)* | L40S 48 GB | Nano FP8, 128k ctx | **guaranteed path** — cheapest fit, ~$1.95/hr metered |
-| `a100-bf16` | A100 80 GB | Nano BF16, 256k ctx | quality path — one env flip |
+| `a100-bf16` *(default)* | A100 80 GB | Nano BF16, 256k ctx | **the judged path** — ~$2.50/hr, cold start ~1–2 min |
+| `l40s-fp8` | L40S 48 GB | Nano FP8, 128k ctx | dev/bulk — faster *and* cheaper to run, but ~12 min cold start |
+
+> Both profiles are measured (`../docs/THROUGHPUT.md`). L40S/FP8 wins on throughput and
+> price (865 vs 696 tok/s at C=16, $1.95 vs $2.50/hr) and loses on **cold-start recovery**:
+> its vLLM engine init takes 494–602s versus the A100's 29s. The default is set for the
+> demo, where a preemption on L40S would mean ~12 minutes of dead air.
 
 > Scale-to-zero means you only spend the free monthly credit while a request is actually
 > running. Intermittent dev over a weekend is single-digit GPU-hours.
@@ -91,11 +97,13 @@ INFERENCE_BACKEND=nim bash verify.sh    # exported vars win over .env
 ## 3. Keep it warm for the demo / stop the meter
 
 ```bash
-MODAL_MIN_CONTAINERS=1 modal deploy modal_app.py   # pin one warm replica for the judged run
-MODAL_MIN_CONTAINERS=0 modal deploy modal_app.py   # back to scale-to-zero (stops idle billing)
+MODAL_MIN_CONTAINERS=1 bash modal-deploy.sh   # pin one warm replica for the judged run
+MODAL_MIN_CONTAINERS=0 bash modal-deploy.sh   # back to scale-to-zero (stops idle billing)
 ```
 
-Cold start for a warmed Volume is ~2–5 min, so pin a replica only for the demo window.
+Cold start is **~1–2 min on `a100-bf16`** (the default) and **~12 min on `l40s-fp8`** —
+measured, with the Volume warm either way (`../docs/THROUGHPUT.md`). Pin a replica only for
+the demo window, and pin it at **T-minus 15**, not T-minus 5.
 
 ## 4. Fallback — the free NIM endpoint (no GPU)
 
