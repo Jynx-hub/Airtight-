@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
+
+# Env / secrets (none tracked yet — keep it that way)
+.env
+.env.*
+*.key
+*.pem
