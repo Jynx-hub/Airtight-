@@ -24,20 +24,26 @@ def main() -> None:
     ap.add_argument("--episodes", action="store_true", help="write an episode + retrieve from past ones")
     ap.add_argument("--ingested", action="store_true",
                     help="also retrieve from records distilled at ingest (memory/ingested)")
+    ap.add_argument("--prior-art", action="store_true",
+                    help="live USPTO prior-art search -> §103 loopholes for THIS invention (needs USPTO_API_KEY)")
     args = ap.parse_args()
 
     disclosure = Disclosure.model_validate_json(FIXTURE.read_text())
     print(f"mode={config.MODE}  model={config.MODEL}  fan_out={args.fan_out}  "
-          f"episodes={args.episodes}  ingested={args.ingested}")
+          f"episodes={args.episodes}  ingested={args.ingested}  prior_art={args.prior_art}")
     print(f"disclosure: {disclosure.id} — {disclosure.title}\n")
 
-    # Composition is layered, so the two memory sources stay orthogonal: the
-    # --episodes path below is byte-identical to what it was before --ingested
-    # existed when the flag is used alone.
-    store, ingested = LoopholeStore.load(CORPUS), None
+    # Composition is layered, so the memory sources stay orthogonal: each --flag
+    # merges one more source into the store that feeds retrieval.
+    store, ingested, prior_art = LoopholeStore.load(CORPUS), None, None
     if args.ingested:
         ingested = LoopholeStore.load(config.INGESTED_DIR)
         store = merged_store(store, ingested)
+    if args.prior_art:
+        from agent.prior_art import search_prior_art
+
+        prior_art = LoopholeStore(search_prior_art(disclosure))
+        store = merged_store(store, prior_art)
 
     guardrails, sink = None, None
     if args.episodes:
@@ -46,11 +52,13 @@ def main() -> None:
         episodes = EpisodeStore.load(config.EPISODES_DIR)
         store = CompositeStore(store, episodes)
         sink = episodes
-    if args.episodes or args.ingested:
+    if args.episodes or args.ingested or args.prior_art:
         guardrails = store.retrieve(disclosure, k=5)
         parts = [f"{len(guardrails)} loopholes from corpus"]
         if ingested is not None:
             parts.append(f"{len(ingested)} ingested")
+        if prior_art is not None:
+            parts.append(f"{len(prior_art)} live prior-art")
         if sink is not None:
             parts.append(f"{len(sink)} past episodes")
         print("retrieved " + " + ".join(parts))
