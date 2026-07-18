@@ -75,6 +75,39 @@ them → self-correct) is now the path the Surface runs. Three pieces, all **pro
   by code that no longer exists. **Neither belongs on a slide until the GPU re-run lands** —
   the retrieval is sound, the measurement is the last step.
 
+⚠️ **The GPU re-run happened (2026-07-18, ~35 min A100, ~$1.50) and produced NO usable
+number — the harness was scoring the wrong thing.** Run: `results/ablation/20260718-183817/`,
+pooled over `data/real`, `--n 10 --k 5 --fast`, 10/10 pairs, `stopped_early: false`.
+Raw result **2 wins / 2 losses / 6 ties**. Do not quote it. Cause, found mid-run:
+
+- **`_split_claims` (`agent/loop.py`) let markdown decide how much of a draft got judged.**
+  `^\s*\d+\.` cannot match `**1.**`, so bolded drafts matched nothing and hit the
+  `claims or [text.strip()]` fallback — judged on the **whole document, specification
+  included**. Plainly-numbered drafts parsed, and `(.+)$` then truncated each claim to its
+  **first line**, dropping every nested limitation. Which branch an arm took came down to
+  formatting the model happened to pick that turn. **4 of 6 inspected pairs scored their
+  two arms on asymmetric targets, one at 13× (1694 vs 128 chars).** Exactly one pair
+  (`uspto-19014047`, 1.0×) was genuinely comparable. Fixed with regression tests on branch
+  `fix/split-claims-scoring-asymmetry` (`0a289d8`), confirmed failing against the old parser.
+- **This casts doubt on C1's validation.** The "backwards 4/10 → 1/10" run that motivated
+  the statute-blind-ranker diagnosis has the same signature (`100851`: empty 5/5 whole-text
+  fallback vs warmed 4/5 — asymmetric). The 5/6 headline (`122807`) was **symmetric**
+  (6/6 both arms whole-text), so it is more defensible than the others. **Re-check whether
+  C1 fixed a real problem or a misdiagnosis before citing it.**
+- **Banked, and the cheap path forward:** all 20 arms stored raw `reply` text, so the same
+  drafts can be **re-judged** against the fixed parser for ~half the GPU of a re-draft. That
+  is the next window, not a full re-run.
+- 📌 **The fingerprint's `git_sha` is captured when `results.json` is WRITTEN, not at run
+  start.** This run is stamped `0a289d8` (the parser-fix commit) though its drafts were
+  produced by `15a54d8` code — a commit landed on another branch while the run was in
+  flight. Provenance on that file is wrong. **Capture the SHA at run start**, and do not
+  touch the tree during a metered run.
+- 📌 **`--deadline-min` is not a hard stop** — checked only at the disclosure boundary, so
+  an in-flight pair always completes and the run overshoots by up to one full pair. The
+  comment at `harness.py:274` claims it prevents firing calls past the window; it does not.
+- 📌 **Steady-state drafting is ~30s/arm on `a100-bf16`, not the ~99s the first arm shows.**
+  The first arm after warm-up is unrepresentative; do not project a window from it.
+
 ---
 
 ## The focus now
