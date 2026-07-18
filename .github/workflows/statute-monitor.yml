@@ -1,0 +1,86 @@
+name: statute-monitor
+
+# Recurring statute-currency check: every 24h, pull new software/electronics
+# patent-law developments and surface any relevant candidates as a GitHub issue
+# for human review (agent/statute_monitor.py). Admission into STATUTES stays a
+# human commit — this job proposes, it never edits statute_reference.py.
+#
+# Federal Register runs with no secrets. The keyed sources activate only when
+# their repo secret is set (Settings -> Secrets and variables -> Actions):
+#   LEGISCAN_API_KEY · CONGRESS_API_KEY · COURTLISTENER_API_TOKEN
+# The monitor skips any source whose key is absent ("no key, no pull"), so a
+# missing secret degrades to fewer sources, never a failure.
+
+on:
+  schedule:
+    - cron: "17 13 * * *"   # daily ~13:17 UTC (off the hour: GitHub throttles :00 crons)
+  workflow_dispatch: {}      # allow a manual run from the Actions tab
+
+permissions:
+  issues: write              # to open the review issue
+  contents: read
+
+concurrency:
+  group: statute-monitor
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      LEGISCAN_API_KEY: ${{ secrets.LEGISCAN_API_KEY }}
+      CONGRESS_API_KEY: ${{ secrets.CONGRESS_API_KEY }}
+      COURTLISTENER_API_TOKEN: ${{ secrets.COURTLISTENER_API_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install the monitor (pydantic + stdlib only)
+        run: pip install -e .
+
+      # Persist the proposal queue across daily runs so dedup holds and only
+      # genuinely-new candidates open an issue. Best-effort: a cache miss just
+      # re-reports the current queue once, which is harmless.
+      - name: Restore proposal queue
+        uses: actions/cache/restore@v4
+        with:
+          path: agent/statute_proposals.jsonl
+          key: statute-queue-${{ github.run_id }}
+          restore-keys: statute-queue-
+
+      - name: Fetch new statute developments
+        id: fetch
+        run: |
+          out="$(python -m agent.statute_monitor --fetch --source all)"
+          echo "$out"
+          new="$(printf '%s\n' "$out" | grep -oE '^[0-9]+' | head -1 || echo 0)"
+          echo "new=${new:-0}" >> "$GITHUB_OUTPUT"
+
+      - name: Save proposal queue
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: agent/statute_proposals.jsonl
+          key: statute-queue-${{ github.run_id }}
+
+      - name: Open a review issue for new proposals
+        if: steps.fetch.outputs.new != '0'
+        run: |
+          python -m agent.statute_monitor --review > review.txt
+          {
+            echo "Automated statute-currency check found **${{ steps.fetch.outputs.new }} new** candidate(s)."
+            echo "Verify each citation, then paste the approved entry into \`agent/statute_reference.py\` and commit."
+            echo
+            echo '```'
+            cat review.txt
+            echo '```'
+          } > issue-body.md
+          gh label create statute-monitor --color 5319e7 --description "Automated statute-currency proposals" 2>/dev/null || true
+          gh issue create \
+            --title "Statute currency: ${{ steps.fetch.outputs.new }} new proposal(s) — $(date -u +%F)" \
+            --body-file issue-body.md \
+            --label statute-monitor

@@ -363,10 +363,19 @@ those and proposes updates.
   from published shapes and unit-tested against fixtures but not yet confirmed against a live
   response. Drop a key in the env and re-run `--fetch --source <name>` to close each.
 
+- ◐ **SC4 · Recurring every 24h — GitHub Actions workflow, activates on merge to `main`.**
+  `.github/workflows/statute-monitor.yml` runs `--fetch --source all` daily (cron `17 13 * * *`)
+  plus manual dispatch, persists the queue across runs via `actions/cache` so only genuinely-new
+  candidates surface, and opens a `statute-monitor`-labelled review issue when `new != 0`.
+  Federal Register needs no secret; keyed sources light up when `LEGISCAN_API_KEY` /
+  `CONGRESS_API_KEY` / `COURTLISTENER_API_TOKEN` are added as repo secrets. YAML + the
+  new-count parse validated locally; **the schedule only fires once the file is on the default
+  branch** (GitHub also disables schedules after 60 days of repo inactivity).
+
 **Done when:** a real §101/§103/§112 development (a precedential CAFC opinion or a USPTO SME
 update) surfaces as a reviewed proposal, an operator verifies the citation, and it lands in
 STATUTES by a human commit — with the ablation template hash only ever changing between runs.
-SC1/SC2 built and gate-verified offline; SC3 (live) open.
+SC1/SC2 built; SC3 Fed. Register verified LIVE; SC4 recurring workflow committed (fires on merge).
 
 ---
 
