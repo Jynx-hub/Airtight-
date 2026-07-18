@@ -46,7 +46,8 @@ def render_guardrails(records: list[LoopholeRecord]) -> str:
     if not records:
         return GUARDRAILS_EMPTY
     return "\n".join(
-        f"- [{r.id}] pattern: {r.pattern} | risky claim shape: {r.claim_shape} | remedy: {r.remedy}"
+        f"- [{r.id}]{' §' + r.statute if r.statute else ''} pattern: {r.pattern} | "
+        f"risky claim shape: {r.claim_shape} | remedy: {r.remedy}"
         for r in records
     )
 

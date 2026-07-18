@@ -128,11 +128,8 @@ class CompositeStore:
 
 
 def _rank(records: list[LoopholeRecord], disclosure: Disclosure, k: int) -> list[LoopholeRecord]:
-    """Same deterministic relevance as LoopholeStore.retrieve (class, overlap, id)."""
-    disc_tokens = tokens(f"{disclosure.title} {disclosure.summary} {disclosure.details}")
+    """Statute-aware retrieval, shared with LoopholeStore so the episodic and
+    warming paths rank identically (class → overlap, then statute-diversified)."""
+    from agent.memory import _retrieve
 
-    def rank_key(rec: LoopholeRecord):
-        overlap = len(tokens(f"{rec.pattern} {rec.claim_shape} {rec.remedy}") & disc_tokens)
-        return (rec.technology_class == disclosure.technology_class, overlap, rec.id)
-
-    return sorted(records, key=rank_key, reverse=True)[:k]
+    return _retrieve(records, disclosure, k)

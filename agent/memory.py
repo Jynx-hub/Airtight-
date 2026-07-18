@@ -39,13 +39,38 @@ class LoopholeStore:
         return cls([])
 
     def retrieve(self, disclosure: Disclosure, k: int = 5) -> list[LoopholeRecord]:
-        disc_tokens = tokens(f"{disclosure.title} {disclosure.summary} {disclosure.details}")
-
-        def rank_key(rec: LoopholeRecord):
-            overlap = len(tokens(f"{rec.pattern} {rec.claim_shape} {rec.remedy}") & disc_tokens)
-            return (rec.technology_class == disclosure.technology_class, overlap, rec.id)
-
-        return sorted(self.records, key=rank_key, reverse=True)[:k]
+        return _retrieve(self.records, disclosure, k)
 
     def __len__(self) -> int:
         return len(self.records)
+
+
+def _rank(records: list[LoopholeRecord], disclosure: Disclosure) -> list[LoopholeRecord]:
+    disc_tokens = tokens(f"{disclosure.title} {disclosure.summary} {disclosure.details}")
+
+    def rank_key(rec: LoopholeRecord):
+        overlap = len(tokens(f"{rec.pattern} {rec.claim_shape} {rec.remedy}") & disc_tokens)
+        return (rec.technology_class == disclosure.technology_class, overlap, rec.id)
+
+    return sorted(records, key=rank_key, reverse=True)
+
+
+def diversify_by_statute(ranked: list[LoopholeRecord], k: int) -> list[LoopholeRecord]:
+    """Fill k by round-robin across statutes in ranked order, so the warmed set
+    spans failure modes (§101/§102/§103/§112) instead of collapsing onto whichever
+    one happened to win on keyword overlap. Deterministic: buckets keep ranked
+    order; the round-robin visits them in first-seen order. This is the fix for
+    the statute-blind retrieval that made a §103 disclosure get primed with §101."""
+    buckets: dict[str, list[LoopholeRecord]] = {}
+    for rec in ranked:  # ranked is already best-first, so each bucket is best-first
+        buckets.setdefault(rec.statute or "?", []).append(rec)
+    selected: list[LoopholeRecord] = []
+    while len(selected) < k and any(buckets.values()):
+        for recs in buckets.values():
+            if recs and len(selected) < k:
+                selected.append(recs.pop(0))
+    return selected
+
+
+def _retrieve(records: list[LoopholeRecord], disclosure: Disclosure, k: int) -> list[LoopholeRecord]:
+    return diversify_by_statute(_rank(records, disclosure), k)

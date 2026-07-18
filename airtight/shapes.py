@@ -5,7 +5,22 @@ step 3). Person 1's loaders produce them, the agent consumes and returns them,
 Person 3's surface renders their JSON.
 """
 
-from pydantic import BaseModel, Field
+import re
+
+from pydantic import BaseModel, Field, model_validator
+
+# §101 eligibility · §102 anticipation · §103 obviousness · §112 definiteness/enablement
+_STATUTE_RE = re.compile(r"[§\s(]\s*(101|102|103|112)\b")
+
+
+def statute_of(*texts: str) -> str:
+    """Pull the statutory basis (101/102/103/112) out of free text, '' if none.
+    The producers encode it in the pattern string ('§103 — obviousness …')."""
+    for text in texts:
+        m = _STATUTE_RE.search(f" {text}")
+        if m:
+            return m.group(1)
+    return ""
 
 
 class Disclosure(BaseModel):
@@ -28,6 +43,15 @@ class LoopholeRecord(BaseModel):
     technology_class: str
     remedy: str
     source: str  # citation to the PTAB decision / office action
+    statute: str = ""  # 101 | 102 | 103 | 112 | "" — the failure mode retrieval balances on
+
+    @model_validator(mode="after")
+    def _derive_statute(self):
+        # Back-compat: existing records carry the statute in the pattern text
+        # ("§103 — …"), so derive it when a producer didn't set it explicitly.
+        if not self.statute:
+            self.statute = statute_of(self.pattern, self.source)
+        return self
 
 
 class Draft(BaseModel):
