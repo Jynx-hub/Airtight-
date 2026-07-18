@@ -43,11 +43,10 @@ Airtight/
 ├── docs/
 │   ├── ARCHITECTURE.md               ← full spec: concept, layers, FIG.1, 3 claims, model, judge's read, build & demo, sources
 │   ├── BUILD-PLAN.md                 ← milestones M1–M6, demo script, self-assessment
+│   ├── INFERENCE-LOCAL.md            ← the one boundary: wiring, invariant, shared-doorway contract
 │   ├── JUDGING-RUBRIC.md             ← official 100-pt scorecard + how Airtight maps to it
 │   ├── WORKSTREAMS.md                ← plain-English who-builds-what plan
-│   ├── UPDATES.md                    ← post-planning decisions (vLLM bounty, Opportunity Mode) + edit log
-│   ├── MOVE-TO-CLAUDE-CODE.md        ← handoff kit: setup steps + kickoff prompts per session
-│   └── airtight-spec.html            ← the shareable artifact (patent-spec styled)
+│   └── SESSIONS.md                   ← per-milestone Claude Code kickoff prompts
 └── research/                         ← grounded briefings (verified 2026-07-17)
     ├── hiddenlayer.md                ← AIDR Interactions API: endpoints, payloads, auth, SDK
     ├── nemoclaw-openshell.md         ← blueprint tiers, policy YAML schema, Policy Advisor, CLI
