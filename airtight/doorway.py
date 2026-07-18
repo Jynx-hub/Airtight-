@@ -54,7 +54,10 @@ def _client():
         )
     from openai import OpenAI  # imported here so stub mode never touches it
 
-    return OpenAI(base_url=config.BASE_URL, api_key=config.API_KEY)
+    # Explicit timeout (was inheriting the SDK default). Generous so it survives
+    # an A100 cold start (~1-2 min) — a short ceiling can't, and each timed-out
+    # retry wakes a scaled-down endpoint and bills. Operator-tunable.
+    return OpenAI(base_url=config.BASE_URL, api_key=config.API_KEY, timeout=config.TIMEOUT_S)
 
 
 def call_model(

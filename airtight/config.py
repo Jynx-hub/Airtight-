@@ -17,6 +17,9 @@ BASE_URL = os.getenv("AIRTIGHT_BASE_URL", "")
 
 API_KEY = os.getenv("AIRTIGHT_API_KEY", "dummy")  # vLLM ignores it; NIM requires a real key
 
+# Client timeout (seconds). Generous by default to survive an A100 cold start.
+TIMEOUT_S = float(os.getenv("AIRTIGHT_TIMEOUT_S", "900"))
+
 # UNVERIFIED model ID — Person 2 corrects against the server's /v1/models (inference/RUNBOOK.md)
 MODEL = os.getenv("AIRTIGHT_MODEL", "nvidia/nemotron-3-nano-31b-a3b")
 
