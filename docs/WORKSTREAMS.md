@@ -57,7 +57,11 @@ wired into the demo, OpenShell↔HiddenLayer fusion live, `inference.local` gate
 creds host-side — all verifiable offline). **A1 (Plan B) and A5's sweep are now real too**
 — `containment/planb/` enforces the four tiers on a Linux kernel with a real 403, verified
 end-to-end; what remains is the **remote-host deploy** for the judged run and the gated
-NVIDIA binary. **B, C and D are unblocked and can start today.**
+NVIDIA binary. **B, C and D all landed 2026-07-18, tested** (revise turn + compounding
+episodes + bounded distill; IDF retrieval + write API + graph decision; ingest→memory with
+a quarantine gate). The remaining un-done items are all DGX/GPU-gated: the vendor binary
+(A1), live-schema validation (A2), the full-production-agent sweep (A5), and the top risk —
+the **live GPU re-measurement** of the ablation delta.
 
 ### A · Containment — make OpenShell real
 
