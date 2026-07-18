@@ -40,6 +40,12 @@ The engine runs in two modes: **hit-mode** (point it at an existing patent → l
 Airtight/
 ├── README.md                         ← you are here (overview + index)
 ├── CLAUDE.md                         ← context for Claude Code sessions in this repo
+├── airtight/                         ← shared package: the doorway (one model hop) + data shapes
+├── agent/                            ← Person 4: work loop, smoke runner (memory/eval land here)
+├── data/                             ← Person 1: corpora, ground truth, fixtures
+├── inference/                        ← Person 2: vLLM runbook, verify script, OpenShell policy draft
+├── surface/                          ← Person 3: applicant surface (Next.js later)
+├── tests/                            ← stub-mode smoke tests (no network needed)
 ├── docs/
 │   ├── ARCHITECTURE.md               ← full spec: concept, layers, FIG.1, 3 claims, model, judge's read, build & demo, sources
 │   ├── BUILD-PLAN.md                 ← milestones M1–M6, demo script, self-assessment
@@ -58,4 +64,6 @@ Airtight/
 
 ## Status
 
-**Phase: architecture / planning.** Nothing built yet. Next highest-leverage step is the eval-harness ablation (see `docs/BUILD-PLAN.md` → M4) — it's both the Track-1 proof and the best demo moment.
+**Phase: build.** The shared scaffold is in `main`: doorway + shapes (`airtight/`), a stub-mode agent loop (`agent/`), and Person 2's vLLM/OpenShell handoff (`inference/`). Everything runs green with `pytest tests/` and `python -m agent.run_smoke` — no network needed. Next: Person 2 stands up vLLM on Brev (M1b), then the eval-harness ablation (`docs/BUILD-PLAN.md` → M4) — the Track-1 proof and the best demo moment.
+
+Quick start: `python3 -m venv .venv && .venv/bin/pip install -e ".[dev]" && .venv/bin/pytest tests/`

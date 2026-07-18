@@ -38,6 +38,6 @@ Benchmark stays on loophole-finding (PTAB ground truth). Opportunity/whitespace 
 
 ## Current status
 
-**Architecture / planning phase — nothing built.** Build order and the winning demo are in `docs/BUILD-PLAN.md`. Start with the eval-harness ablation (M4): same invention, same Nemotron model, memory graph empty vs. warmed — it's the Track-1 proof and the strongest demo moment.
+**Build phase — shared scaffold landed (Session A).** `airtight/` holds the doorway (`call_model`, the only legal model hop — HiddenLayer's M2 slot is `_analyze`, the reasoning toggle lives in `_reasoning_params`) and the four cross-lane shapes; `agent/loop.py` is the M1 work loop; `inference/` has Person 2's Brev/vLLM runbook + the OpenShell policy draft (audit mode). Verify anytime: `.venv/bin/pytest tests/` + `python -m agent.run_smoke` (stub mode, no network). Next per build order: Person 2 lands M1b, then M4 — same invention, same Nemotron model, memory graph empty vs. warmed.
 
 The official 100-point judging rubric — and how each Airtight decision maps to a scoring line — is in `docs/JUDGING-RUBRIC.md`. Optimize build effort against it; M4 scores on four lines at once.
