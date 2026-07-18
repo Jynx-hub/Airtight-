@@ -27,7 +27,7 @@ Honest read against each track's published rubric. Scores are where the concept 
 **Why:** the dev machine is macOS (darwin), and OpenShell's containment is built on **Linux Landlock LSM + seccomp-BPF + namespaces** — it can't run natively on the Mac, and standing up a local Linux+GPU box at the venue is exactly the "early-preview install risk on event hardware" the scorecard flags. Removing local hardware from the critical path removes that risk class entirely.
 
 **What this means concretely:**
-- **Inference → vLLM on Modal serverless GPU** (updated 2026-07-18 — supersedes the earlier Brev/cloud-NIM pinning). Route `inference.local` to a **vLLM-served Nemotron** on Modal — remote serverless hardware, so the no-local principle holds; only the *local* Ollama/vLLM path (`research/nemoclaw-openshell.md` §7) stays off-limits. **NVIDIA NIM cloud API** (`nvidia/nemotron-3-super-120b-a12b`) is the reliability fallback if the Modal deploy misbehaves (hosted, so not bounty-eligible). The design invariant is only that inference is *operator-pinned* — both satisfy it. Full wiring in `docs/INFERENCE-LOCAL.md`; deploy template in `inference/vllm_modal.py`.
+- **Inference → vLLM on Modal's free tier** (updated 2026-07-17 — Brev is no longer available to us; Modal serverless vLLM replaces it). Route `inference.local` to a **vLLM-served Nemotron 3 Nano** deployed on Modal — remote hardware, so the no-local principle holds; only the *local* Ollama/vLLM path (`research/nemoclaw-openshell.md` §7) stays off-limits. It's still **self-hosted vLLM**, so the $500 bounty is intact, and scale-to-zero keeps it inside the free monthly credit. The **free NVIDIA NIM hosted endpoint** (`nvidia/nemotron-3-nano-30b-a3b`) is the one-env-flip fallback / dev endpoint. The design invariant is only that inference is *operator-pinned* — both satisfy it. Full wiring in `docs/INFERENCE-LOCAL.md`; cost/free-tier plan in `docs/COSTS.md`.
 - **Containment → hosted DGX Spark.** Stand up NemoClaw/OpenShell on the hosted run pages (`build.nvidia.com/spark/nemoclaw`, `build.nvidia.com/spark/openshell`), **not** a local Linux VM. No dependency on venue hardware or a local GPU.
 - **Fallback stays non-local too.** If the preview won't stand up, the §8 fallback (gVisor/Firecracker + OPA/Rego + NIM proxy) runs on a **remote Linux host**, never a local one.
 
@@ -40,7 +40,7 @@ This does not touch the "one boundary, three tracks" story: HiddenLayer and Open
 | # | Milestone | Proves |
 |---|-----------|--------|
 | **M1** | `nemoclaw onboard` → OpenShell sandbox **on hosted DGX Spark** (no local host), agent routed to Nemotron via `inference.local` | capability + routing constraint |
-| **M1b** | Deploy **vLLM behind `inference.local`** on Modal (Nano guaranteed, Super if VRAM allows); verify OpenAI-compatible + concurrent batching under the heartbeat | serving + vLLM bounty |
+| **M1b** | Stand up **vLLM behind `inference.local`** on Modal's free tier (Nano guaranteed on L40S, Super if a bigger box lands); verify OpenAI-compatible + concurrent batching under the heartbeat | serving + vLLM bounty |
 | **M2** | HiddenLayer `interactions.analyze()` wrapper on all five hooks + response-policy map | instrumentation depth (Track 2) |
 | **M3** | Edge-case knowledge graph + episodic store + RAG-from-self into the drafting prompt | the learning mechanism (Track 1) |
 | **M4** | Eval harness: fixed disclosure set, 3 metrics, empty-vs-warmed ablation chart | the scored delta (Track 1) |

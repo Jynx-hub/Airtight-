@@ -1,0 +1,136 @@
+{
+  "provenance": {
+    "captured_utc": "2026-07-18T05:58:04+00:00",
+    "base_url": "https://steven-ortega426--airtight-nemotron-serve.modal.run/v1",
+    "served_model": "nemotron",
+    "gpu_reported_by_operator": "A100-80GB / Nemotron-3-Nano-30B-A3B BF16",
+    "notes": "F2 live window; vLLM 0.12.0, max-num-seqs 16, modal.concurrent max_inputs 16",
+    "max_num_seqs_deployed": 16,
+    "modal_concurrent_max_inputs": 16,
+    "models_endpoint": [
+      "nemotron"
+    ]
+  },
+  "config": {
+    "levels": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      32
+    ],
+    "max_tokens": 128,
+    "ignore_eos": true,
+    "temperature": 0.0,
+    "streaming": true,
+    "prompt": "You are a prior-art retrieval sub-agent. Summarize the closest prior art for a foldable phone hinge with a flexible display substrate. Be specific and concise.",
+    "requests_per_level": "max(8, 2*concurrency)"
+  },
+  "levels": [
+    {
+      "concurrency": 1,
+      "requests": 8,
+      "wall_s": 15.707,
+      "output_tokens": 1024,
+      "aggregate_tok_s": 65.2,
+      "requests_s": 0.509,
+      "latency_p50": 1.959,
+      "latency_p95": 2.092,
+      "ttft_p50": 0.876,
+      "ttft_p95": 0.957,
+      "errors": 0,
+      "error_samples": [],
+      "token_count_mismatch": false
+    },
+    {
+      "concurrency": 2,
+      "requests": 8,
+      "wall_s": 11.642,
+      "output_tokens": 1024,
+      "aggregate_tok_s": 88.0,
+      "requests_s": 0.687,
+      "latency_p50": 2.83,
+      "latency_p95": 3.136,
+      "ttft_p50": 0.965,
+      "ttft_p95": 1.843,
+      "errors": 0,
+      "error_samples": [],
+      "token_count_mismatch": false
+    },
+    {
+      "concurrency": 4,
+      "requests": 8,
+      "wall_s": 6.817,
+      "output_tokens": 1024,
+      "aggregate_tok_s": 150.2,
+      "requests_s": 1.173,
+      "latency_p50": 2.81,
+      "latency_p95": 4.006,
+      "ttft_p50": 1.507,
+      "ttft_p95": 2.689,
+      "errors": 0,
+      "error_samples": [],
+      "token_count_mismatch": false
+    },
+    {
+      "concurrency": 8,
+      "requests": 16,
+      "wall_s": 5.651,
+      "output_tokens": 2048,
+      "aggregate_tok_s": 362.4,
+      "requests_s": 2.831,
+      "latency_p50": 2.801,
+      "latency_p95": 2.867,
+      "ttft_p50": 1.467,
+      "ttft_p95": 1.546,
+      "errors": 0,
+      "error_samples": [],
+      "token_count_mismatch": false
+    },
+    {
+      "concurrency": 16,
+      "requests": 32,
+      "wall_s": 5.887,
+      "output_tokens": 4096,
+      "aggregate_tok_s": 695.8,
+      "requests_s": 5.436,
+      "latency_p50": 2.924,
+      "latency_p95": 3.004,
+      "ttft_p50": 1.437,
+      "ttft_p95": 1.482,
+      "errors": 0,
+      "error_samples": [],
+      "token_count_mismatch": false
+    },
+    {
+      "concurrency": 32,
+      "requests": 64,
+      "wall_s": 11.336,
+      "output_tokens": 8192,
+      "aggregate_tok_s": 722.7,
+      "requests_s": 5.646,
+      "latency_p50": 5.474,
+      "latency_p95": 5.851,
+      "ttft_p50": 3.977,
+      "ttft_p95": 4.273,
+      "errors": 0,
+      "error_samples": [],
+      "token_count_mismatch": false
+    }
+  ],
+  "summary": {
+    "baseline_concurrency": 1,
+    "baseline_tok_s": 65.2,
+    "peak_concurrency": 32,
+    "peak_tok_s": 722.7,
+    "peak_speedup_x": 11.08,
+    "knee_concurrency": 16,
+    "operating_point_concurrency": 16,
+    "operating_point_tok_s": 695.8,
+    "headline_speedup_x": 10.67,
+    "latency_cost_p50_x": 1.49,
+    "verdict": "batching engaged"
+  },
+  "markdown_table": "| Concurrency | Reqs | Wall (s) | Out tok | **Aggregate tok/s** | Req/s | Lat p50 | Lat p95 | TTFT p50 | TTFT p95 | Err |\n|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|\n| 1 | 8 | 15.707 | 1024 | **65.2** | 0.509 | 1.959 | 2.092 | 0.876 | 0.957 | 0 |\n| 2 | 8 | 11.642 | 1024 | **88.0** | 0.687 | 2.83 | 3.136 | 0.965 | 1.843 | 0 |\n| 4 | 8 | 6.817 | 1024 | **150.2** | 1.173 | 2.81 | 4.006 | 1.507 | 2.689 | 0 |\n| 8 | 16 | 5.651 | 2048 | **362.4** | 2.831 | 2.801 | 2.867 | 1.467 | 1.546 | 0 |\n| 16 | 32 | 5.887 | 4096 | **695.8** | 5.436 | 2.924 | 3.004 | 1.437 | 1.482 | 0 |\n| 32 | 64 | 11.336 | 8192 | **722.7** | 5.646 | 5.474 | 5.851 | 3.977 | 4.273 | 0 |"
+}

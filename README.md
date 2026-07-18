@@ -26,7 +26,7 @@ The engine runs in two modes: **hit-mode** (point it at an existing patent → l
 
 - **Model:** Nemotron 3 Super (120B-A12B, 1M ctx) primary · Nemotron 3 Nano sub-agent · Llama-3.3-Nemotron-Super-49B fallback
 - **Runtime:** NVIDIA OpenShell sandbox, stood up by NemoClaw; inference pinned to `inference.local`
-- **Serving:** vLLM (OpenAI-compatible) on Modal serverless GPU, behind `inference.local`
+- **Serving:** vLLM (OpenAI-compatible) on Modal's free tier (scale-to-zero), behind `inference.local`; free NVIDIA NIM hosted endpoint as fallback
 - **Security:** HiddenLayer AI Runtime Security (AIDR engine, Interactions API)
 - **Harness:** LangChain Deep Agents / OpenClaw (NemoClaw-supported)
 
@@ -53,7 +53,8 @@ Airtight/
 │   ├── INFERENCE-LOCAL.md            ← the one boundary: wiring, invariant, shared-doorway contract
 │   ├── JUDGING-RUBRIC.md             ← official 100-pt scorecard + how Airtight maps to it
 │   ├── WORKSTREAMS.md                ← plain-English who-builds-what plan
-│   └── SESSIONS.md                   ← per-milestone Claude Code kickoff prompts
+│   ├── SESSIONS.md                   ← per-milestone Claude Code kickoff prompts
+│   └── COSTS.md                      ← free-tier hosting plan (Modal + NIM) + deploy flags
 └── research/                         ← grounded briefings (verified 2026-07-17)
     ├── hiddenlayer.md                ← AIDR Interactions API: endpoints, payloads, auth, SDK
     ├── nemoclaw-openshell.md         ← blueprint tiers, policy YAML schema, Policy Advisor, CLI

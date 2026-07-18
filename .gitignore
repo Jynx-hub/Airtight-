@@ -18,7 +18,7 @@ results/
 # Agent-generated episodic memory (re-derivable)
 memory/episodes/*.json
 
-# Env / secrets
+# Env / secrets — but DO track the config template
 .env
 .env.*
 !.env.example
