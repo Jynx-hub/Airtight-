@@ -72,13 +72,28 @@ the repo is prose or an f-string.
   Fallback if the preview won't stand up: `research/nemoclaw-openshell.md` §8
   (gVisor/Firecracker + OPA/Rego + a NIM proxy) on a **remote** Linux host — never local,
   never venue hardware. OpenShell needs Linux Landlock + seccomp-BPF; macOS cannot run it.
-- [ ] **A2 · Make the policy YAML enforce.** `inference/policy/airtight-sandbox.yaml`
-  covers all four tiers on paper but **ships `enforcement: audit` on every endpoint**
-  (`:26,37,43,49,61,75`) — which per `research/nemoclaw-openshell.md` §5 *logs and lets
-  traffic through*. The strictness only exists as a Python default arg
-  (`containment/policy.py:63`), so the simulator is stricter than the artifact it models.
-  Needed: `enforce` on the inference endpoint, **two** inference destinations (Modal *and*
-  NIM, not one), and validation against the live schema.
+- ◐ **A2 · Make the policy YAML enforce — open items recorded 2026-07-18; not autonomously
+  flippable.** The three needs from the original spec now resolve as:
+  1. **Two inference destinations — RESOLVED by A4, moved layer.** The spec assumed the agent
+     reaches Modal/NIM directly, so both belonged in the sandbox allowlist. **A4 changed
+     that:** the sandbox now talks only to `inference.local` (the gateway), and the two
+     upstreams {Modal, NIM} are the *gateway's* host-side egress. Adding
+     `integrate.api.nvidia.com` to the sandbox allowlist would re-permit the agent to reach a
+     model endpoint directly — breaking the "operator pins the endpoint" invariant A4 just
+     built. So the sandbox enforces the single gateway hop; the destinations live at the
+     gateway. Recorded in the YAML comment on `inference_gateway`.
+  2. **`enforce` on the inference endpoint — READY, deliberately not flipped.** The repo rule
+     (CLAUDE.md, A5, risk table) is: flip to enforce *after* the A5 audit sweep observes the
+     real egress set — and A5 needs the running sandbox (A1). Pre-flipping enforces without
+     ever seeing the traffic, exactly the "door nobody knew about" risk A5 exists to catch.
+     It is also cosmetic in the simulator (`containment/policy.py` doesn't read the
+     `enforcement:` field; strictness is the `enforcement_override="enforce"` default). The
+     YAML ships `audit` on purpose; the flip is a one-liner during A5 (`ONBOARDING.md` step 6).
+  3. **Validation against the live schema — DGX-gated.** The draft follows the *researched*
+     schema; validating against the live early-preview schema needs the box (`ONBOARDING.md`
+     "Things to confirm").
+  Done here: the stale `vLLM-on-Brev` comment fixed → Modal, and the destination-placement
+  decision recorded. The rest is A1/A5/DGX, not a macOS edit.
 - [x] **A3 · Wire the Policy Advisor client in — done 2026-07-18.** `containment/demo.py`
   now calls `PolicyAdvisorClient.escalate()` (`agent/policy_advisor.py`, landed `0878a5f`)
   on every default-deny; the hardcoded `proposal_flow()` prints are gone and
