@@ -22,7 +22,7 @@ What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.m
 | **Containment** | ⚠️ simulated | `policy.py` decision logic is real, and now so is an escalation client — but enforcement is still a `print()`. No OpenShell exists |
 | **Surface** | ◐ starter | idea → draft → patent works; edit boxes discard input; no chart view |
 
-Suite: `.venv/bin/pytest tests/` → **67 passed**, 0 skipped, stub mode, no network.
+Suite: `.venv/bin/pytest tests/` → **70 passed**, 0 skipped, stub mode, no network.
 
 **The two headline numbers, stated honestly:**
 
@@ -40,9 +40,11 @@ Suite: `.venv/bin/pytest tests/` → **67 passed**, 0 skipped, stub mode, no net
   The two live runs also **disagree, on different corpora** — the distilled-FWD run above
   warmed 5/6, while the salvaged office-action pairs
   (`results/ablation/20260718-100851/transcripts/`) ran backwards 4/10 → 1/10. That is
-  exactly what a statute-blind ranker produces, which is why **C1 gates the Track-1 claim**
-  rather than sitting parallel to it. Neither number belongs on a slide until retrieval
-  ranks statute-first and both corpora re-run against it.
+  exactly what a statute-blind ranker produces, and **that ranker is now fixed** (C1,
+  `d1c60b1`, offline-validated). What has *not* happened is the re-measurement: neither
+  corpus has been re-run against the fixed retrieval, so both numbers above were produced
+  by code that no longer exists. **Neither belongs on a slide until the GPU re-run lands** —
+  the retrieval is sound, the measurement is the last step.
 
 ---
 
@@ -144,16 +146,23 @@ ever written get staged despite the stated intent.
 then `rec.id` reverse-alphabetical (`:41-48`). The store is a plain Python list hydrated
 from a flat JSON directory (`:25`, `:29-35`) — no index, no embeddings.
 
-- [ ] **C1 · Rank by statute.** Nothing in the ranking considers statute type, and
-  `LoopholeRecord` (`airtight/shapes.py:22-32`) **has no statute field at all** — §101/§112
-  survive only as free text inside `pattern`, and the tokenizer strips `§`. So a §112
-  disclosure gets primed with §103 rejections. This is the measured explanation for the
-  earlier backwards ablation: `19195387`'s checklist is 3×§103 but retrieval returned
-  3×§101; `19221862`'s is 4×§112 but retrieval returned 3×§103. Add the field, rank
-  statute-first. Offline, free, testable against the salvaged pairs in
-  `results/ablation/20260718-100851/transcripts/`.
-  **This is the item that gates the Track-1 claim** — see the two disagreeing runs above.
-  The shape change touches the cross-lane `LoopholeRecord`, so flag it before landing.
+- [x] **C1 · Rank by statute — done 2026-07-18 (`d1c60b1`), offline-validated.**
+  `LoopholeRecord` now carries a `statute` field (`airtight/shapes.py`), derived from the
+  pattern text by a model validator so the 193 existing records need no re-pull, and
+  `retrieve()` spreads the k across §101/§102/§103/§112 via `diversify_by_statute`
+  (`agent/memory.py`) instead of collapsing onto whichever statute won on keyword overlap.
+  `agent/episodes.py` delegates to the same function, so the episodic and warming paths
+  rank identically. Three tests cover derivation, spread and determinism.
+  **The fix is diversification, not the statute-*matching* this item originally proposed —
+  and the correction matters.** `Disclosure` has no statute field; a disclosure's statute is
+  only knowable from its held-out checklist, so ranking to match it would have leaked the
+  graded answer into the warmed arm and the leakage guard should have caught it. Spreading
+  the k gets the coverage without the leak.
+  Validated on the real corpus: all 6 graded disclosures now retrieve a statute set that
+  **includes their checklist's statutes**, where before they collapsed onto one — the
+  mechanism behind the backwards run.
+  **What's left is measurement, not code:** neither corpus has been re-run live, so the
+  delta itself is still unproven. Tracked as a risk below.
 - [ ] **C2 · Normalize the overlap score.** Overlap is a raw unnormalized count against
   `pattern + claim_shape + remedy`, and real records carry 600+ char `claim_shape` fields
   (full amended claim text). Longest record mechanically wins. Normalize by length or
@@ -246,8 +255,8 @@ and a poisoned one provably does not.
 
 | Risk | Plan |
 |---|---|
-| **The ablation headline rests on a deleted input** | Re-run pooled over `data/real/` after C1. Until then don't put 5/6 on a slide without the caveat |
-| **The two live runs disagree on the Track-1 effect** | Expected under statute-blind ranking. C1 first, then re-run *both* corpora — the distilled-FWD set and the office-action set — before any delta is quoted |
+| **Both live numbers were produced by retrieval that no longer exists** | C1 landed, so the 5/6 and the backwards 4/10→1/10 are both pre-fix measurements. **This is now the top open item on the board:** one GPU window, pooled over `data/real/`, plus a re-run of the distilled-FWD set. Until it lands, no delta is quotable — including the good one |
+| **The ablation headline also rests on a deleted input** | The 5/6 ran on `data/real-eval/`, absent from the tree. Re-derive from the tracked corpus in the same re-run rather than trying to reconstruct it |
 | NemoClaw preview won't stand up (A1) | It's a small binary go/no-go — attempt it **early**, fail fast, fall back to §8 on a remote Linux host in the same four-tier vocabulary |
 | Judges find an egress path the policy never covered | That is exactly what A5 is for. Don't skip it to save time |
 | Docs claim enforcement the code doesn't have | `docs/ARCHITECTURE.md:95,236` assert real Landlock enforcement and real Policy-Advisor HITL. Both collapse under a `grep openshell`. Fix the prose or build the thing — C4 is the same problem for the knowledge graph |
