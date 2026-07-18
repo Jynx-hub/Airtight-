@@ -14,9 +14,12 @@ The agent never talks to a model provider directly. Every inference call address
 agent (in OpenShell sandbox)
   └─ OpenAI-compatible call → https://inference.local/v1
        └─ OpenShell gateway (host side; dynamic policy, hot-reloadable)
-            │  ⚠ F5 — NOT BUILT YET. Today the operator-pinned Modal URL in
-            │    runtime/.env *is* `inference.local`; the name is a contract,
-            │    not a resolvable host.
+            │  ◐ A4 (code side) BUILT: runtime/inference_gateway.py is a real
+            │    process that fronts `inference.local`, injects the provider key
+            │    host-side, and pins the model. Point the agent at it with
+            │    INFERENCE_BACKEND=gateway. Verified offline (runtime/gateway_smoke.py).
+            │    Still on A1: the Landlock/seccomp *isolation* (Linux) that makes
+            │    host-side creds an enforced guarantee, and the /etc/hosts mapping.
             ├─ PRIMARY:  vLLM on Modal (serverless, free tier)
             │            Nemotron 3 Nano (guaranteed — L40S/FP8 fits VRAM)
             │            Nemotron 3 Super (only if a bigger box lands)
@@ -36,6 +39,7 @@ One env var picks the backend. Both credential sets live in `runtime/.env` side 
 |---|---|---|
 | `modal` | **PRIMARY** — self-hosted vLLM on Modal | ✅ counts for the $500 vLLM bounty |
 | `nim` | **FALLBACK** — NVIDIA's free hosted endpoint | ❌ hosted; does not count |
+| `gateway` | agent → host-side `inference.local` gateway (dummy token; real key injected host-side, A4). The gateway's *own* backend is `modal`/`nim` | inherits the gateway's upstream |
 | unset | legacy: the flat `INFERENCE_*` vars, exactly as before F3 | — |
 
 NIM's base URL and model slug are public constants baked into `runtime/inference_local.py`; only `NVIDIA_API_KEY` comes from env. That is what makes this **one** variable instead of three — the pre-F3 flip overwrote `INFERENCE_API_KEY` with the `nvapi-` key and lost the Modal credential in the process.
@@ -66,12 +70,25 @@ All application code calls **one shared inference function** — the "shared doo
 5. Until M1b lands, the doorway may run as a stub that returns "all clear" so downstream lanes can build (WORKSTREAMS setup tip).
 6. Falling back to NIM is an **operator action, never automatic and never agent-triggerable**. NIM is hosted; it does not count toward the vLLM bounty.
 
-## Known gaps (as of F3)
+## Known gaps — status (A4 landed 2026-07-18, code side)
 
-Written down so nobody claims them during judging:
+Written down so nobody over- *or* under-claims during judging:
 
-- **`inference.local` is a naming contract, not a resolvable host.** No `/etc/hosts` entry, no DNS, no gateway process exists. Every call resolves through the operator-pinned URL in `runtime/.env`. The invariant it protects — the agent cannot choose its own endpoint — *is* enforced today, in `inference_local.py`; only the literal hostname is outstanding. Closes at **F5**.
-- **Provider credentials are read inside the sandbox.** `inference_local.py` loads the API key from `runtime/.env`, so the "creds live on the host, never inside the sandbox" promise above is not yet true. It becomes true when the F5 gateway injects credentials host-side and the sandbox holds none.
+- **`inference.local` gateway process — BUILT (`runtime/inference_gateway.py`).** A real,
+  stdlib-only OpenAI-compatible process now fronts the name and forwards to the
+  operator-pinned upstream (reusing the one `_resolve()` table, so `modal|nim` still
+  selects the destination). Point the agent at it with `INFERENCE_BACKEND=gateway`.
+  **Still outstanding:** the literal name→process mapping is a one-line operator step
+  (`127.0.0.1 inference.local` in `/etc/hosts`), and in production the gateway runs on the
+  host *outside* the OpenShell sandbox — which needs **A1** (Linux).
+- **Provider credentials host-side — DONE and verified offline.** With
+  `INFERENCE_BACKEND=gateway` the sandbox holds only a dummy token; the real key lives in
+  the gateway process's env and is injected host-side. `runtime/gateway_smoke.py` proves it
+  with three real processes: the dummy token is rejected talking to the provider directly
+  (401) yet works through the gateway (200), and the provider key never appears in the
+  agent's environment. **What A1 still adds:** the Landlock/seccomp isolation that makes
+  "the sandbox *cannot* obtain the key by any other path" an enforced guarantee rather than
+  a configuration fact.
 
 ## Verify at M1b
 

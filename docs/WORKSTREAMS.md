@@ -17,12 +17,14 @@ What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.m
 | Lane | State | One-line reality |
 |---|---|---|
 | **Data** | ✅ done | 134 patents (G06N/G06F/H04L), 94 held-out checklists, 193 real office-action defects, tracked in git |
-| **Inference** | ✅ first half | Nemotron on vLLM/Modal, `INFERENCE_BACKEND=modal\|nim`, 10.67× batching on record |
+| **Inference** | ✅ first half | Nemotron on vLLM/Modal, `INFERENCE_BACKEND=modal\|nim\|gateway`, 10.67× batching on record; `inference.local` gateway injects creds host-side (A4) |
 | **Agent** | ◐ built, shallow | loop + guardrails + eval harness all real and tested; memory is static RAG, nothing compounds |
-| **Containment** | ⚠️ simulated | `policy.py` decision + the escalation client are real and now wired into the demo (A3), and the OpenShell↔HiddenLayer fusion is a live beat (A6) — but the "403" is still a `[SIM]` print, not a socket refusal. No OpenShell binary exists; A1/A4 close that |
+| **Containment** | ⚠️ simulated | `policy.py` decision + the escalation client are real and now wired into the demo (A3), and the OpenShell↔HiddenLayer fusion is a live beat (A6) — but the "403" is still a `[SIM]` print, not a socket refusal. No OpenShell binary exists; A1 closes that |
 | **Surface** | ◐ starter | idea → draft → patent works; edit boxes discard input; no chart view |
 
-Suite: `.venv/bin/pytest tests/` → **74 passed**, 0 skipped, stub mode, no network.
+Suite: `.venv/bin/pytest tests/` → **78 passed**, 0 skipped, stub mode, no network.
+(The gateway's full 3-process end-to-end proof is `python -m runtime.gateway_smoke`, kept
+out of the suite so `pytest tests/` stays server-free.)
 
 **The two headline numbers, stated honestly:**
 
@@ -50,9 +52,11 @@ Suite: `.venv/bin/pytest tests/` → **74 passed**, 0 skipped, stub mode, no net
 
 ## The focus now
 
-Four blocks, in dependency order. **A3 and A6 landed 2026-07-18** (the escalation client is
-wired into the demo and the OpenShell↔HiddenLayer fusion is a live beat). **B, C and D are
-unblocked and can start today** — only A1/A2/A4/A5 wait on hosted hardware.
+Four blocks, in dependency order. **A3, A4 and A6 landed 2026-07-18** (the escalation client
+is wired into the demo, the OpenShell↔HiddenLayer fusion is a live beat, and the
+`inference.local` gateway injects creds host-side — all verifiable offline). **B, C and D
+are unblocked and can start today** — only A1/A2/A5 (and A1's isolation half of A4) wait on
+hosted Linux/DGX hardware.
 
 ### A · Containment — make OpenShell real
 
@@ -88,11 +92,23 @@ the repo is prose or an f-string.
   (decision from the YAML, proposal from the injectable client) — but the "403" is still a
   `[SIM]` line, not a socket-level refusal from an enforcing gateway. That last mile is
   A1/A4, not A3.
-- [ ] **A4 · Close the two honest gaps** (both recorded in `docs/INFERENCE-LOCAL.md`):
-  `inference.local` becomes a resolvable host with a gateway process instead of a naming
-  contract, and **credentials move host-side** — today `runtime/inference_local.py` reads
-  the API key from inside the sandbox, so "creds never in the sandbox" is currently false.
-  The gateway injection is the real engineering here, not the YAML.
+- [x] **A4 · Close the two honest gaps — code side done 2026-07-18, verified offline.**
+  `runtime/inference_gateway.py` is a real, stdlib-only OpenAI-compatible gateway process
+  in front of `inference.local`. New backend `INFERENCE_BACKEND=gateway`
+  (`runtime/inference_local.py`) points the agent at it with a **dummy** token; the gateway
+  strips it and injects the operator's real key **host-side** before forwarding upstream,
+  and pins the model (the agent can override neither endpoint nor model). It reuses the one
+  `_resolve()` backend table — no third divergent copy. **Proven end-to-end with no GPU**
+  (`python -m runtime.gateway_smoke`, 3 real processes): the sandbox's dummy token is
+  rejected talking to the provider directly (401) yet works through the gateway (200), the
+  model is pinned, and the provider key is absent from the agent's env. Four hermetic unit
+  tests in `tests/test_gateway.py`.
+  **Scope, honestly:** this is the credential-injection + name-resolution half. Two things
+  remain — (a) mapping the literal name is a one-line operator step
+  (`127.0.0.1 inference.local` in `/etc/hosts`; can't `sudo` from here); (b) the *guarantee*
+  that a sandboxed process can't reach the host's env by some other path is OpenShell's
+  Landlock/seccomp isolation — **A1**, Linux-only. So: the agent now holds no provider
+  credential and the gateway is a real hop; the isolation that enforces it is still A1.
 - [ ] **A5 · Audit → enforce sweep.** Run the full agent under `enforcement: audit`,
   read what it actually tries (`openshell logs <name> --tail --source sandbox`), then flip
   to `enforce`. This is the pass that catches the door nobody thought of — an un-covered

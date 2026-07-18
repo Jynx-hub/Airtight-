@@ -59,6 +59,18 @@ def _resolve() -> tuple[str, str, str]:
 
     if not backend:
         return url, model, key  # legacy path — identical to pre-F3
+    if backend == "gateway":
+        # A4 / F5: the agent talks ONLY to the host-side inference.local gateway
+        # (runtime/inference_gateway.py). The provider credential lives in the
+        # gateway's env, never here — so the sandbox .env carries a dummy token and
+        # no MODAL_/NVIDIA_ key at all. The gateway strips this token and injects the
+        # real one host-side. Operator-set like every other backend; the agent cannot
+        # repoint INFERENCE_GATEWAY_URL any more than it can pick a model endpoint.
+        return (
+            os.environ.get("INFERENCE_GATEWAY_URL", "http://inference.local/v1"),
+            os.environ.get("INFERENCE_MODEL", model),
+            os.environ.get("INFERENCE_API_KEY", "sandbox-no-cred"),  # dummy; real key is host-side
+        )
     if backend == "modal":
         return (
             os.environ.get("MODAL_BASE_URL", url),
@@ -77,7 +89,7 @@ def _resolve() -> tuple[str, str, str]:
             os.environ.get("NIM_MODEL", _NIM_MODEL),
             nim_key,
         )
-    raise RuntimeError(f"Unknown INFERENCE_BACKEND={backend!r} (expected: modal | nim)")
+    raise RuntimeError(f"Unknown INFERENCE_BACKEND={backend!r} (expected: modal | nim | gateway)")
 
 
 # Resolved at import so these stay readable module attributes (the __main__ block and
