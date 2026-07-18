@@ -22,13 +22,14 @@ What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.m
 | **Containment** | ⚠️ simulated | `policy.py` decision logic is real, and now so is an escalation client — but enforcement is still a `print()`. No OpenShell exists |
 | **Surface** | ✅ two frames | intake (retrieval → live pipeline → grant) + engine panel over every committed artifact; D3's dishonest edit boxes replaced with a labelled seam |
 
-Suite: `.venv/bin/pytest tests/` → **156 passed**, 0 skipped, stub mode, no network.
+Suite: `.venv/bin/pytest tests/` → **169 passed**, 0 skipped, stub mode, no network.
 
 📌 **Unrecorded on this board:** `main` gained live USPTO prior-art search
 (`agent/prior_art.py`) and an MPEP statute reference grounding the draft/critique/revise
 loop (`agent/statute_reference.py`) at `5e5f9eb`/`f85faa7`, +11 tests, with no lane entry.
 Both claim product-path-only isolation from the M4 ablation. Noted here so it isn't lost —
 **not verified by the Surface lane**; the author should grade it against the notation above.
+The statute reference now has a currency monitor keeping it fresh — see block **SC** below.
 
 **The two headline numbers, stated honestly:**
 
@@ -332,6 +333,57 @@ network** — `python -m agent.run_smoke --ingested` retrieves 5 corpus records;
 the retrieved set, displacing `lh-w-006`; after ingesting the poisoned PDF with
 `--fake-detect --remember`, the retrieved set is byte-identical to the run before it and
 `memory/ingested/` still holds exactly one file. Full sequence in `README.md`.
+
+---
+
+### SC · Statute currency — keep STATUTES from silently going stale ◐ built, live pulls unverified
+
+The `STATUTES` reference (`agent/statute_reference.py`, added `5e5f9eb`) is a snapshot
+of the standards, hand-verified against the MPEP on a date. It has no mechanism to stay
+current — and for this domain "current" is mostly **case law** (Alice/KSR/Nautilus/Williamson
+are all judicial) and **USPTO guidance**, not statute. `agent/statute_monitor.py` watches
+those and proposes updates.
+
+- ◐ **SC1 · Monitor + proposal queue — code done, Fed. Register verified LIVE 2026-07-18.**
+  `agent/statute_monitor.py` pulls from four sources — **Federal Register** (USPTO
+  guidance, keyless), **CourtListener** (precedential CAFC opinions, `COURTLISTENER_API_TOKEN`),
+  **LegiScan** (state + federal bills, `LEGISCAN_API_KEY`), and **Congress.gov** (federal
+  Title-35 bills, `CONGRESS_API_KEY`) — filters each candidate through
+  a software/electronics scope gate (`_is_relevant`) and a statutory-basis classifier
+  (`_classify_statute`, 112 split into a/b/f), and appends survivors to a jsonl proposal
+  queue (`agent/statute_proposals.jsonl`, gitignored runtime state). Carries `pull_uspto`'s
+  **never-fabricates** rule verbatim: no source URL → no entry; a candidate with no resolvable
+  basis is *dropped, not guessed*. 11 tests in `tests/test_statute_monitor.py`.
+- [x] **SC2 · Admission is a human, between-runs step — the load-bearing invariant.** The
+  monitor **never writes into STATUTES and never imports it** (asserted by
+  `test_monitor_never_touches_the_reference`). It mirrors the **Policy-Advisor** flow:
+  `--review` renders the exact pasteable `STATUTES` entry behind a *"verify the citation"*
+  line; a human pastes and commits. This is deliberate — `reference_block()` feeds a
+  deterministic prompt-template hash the M4 ablation proof depends on
+  (`test_reference_is_constant_across_ablation_arms`), so a live auto-write would corrupt it.
+  Auto-commit was considered and rejected against that named cost, not overlooked.
+- ◐ **SC3 · Live pull — Fed. Register verified LIVE; keyed sources pending a key.**
+  `--fetch --source fedreg` was run against the **live** Federal Register API 2026-07-18 and
+  surfaced a real, correctly-classified §101 proposal — the *2024 Guidance Update on Patent
+  Subject Matter Eligibility, Including on AI* (`Fed. Reg. 2024-15377`) — and the escaped
+  paste block parses. That closes the highest-signal channel (guidance) live. **Still open:**
+  CourtListener / LegiScan / Congress need free API keys, so their field mappings are coded
+  from published shapes and unit-tested against fixtures but not yet confirmed against a live
+  response. Drop a key in the env and re-run `--fetch --source <name>` to close each.
+
+- ◐ **SC4 · Recurring every 24h — GitHub Actions workflow, activates on merge to `main`.**
+  `.github/workflows/statute-monitor.yml` runs `--fetch --source all` daily (cron `17 13 * * *`)
+  plus manual dispatch, persists the queue across runs via `actions/cache` so only genuinely-new
+  candidates surface, and opens a `statute-monitor`-labelled review issue when `new != 0`.
+  Federal Register needs no secret; keyed sources light up when `LEGISCAN_API_KEY` /
+  `CONGRESS_API_KEY` / `COURTLISTENER_API_TOKEN` are added as repo secrets. YAML + the
+  new-count parse validated locally; **the schedule only fires once the file is on the default
+  branch** (GitHub also disables schedules after 60 days of repo inactivity).
+
+**Done when:** a real §101/§103/§112 development (a precedential CAFC opinion or a USPTO SME
+update) surfaces as a reviewed proposal, an operator verifies the citation, and it lands in
+STATUTES by a human commit — with the ablation template hash only ever changing between runs.
+SC1/SC2 built; SC3 Fed. Register verified LIVE; SC4 recurring workflow committed (fires on merge).
 
 ---
 
