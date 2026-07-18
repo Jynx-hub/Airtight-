@@ -22,7 +22,7 @@ What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.m
 | **Containment** | ⚠️ simulated | `policy.py` decision logic is real, and now so is an escalation client — but enforcement is still a `print()`. No OpenShell exists |
 | **Surface** | ◐ starter | idea → draft → patent works; edit boxes discard input; no chart view |
 
-Suite: `.venv/bin/pytest tests/` → **122 passed**, 0 skipped, stub mode, no network.
+Suite: `.venv/bin/pytest tests/` → **137 passed**, 0 skipped, stub mode, no network.
 
 **The two headline numbers, stated honestly:**
 
@@ -325,6 +325,45 @@ network** — `python -m agent.run_smoke --ingested` retrieves 5 corpus records;
 the retrieved set, displacing `lh-w-006`; after ingesting the poisoned PDF with
 `--fake-detect --remember`, the retrieved set is byte-identical to the run before it and
 `memory/ingested/` still holds exactly one file. Full sequence in `README.md`.
+
+---
+
+### SC · Statute currency — keep STATUTES from silently going stale ◐ built, live pulls unverified
+
+The `STATUTES` reference (`agent/statute_reference.py`, added `5e5f9eb`) is a snapshot
+of the standards, hand-verified against the MPEP on a date. It has no mechanism to stay
+current — and for this domain "current" is mostly **case law** (Alice/KSR/Nautilus/Williamson
+are all judicial) and **USPTO guidance**, not statute. `agent/statute_monitor.py` watches
+those and proposes updates.
+
+- ◐ **SC1 · Monitor + proposal queue — code done, gating verified offline 2026-07-18.**
+  `agent/statute_monitor.py` pulls from three sources — **Federal Register** (USPTO
+  guidance, keyless), **CourtListener** (precedential CAFC opinions, `COURTLISTENER_API_TOKEN`),
+  and **Congress.gov** (Title-35 bills, `CONGRESS_API_KEY`) — filters each candidate through
+  a software/electronics scope gate (`_is_relevant`) and a statutory-basis classifier
+  (`_classify_statute`, 112 split into a/b/f), and appends survivors to a jsonl proposal
+  queue (`agent/statute_proposals.jsonl`, gitignored runtime state). Carries `pull_uspto`'s
+  **never-fabricates** rule verbatim: no source URL → no entry; a candidate with no resolvable
+  basis is *dropped, not guessed*. 11 tests in `tests/test_statute_monitor.py`.
+- [x] **SC2 · Admission is a human, between-runs step — the load-bearing invariant.** The
+  monitor **never writes into STATUTES and never imports it** (asserted by
+  `test_monitor_never_touches_the_reference`). It mirrors the **Policy-Advisor** flow:
+  `--review` renders the exact pasteable `STATUTES` entry behind a *"verify the citation"*
+  line; a human pastes and commits. This is deliberate — `reference_block()` feeds a
+  deterministic prompt-template hash the M4 ablation proof depends on
+  (`test_reference_is_constant_across_ablation_arms`), so a live auto-write would corrupt it.
+  Auto-commit was considered and rejected against that named cost, not overlooked.
+- [ ] **SC3 · Live source pull unverified.** The scope gate, classifier, dedup, review render
+  and offline rehearsal (`--fake`) are observed end-to-end, stub mode, no network. The three
+  real feeds have **not** been run against the live APIs — field mappings for
+  CourtListener/Congress are coded from their published shapes, not verified against a live
+  response the way `pull_uspto`'s USPTO mappings were. First live pull should confirm the
+  mappings and hand-check the first batch of proposals before trusting the queue.
+
+**Done when:** a real §101/§103/§112 development (a precedential CAFC opinion or a USPTO SME
+update) surfaces as a reviewed proposal, an operator verifies the citation, and it lands in
+STATUTES by a human commit — with the ablation template hash only ever changing between runs.
+SC1/SC2 built and gate-verified offline; SC3 (live) open.
 
 ---
 

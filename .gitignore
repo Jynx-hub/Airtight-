@@ -26,6 +26,11 @@ memory/episodes/**/*.json
 # shared tree the ablation measures.
 memory/ingested/*.json
 
+# Statute-monitor proposal queue — machine-fetched candidates awaiting operator
+# review (agent/statute_monitor.py). Runtime state, not the curated source of
+# truth: only the human-verified entry a person pastes into STATUTES is committed.
+agent/statute_proposals.jsonl
+
 # Env / secrets — but DO track the config template
 .env
 .env.*
