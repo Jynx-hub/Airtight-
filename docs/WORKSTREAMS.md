@@ -19,7 +19,7 @@ What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.m
 | **Data** | ✅ done | 134 patents (G06N/G06F/H04L), 94 held-out checklists, 193 real office-action defects, tracked in git |
 | **Inference** | ✅ first half | Nemotron on vLLM/Modal, `INFERENCE_BACKEND=modal\|nim\|gateway`, 10.67× batching on record; `inference.local` gateway injects creds host-side (A4) |
 | **Agent** | ◐ built, shallow | loop + guardrails + eval harness all real and tested; memory is static RAG, nothing compounds |
-| **Containment** | ✅ real enforcement (Plan B) | offline: `policy.decide` + escalation wired into the demo (A3), OpenShell↔HiddenLayer fusion live (A6). **Real: `containment/planb/` enforces the four tiers on a Linux kernel — real 403, non-root, read-only fs, no route off-box (A1 Plan B, A5 sweep).** Vendor `nemoclaw` binary still DGX-gated; judged run deploys the same compose to a remote host |
+| **Containment** | ✅ real enforcement (Plan B) + LIVE | offline demo (A3/A6); **`containment/planb/` enforces the four tiers on a Linux kernel — real 403, non-root, read-only fs, no route off-box (A1 Plan B, A5 sweep)**; **LIVE online at https://airtight-openshell.vercel.app — real `policy.decide`, real HTTP 403 over the internet, operator approve/reject (`containment/live/`)**. Vendor `nemoclaw` binary still DGX-gated; judged run deploys the same compose to a remote host |
 | **Surface** | ◐ starter | idea → draft → patent works; edit boxes discard input; no chart view |
 
 Suite: `.venv/bin/pytest tests/` → **84 passed**, 0 skipped, stub mode, no network.
@@ -96,12 +96,14 @@ the repo is prose or an f-string.
      endpoints (`patent_sources`, `client_datastore`) stay `audit` for the A5 full-agent
      sweep. Proven by `test_enforcement_field_drives_the_decision` (flip the field → the
      decision flips) and enforced for real in Plan B (`ENFORCE=enforce` → real 403).
-  2. **Two inference destinations — DONE at the correct (gateway) layer.** A4 made the sandbox
-     talk only to `inference.local`; the two upstreams {Modal, NIM} are the gateway's
-     host-side egress, both reachable by the operator's one flip (tested:
-     `test_gateway_resolves_operator_upstream_from_the_one_table` (Modal) +
-     `test_gateway_resolves_the_nim_upstream_too`). NIM in the *sandbox* allowlist would break
-     the "operator pins the endpoint" invariant, so it correctly lives at the gateway.
+  2. **Two inference destinations — DONE.** Both are now enumerated in `inference_gateway`
+     (owner decision, 2026-07-18): `inference.local` (the A4 gateway), the Modal serve host
+     (PRIMARY, `$500` bounty path) and `integrate.api.nvidia.com` (NIM FALLBACK) — **all
+     `enforce`**. The operator pins one backend (`INFERENCE_BACKEND=modal|nim`); the A4 gateway
+     also resolves both (tested: `test_gateway_resolves_operator_upstream_from_the_one_table`
+     + `test_gateway_resolves_the_nim_upstream_too`). Tradeoff recorded in the YAML comment:
+     listing the two backends directly also permits the pre-gateway path; the gateway is what
+     keeps creds host-side once deployed.
   3. **Validation — LOCAL structural check DONE; live schema still DGX.**
      `inference/policy/validate_policy.py` (`python -m inference.policy.validate_policy` + 3
      tests) checks the four tiers, enforcement modes, rule shapes, and the inference hop. The

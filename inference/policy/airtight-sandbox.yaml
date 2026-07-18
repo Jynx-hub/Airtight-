@@ -23,18 +23,30 @@ process:
 network_policies:
   inference_gateway:
     name: inference_gateway
-    # A4 (2026-07-18) changed the shape of "two inference destinations": the sandbox
-    # now talks ONLY to inference.local (the host-side gateway, runtime/inference_gateway.py),
-    # and the TWO upstreams {Modal, NIM} are the GATEWAY's host-side egress — NOT the
-    # sandbox's. Adding integrate.api.nvidia.com here would re-permit the agent to reach a
-    # model endpoint directly, breaking the "operator pins the endpoint, not the agent"
-    # invariant (CLAUDE.md). So the sandbox allowlists the single gateway hop; the two
-    # destinations live at the gateway layer. See docs/WORKSTREAMS.md A2.
+    # A2: enforce, with BOTH inference destinations (Modal PRIMARY + NIM FALLBACK) enumerated.
+    # inference.local is the A4 host-side gateway — the preferred single hop once deployed
+    # (creds host-side; the sandbox holds a dummy token). Modal and NIM are the two
+    # operator-selectable backends (INFERENCE_BACKEND=modal|nim); only ONE is live at a time and
+    # the OPERATOR pins it — the agent cannot choose. All three enforce. Tradeoff (owner-accepted):
+    # listing the two backends here also permits the pre-gateway direct path; the A4 gateway is
+    # what keeps creds host-side once it is deployed.
     endpoints:
-      - host: inference.local           # the host-side gateway forwards to Modal (or NIM); creds host-side
+      - host: inference.local           # A4 gateway → forwards to the pinned backend; creds host-side
         port: 443
         protocol: rest
         enforcement: enforce            # A2: the inference hop enforces — decide() reads this field now
+      - host: airtight-nemotron-serve.modal.run   # PRIMARY — self-hosted vLLM on Modal ($500 bounty path)
+        port: 443                                  # operator replaces with their <workspace>-- serve URL
+        protocol: rest
+        enforcement: enforce
+        rules:
+          - allow: { method: POST, path: "/v1/**" }   # OpenAI-compatible inference only
+      - host: integrate.api.nvidia.com              # FALLBACK — NVIDIA NIM hosted endpoint (hosted; no bounty)
+        port: 443
+        protocol: rest
+        enforcement: enforce
+        rules:
+          - allow: { method: POST, path: "/v1/**" }
     binaries:
       - { path: /usr/local/bin/agent }
 
