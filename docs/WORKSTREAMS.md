@@ -50,8 +50,9 @@ Suite: `.venv/bin/pytest tests/` → **122 passed**, 0 skipped, stub mode, no ne
 
 ## The focus now
 
-Four blocks, in dependency order. **C and D are done (2026-07-18).** A3 and B remain
-unblocked and can start today; only A1/A2/A4/A5 wait on hosted hardware.
+Four blocks, in dependency order. **B, C and D are done (2026-07-18)** — B landed in a
+separate tree and merged at `d899e26`, which surfaced the collision closed by `201e8f8`.
+A3 remains unblocked and can start today; only A1/A2/A4/A5 wait on hosted hardware.
 
 **The single highest-leverage item is still the GPU re-run** — C1 and now C2 both changed
 retrieval, so neither live ablation number is quotable until it lands. Retrieval is sound

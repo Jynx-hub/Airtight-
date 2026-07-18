@@ -124,7 +124,7 @@ content — the doorway never sees it. That is why Track 2 isn't a bolt-on next 
 a learning agent that ingests untrusted documents must have a scanner on that hop, or its
 memory is an attack surface.
 
-Next highest-leverage work: `docs/WORKSTREAMS.md`. Blocks C (retrieval) and D (ingest →
-memory) are done; **the GPU ablation re-run is the top open item** — retrieval changed
-twice, so neither live number is quotable until it lands. A (make OpenShell actually
-enforce) and B (make the loop recursive) are unblocked.
+Next highest-leverage work: `docs/WORKSTREAMS.md`. Blocks B (recursion), C (retrieval) and
+D (ingest → memory) are done; **the GPU ablation re-run is the top open item** — retrieval
+changed twice, so neither live number is quotable until it lands. A (make OpenShell
+actually enforce) is what's left, and its one non-hardware item is unblocked.
