@@ -3,7 +3,7 @@
 This is the PRIMARY inference backend (replaces the retired Brev plan). It stands up
 ONE OpenAI-compatible vLLM server for Nemotron 3 Nano and exposes it as a web endpoint
 — the single pinned `inference.local` hop the whole system routes through. Both
-HiddenLayer (Lane B) and OpenShell (Lane C) enforce on this one URL.
+HiddenLayer (Lane B) and OpenShell enforce on this one URL.
 
 Why Modal: serverless GPU with scale-to-zero. You pay per-second only while a request
 is running, so a hackathon fits inside the free monthly credit. It is still SELF-HOSTED
@@ -32,15 +32,21 @@ VLLM_PORT = 8000
 SERVED_NAME = os.environ.get("INFERENCE_MODEL", "nemotron")  # backend-agnostic client alias
 
 # ── GPU / precision profile ───────────────────────────────────────────────────
-# Default is the CHEAPEST tier that fits Nano: L40S (48GB) + the FP8 checkpoint
-# (Ada natively runs FP8). Swap to the A100-80GB BF16 quality path with ONE env var
-# at deploy time: `MODAL_GPU_PROFILE=a100-bf16 modal deploy runtime/modal_app.py`.
+# Default is a100-bf16 — the JUDGED profile, chosen for COLD-START RECOVERY, not price.
+# Measured 2026-07-18 (docs/THROUGHPUT.md): l40s-fp8 is genuinely faster and cheaper to
+# run (865 vs 696 tok/s at C=16, $1.95 vs $2.50/hr) but its engine init takes 494-602s
+# vs the A100's 29s, so a cold start is ~12 min instead of ~1-2. Modal preempted a
+# container during that same session, so mid-demo recovery is a real risk — and 12
+# minutes of dead air loses the demo that the cheaper GPU was meant to fund.
+# Swap with ONE env var at deploy time:
+#   MODAL_GPU_PROFILE=l40s-fp8 bash runtime/modal-deploy.sh
 # Weights: 30B params ≈ 30GB FP8 / 60GB BF16. Nano's hybrid Mamba arch keeps only 6
 # attention layers' KV cache, so long context is cheap on modest headroom.
 PROFILES = {
     "l40s-fp8": {
         "gpu": "L40S",
         "checkpoint": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-FP8",
+        "revision": "f8dc1c0afee92f44417695b4f5ddca9afc95ea58",  # HF head 2026-07-18
         "max_model_len": 131072,          # 128K fits L40S KV headroom
         "kv_cache_dtype": "fp8",
         "extra_env": {"VLLM_USE_FLASHINFER_MOE_FP8": "1"},  # FP8 MoE kernels (Ada/Hopper)
@@ -48,14 +54,20 @@ PROFILES = {
     "a100-bf16": {
         "gpu": "A100-80GB",
         "checkpoint": "nvidia/NVIDIA-Nemotron-3-Nano-30B-A3B-BF16",
+        "revision": "cbd3fa9f933d55ef16a84236559f4ee2a0526848",  # HF head 2026-07-18
         "max_model_len": 262144,          # 256K on 80GB
         "kv_cache_dtype": "auto",         # Ampere has no FP8 tensor cores
         "extra_env": {},
     },
 }
-_PROFILE_NAME = os.environ.get("MODAL_GPU_PROFILE", "l40s-fp8")
+_PROFILE_NAME = os.environ.get("MODAL_GPU_PROFILE", "a100-bf16")
 PROFILE = PROFILES[_PROFILE_NAME]
-MODEL_REVISION = os.environ.get("MODAL_MODEL_REVISION", "main")  # pin a commit SHA before the demo
+# Weights are PINNED to a commit SHA, not "main", so an upstream repo update cannot move
+# the model out from under a rehearsed demo. The SHA lives PER PROFILE because the FP8 and
+# BF16 checkpoints are separate HF repos with unrelated histories — one shared revision
+# would be wrong for whichever profile it wasn't taken from. Override for a one-off:
+#   MODAL_MODEL_REVISION=<sha|main> bash runtime/modal-deploy.sh
+MODEL_REVISION = os.environ.get("MODAL_MODEL_REVISION", PROFILE["revision"])
 
 # nano_v3 is a PLUGIN reasoning parser per the vLLM Nemotron-3-Nano recipe — the .py
 # file is baked into the image below. If your pinned vLLM ships `nano_v3` built-in

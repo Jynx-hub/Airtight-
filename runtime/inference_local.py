@@ -2,7 +2,7 @@
 
 Every model interaction in Airtight goes through `chat()` here. Nothing calls the
 endpoint directly. That is the whole design invariant: one operator-pinned hop, so
-HiddenLayer (Lane B) and OpenShell (Lane C) both enforce on the same place.
+HiddenLayer (Lane B) and OpenShell both enforce on the same place.
 
 Two rules this file exists to keep:
   1. The endpoint is chosen by the OPERATOR (env), never by the agent. There is no
