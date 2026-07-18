@@ -26,6 +26,9 @@ Inference is **pinned to `inference.local`** and chosen by operator policy, not 
 - **LLM calls in this project route to Nemotron** (per the track constraint), not the workspace default (`gpt-5.4-mini` from the parent `~/CLAUDE.md`). This project is the exception — it must stay all-Nemotron / open-model for judging.
 - Every model interaction must pass through the HiddenLayer wrapper. No raw model calls that bypass the bus.
 - During policy dev, set OpenShell `enforcement: audit` first to observe the agent's real egress set, then flip to `enforce` for the judged run.
+- **The Modal app stays PAUSED by default — GPU time is the scarcest resource on this project.** Un-pause only for a step that genuinely cannot be done without the GPU (a benchmark, a rehearsal, the judged demo), and re-pause the moment it's done. Never leave it running to "save time later"; an idle A100 bills at ~$2.50/hr against a fixed free credit, and the demo has to come out of that same pool. Pausing/un-pausing is the **operator's** call — ask, don't do it unprompted.
+- **Build and validate against `runtime/mock_endpoint.py` before ever touching the live endpoint.** It's a stdlib OpenAI-compatible fake with simulated continuous batching, so harnesses, clients, and streaming logic can be debugged for free. Debugging on a metered cold start (~2–5 min each) is how the credit disappears. Get it green offline, then spend one short, fully-scripted live window.
+- Check for concurrent sessions before a metered run. More than one agent working this repo can wake the app, redeploy it, or contaminate a measurement mid-window — `modal app list` shows live containers, and `runtime/bench.py` stamps a provenance note into every results file for exactly this reason.
 - This repo lives at `github.com/Jynx-hub/Airtight-`. Commit locally as you work; ask before pushing.
 
 ## Build order (do not reorder)

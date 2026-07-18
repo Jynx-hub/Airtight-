@@ -28,9 +28,11 @@ retired Brev plan. Read `../docs/INFERENCE-LOCAL.md` (the contract) and `../rese
 | `modal-deploy.sh` | your laptop | `modal deploy` the app; prints the endpoint URL |
 | `serve-vllm.sh` | any GPU box | The host-agnostic `vllm serve` command (same flags `modal_app.py` runs) |
 | `serve-nim.sh` | — | **Fallback** — proves the one-var NIM flip end-to-end (never writes `.env`) |
-| `nano_v3_reasoning_parser.py` | Modal image | vLLM reasoning-parser plugin (**placeholder — replace before deploy**) |
+| `nano_v3_reasoning_parser.py` | Modal image | vLLM reasoning-parser plugin — the real one from the NVIDIA HF repo, loaded and working in the deployed server. **Known bug:** it overrides only the non-streaming path, so *streaming* output arrives as `reasoning_content` instead of `content` (`../docs/THROUGHPUT.md` §Open issue) |
 | `verify.sh` | anywhere reaching the endpoint | Smoke-test: models list + chat + tool-call |
 | `inference_local.py` | the app | The **one doorway** — every model call goes through `chat()` |
+| `bench.py` | anywhere reaching the endpoint | **Throughput harness** — concurrency sweep, streaming + TTFT, writes `bench-results/*.json` (the $500 bounty evidence) |
+| `mock_endpoint.py` | your laptop | Offline OpenAI-compatible fake with simulated batching — **validate `bench.py` here for free before spending GPU credits** |
 
 ---
 
