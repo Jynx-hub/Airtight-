@@ -421,6 +421,29 @@ def episode_store():
         return EpisodeStore([], None)
 
 
+def episode_sink():
+    """The store a finished product-path draft records itself into.
+
+    Separate from `episode_store()` because reading and writing degrade
+    differently: a read tolerates a missing directory by returning a
+    directory-less store, and `record()` raises on exactly that. Ensuring the
+    directory here is what lets a fresh clone compound from its first draft, and
+    a record that failed to parse must not stop the next episode being written.
+
+    The write itself is still env-gated inside `draft_patent` — this only hands
+    it somewhere to go. The M4 harness passes no sink at all, so no env flip can
+    make the judged ablation mutate memory (agent/eval/harness.py).
+    """
+    from agent.episodes import EpisodeStore
+
+    directory = ROOT / config.EPISODES_DIR
+    directory.mkdir(parents=True, exist_ok=True)
+    try:
+        return EpisodeStore.load(directory)
+    except (OSError, ValueError):
+        return EpisodeStore([], directory)
+
+
 def retrieval_store():
     """The store the intake frame actually retrieves against — corpus plus
     whatever the agent has taught itself, behind one retrieve()."""
@@ -429,17 +452,56 @@ def retrieval_store():
     return CompositeStore(corpus_store(), episode_store())
 
 
+def _episode_seam(episodes, lessons):
+    """Whichever of the three episodic states is actually blocking, or None."""
+    if not len(episodes):
+        return seam(
+            "NOT POPULATED",
+            "The loop compounds by distilling its own critique into lessons at confidence 0.5. "
+            + ("Writes are on — the next draft through this engine fills this. "
+               if config.EPISODES_ENABLED
+               else "Writes are env-gated and currently off, so drafts do not compound. ")
+            + "The ablation harness never passes a sink, so this can never contaminate a judged run.",
+            "memory/episodes/<disclosure_id>/ · "
+            + ("draft a disclosure" if config.EPISODES_ENABLED else "AIRTIGHT_EPISODES_ENABLED=1"),
+        )
+    if not lessons:
+        return seam(
+            "NOTHING LEARNED YET",
+            f"{len(episodes)} run(s) recorded, but no lesson that wasn't already retrievable. "
+            "A lesson is minted from a critique naming a defect, and in stub mode the critique "
+            "turn returns canned text that names none — so the loop is compounding structurally, "
+            "not substantively. A live run against the real model is what fills this.",
+            "AIRTIGHT_MODE=live + AIRTIGHT_BASE_URL · docs/GPU-RERUN-RUNBOOK.md",
+        )
+    return None
+
+
 def memory_stats() -> dict:
     ground, ground_skipped = _load_store(CORPUS_DIR)
     ingested, ingested_skipped = _load_store(ROOT / config.INGESTED_DIR)
     episodes = episode_store()
-    lessons = [rec for ep in episodes.episodes for rec in ep.distilled]
 
     # Facets come off the merged store, not ground truth alone. memory_records()
     # browses the merged store, so counting only ground truth here made the stat
     # tile and the browser disagree the moment anything was ingested — and left
     # an ingested record's CPC class unreachable from the filter dropdown.
     retrievable = corpus_store()
+
+    # "lessons distilled" must mean lessons the agent MINTED, and `distilled` is
+    # not that: `compress_run` seeds it with the records the run retrieved, so
+    # every episode carries k copies before it mints anything. Counting the raw
+    # list read "10 lessons distilled" for two stub runs that learned nothing.
+    #
+    # Provenance, not novelty, is the exact signal. `compress_run` stamps
+    # `source="episode:<disclosure_id>"` on precisely what it minted; everything
+    # else is a copy of something retrieved. An earlier cut of this counted
+    # "records not already in the corpus", which looked right until a draft
+    # carrying live prior art landed — those 5 `priorart-*` records are not in
+    # the corpus either, so the panel reported "lessons distilled 5" for USPTO
+    # references the agent copied rather than anything it learned.
+    lessons = [rec for ep in episodes.episodes for rec in ep.distilled
+               if (rec.source or "").startswith("episode:")]
     skipped = ground_skipped + ingested_skipped
 
     return {
@@ -472,13 +534,12 @@ def memory_stats() -> dict:
             "count": len(episodes),
             "lessons": len(lessons),
             "enabled": config.EPISODES_ENABLED,
-            "seam": None if len(episodes) else seam(
-                "NOT POPULATED",
-                "The loop compounds by distilling its own critique into lessons at confidence 0.5. "
-                f"Writes are opt-in and env-gated (currently {'on' if config.EPISODES_ENABLED else 'off'}); "
-                "the ablation harness never passes a sink, so this can never contaminate a judged run.",
-                "memory/episodes/<disclosure_id>/ · AIRTIGHT_EPISODES_ENABLED=1",
-            ),
+            # Three states, and collapsing any two would misdirect the fix:
+            # writes off (no draft will ever fill this), writes on but nothing
+            # drafted yet (the next one will), and episodes recorded that taught
+            # the agent nothing — which looks identical to compounding on a stat
+            # tile and is the state a stub-mode demo is actually in.
+            "seam": _episode_seam(episodes, lessons),
         },
     }
 

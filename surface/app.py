@@ -104,7 +104,10 @@ def draft(disclosure: Disclosure) -> DraftResponse:
     # Serialized, and the findings slice is taken inside the lock — otherwise a
     # concurrent draft's blocks land in this request's report. See jobs.py.
     with jobs.exclusive_draft() as offset:
-        result = draft_patent(disclosure, guardrails=guardrails)
+        # Same sink as the job path — two product routes that remembered
+        # differently would be the same class of bug as the retrieval gap above.
+        result = draft_patent(disclosure, guardrails=guardrails,
+                              episode_sink=sources.episode_sink())
         findings = [SecurityFinding(**f) for f in jobs.security_findings(offset)]
     report = LoopholeReport(
         smart_catches=result.critique_notes,

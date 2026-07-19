@@ -207,10 +207,15 @@ function InspectorPanel() {
 
 /* ================= failure library ================= */
 
+// A corpus browse is for sampling and filtering, not for reading end to end —
+// so the table opens at a page and the filters above it do the narrowing.
+const LIBRARY_PAGE = 8;
+
 function FailureLibrary({ stats }) {
   const [filters, setFilters] = React.useState({ statute: '', cpc: '', q: '' });
   const [data, setData] = React.useState(null);
   const [error, setError] = React.useState(null);
+  const [expanded, setExpanded] = React.useState(false);
   const debounce = React.useRef(null);
 
   React.useEffect(() => {
@@ -221,12 +226,19 @@ function FailureLibrary({ stats }) {
     return () => clearTimeout(debounce.current);
   }, [filters]);
 
+  // A new filter is a new result set — collapse, or the page opens mid-scroll
+  // on rows the user never asked to see.
+  React.useEffect(() => setExpanded(false), [filters]);
+
   const set = (k) => (e) => setFilters((f) => ({ ...f, [k]: e.target.value }));
   const statutes = Object.keys(stats.corpus.by_statute).sort();
   const classes = Object.keys(stats.corpus.by_class).sort();
 
+  const rows = data ? (expanded ? data.records : data.records.slice(0, LIBRARY_PAGE)) : [];
+  const hidden = data ? data.records.length - rows.length : 0;
+
   return (
-    <Card title="Failure library" meta={data ? `${data.shown} of ${data.total}` : '—'} eyebrow>
+    <Card title="Failure library" meta={data ? `${rows.length} of ${data.total}` : '—'} eyebrow>
       <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
         <select value={filters.statute} onChange={set('statute')} style={{ ...selectStyle, minWidth: 140, maxWidth: 160 }}>
           <option value="">all statutes</option>
@@ -266,8 +278,8 @@ function FailureLibrary({ stats }) {
                 </tr>
               </thead>
               <tbody>
-                {data.records.map((rec, i) => {
-                  const td = { padding: 14, borderBottom: rowRule(i === data.records.length - 1), verticalAlign: 'top' };
+                {rows.map((rec, i) => {
+                  const td = { padding: 14, borderBottom: rowRule(i === rows.length - 1), verticalAlign: 'top' };
                   return (
                     <tr key={rec.id + i}>
                       <td style={{ ...td, ...mono, color: 'var(--forest)' }}>§{rec.statute}</td>
@@ -290,6 +302,24 @@ function FailureLibrary({ stats }) {
                 })}
               </tbody>
             </table>
+
+            {(hidden > 0 || expanded) && (
+              <div style={{ paddingTop: 14 }}>
+                <button
+                  onClick={() => setExpanded((v) => !v)}
+                  style={{ ...mono, color: 'var(--muted-2)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+                >
+                  {expanded ? `▾ Show fewer` : `▸ Show ${hidden} more`}
+                </button>
+                {/* The fetch itself is capped, so "all" here means all that were
+                    read — say so rather than implying the corpus is exhausted. */}
+                {expanded && data.total > data.records.length && (
+                  <span style={{ ...mono, color: 'var(--muted-2)', marginLeft: 12 }}>
+                    · {data.total - data.records.length} beyond the read limit — filter to reach them
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         ))}
     </Card>
@@ -368,8 +398,14 @@ function AblationPanel() {
 
 /* ================= guardrail bus ================= */
 
+// The tail the server hands back is 40 hops deep. The panel's job is to show
+// that the bus is live and what it did — the recent few carry that; the rest is
+// scrollback, so it opens collapsed like the failure library does.
+const BUS_PAGE = 8;
+
 function GuardrailPanel({ onLed }) {
   const { loading, data, error } = useLoad(api.security);
+  const [expanded, setExpanded] = React.useState(false);
 
   React.useEffect(() => {
     if (data) onLed?.({ label: 'BUS', value: data.enabled ? 'live' : 'off', state: data.enabled ? 'on' : 'off' });
@@ -385,6 +421,8 @@ function GuardrailPanel({ onLed }) {
             : action === 'pass' ? 'var(--muted-2)'
             : action === 'redact' ? 'var(--forest-deep)'
             : 'var(--forest)';
+          const shown = expanded ? data.events : data.events.slice(0, BUS_PAGE);
+          const hidden = data.events.length - shown.length;
           return (
             <>
               <StatReadout style={{ marginBottom: 24 }} items={[
@@ -418,8 +456,8 @@ function GuardrailPanel({ onLed }) {
               </p>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 2, marginBottom: 20 }}>
-                {data.events.map((e, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '7px 0', borderBottom: rowRule(i === data.events.length - 1) }}>
+                {shown.map((e, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '7px 0', borderBottom: rowRule(i === shown.length - 1) }}>
                     <span style={{ ...mono, color: 'var(--muted-2)', width: 62, flex: 'none' }}>{(e.ts || '').slice(11, 19)}</span>
                     <span style={{ width: 96, flex: 'none' }}>
                       <Badge tone={e.action === 'block' ? 'defect' : e.action === 'quarantine' ? 'ink' : e.action === 'redact' ? 'accent' : 'neutral'}>
@@ -431,6 +469,24 @@ function GuardrailPanel({ onLed }) {
                     </span>
                   </div>
                 ))}
+
+                {(hidden > 0 || expanded) && (
+                  <div style={{ paddingTop: 12 }}>
+                    <button
+                      onClick={() => setExpanded((v) => !v)}
+                      style={{ ...mono, color: 'var(--muted-2)', background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+                    >
+                      {expanded ? '▾ Show fewer' : `▸ Show ${hidden} more`}
+                    </button>
+                    {/* The tail is capped server-side, so an expanded list is not
+                        the whole log — say so rather than implying it is. */}
+                    {expanded && data.counts.audit > data.events.length && (
+                      <span style={{ ...mono, color: 'var(--muted-2)', marginLeft: 12 }}>
+                        · {data.counts.audit - data.events.length} older hops beyond the tail
+                      </span>
+                    )}
+                  </div>
+                )}
               </div>
 
               <Seam seam={data.provenance_seam} />

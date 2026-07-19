@@ -11,6 +11,7 @@ being present.
 """
 
 import json
+import pathlib
 import time
 
 import pytest
@@ -198,6 +199,93 @@ def test_job_runs_to_completion_with_stages():
 
 def test_job_status_404_for_unknown_id():
     assert client.get("/api/draft/nosuchjob").status_code == 404
+
+
+def test_product_path_records_an_episode_when_enabled(monkeypatch):
+    """Drafting through the surface compounds — both routes, one memory.
+
+    Stub replies carry no defect, so `material_defects` is empty and the distilled
+    lessons are just the retrieved records; minting a *new* lesson is covered by
+    tests/test_episodes.py. What is only testable here is that the surface hands
+    `draft_patent` a sink at all, and that the job and synchronous routes agree —
+    two product routes remembering differently is a silent split-brain in memory.
+    """
+    monkeypatch.setattr(config, "EPISODES_ENABLED", True)
+    assert len(sources.episode_store()) == 0, "conftest must pin EPISODES_DIR off the real tree"
+
+    disclosure = client.get("/api/sample").json()
+    snap = poll_job(client.post("/api/draft/start", json=disclosure).json()["job_id"])
+    assert snap["status"] == "done", snap["error"]
+    assert len(sources.episode_store()) == 1
+
+    client.post("/api/draft", json=disclosure)  # the synchronous route must remember too
+    assert len(sources.episode_store()) == 2
+
+    stats = client.get("/api/memory/stats").json()["episodes"]
+    assert stats["count"] == 2 and stats["enabled"] is True
+
+    # `distilled` is seeded with the records the run retrieved, so it is non-empty
+    # even when nothing was learned. "lessons distilled" must count only what
+    # `compress_run` MINTED (source="episode:...") — counting "not already in the
+    # corpus" instead reports live prior-art copies as lessons.
+    raw = sum(len(ep.distilled) for ep in sources.episode_store().episodes)
+    assert raw > 0, "episodes should carry their retrieved records"
+    assert stats["lessons"] == 0, "stub critiques name no defect — nothing can be minted"
+    assert stats["seam"]["label"] == "NOTHING LEARNED YET", (
+        "recorded-but-taught-nothing must not read as compounding")
+
+
+def test_lessons_counts_minted_records_not_copied_prior_art():
+    """A record an episode *carried* is not a lesson it *learned*.
+
+    Regression for a real panel lie: an episode from a UI draft carries the live
+    USPTO prior art the run retrieved, and counting "records not already in the
+    corpus" reported those 5 references as "lessons distilled 5". Provenance is
+    the exact signal — `compress_run` stamps `source="episode:<id>"` on what it
+    minted and nothing else does.
+    """
+    from agent.episodes import Episode
+    from airtight import LoopholeRecord
+
+    def rec(rid, source):
+        return LoopholeRecord(
+            id=rid, pattern="§112 — indefinite element", claim_shape="claim 1",
+            technology_class="G06F", remedy="recite structure", source=source,
+            extraction_confidence=0.5)
+
+    episode = Episode(
+        id="ep-test-0001", disclosure_id="test-0001", technology_class="G06F",
+        retrieved_ids=[], critique_findings=[],
+        distilled=[
+            rec("priorart-19564452", "USPTO ODP prior-art search · app 19564452"),
+            rec("oa-copied-from-corpus", "PTAB FWD IPR2021-00001"),
+            rec("ep-test-0001-112-0", "episode:test-0001"),
+        ],
+        mode="stub", created_at="2026-07-19T01:15:01-05:00")
+
+    directory = pathlib.Path(config.EPISODES_DIR) / episode.disclosure_id
+    directory.mkdir(parents=True, exist_ok=True)
+    (directory / f"{episode.id}.json").write_text(episode.model_dump_json())
+
+    stats = client.get("/api/memory/stats").json()["episodes"]
+    assert stats["count"] == 1
+    assert stats["lessons"] == 1, (
+        "only the minted record is a lesson — prior art and corpus copies are not")
+
+
+def test_product_path_does_not_record_when_episodes_are_off(monkeypatch):
+    """The write gate is the operator's, and it has to hold on the product path
+    too — a sink that wrote regardless would make the env flag decorative."""
+    monkeypatch.setattr(config, "EPISODES_ENABLED", False)
+    disclosure = client.get("/api/sample").json()
+
+    client.post("/api/draft", json=disclosure)
+    snap = poll_job(client.post("/api/draft/start", json=disclosure).json()["job_id"])
+    assert snap["status"] == "done", snap["error"]
+
+    assert len(sources.episode_store()) == 0
+    assert client.get("/api/memory/stats").json()["episodes"]["seam"]["source"].endswith(
+        "AIRTIGHT_EPISODES_ENABLED=1"), "an off flag must name the flag as what fills this"
 
 
 def test_patch_persists_applicant_claim_edits():

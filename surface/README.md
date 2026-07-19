@@ -48,7 +48,7 @@ and the four containment tiers.
 | `app.py` | Routing only. Calls just `agent.loop.draft_patent`, so the doorway / HiddenLayer invariant holds. |
 | `sources.py` | Tolerant read-only views over `results/`, `data/`, `memory/`, `runtime/bench-results/`. Nothing raises; missing or stale data becomes a labelled seam. |
 | `explain.py` | Recomputes *why* retrieval picked what it picked, reusing `agent/memory.py`'s own `_rank` / `diversify_by_statute` / BM25 constants. |
-| `jobs.py` | In-process job registry + the worker that runs a draft with a live transcript. |
+| `jobs.py` | In-process job registry + the worker that runs a draft with a live transcript, and hands it the episode sink so a finished run becomes memory. |
 | `ui/` | JSX source for both frames — `Intake.jsx`, `Engine.jsx`, `App.jsx`, the seam renderer in `common.jsx`, and the vendored Pete design-system components in `ui/ds/`. Not served. |
 | `build.sh` | Compiles `ui/` → `static/airtight-kit.js` with esbuild. Run it only after editing `ui/`. |
 | `static/` | `airtight.css` (the token layer), `index.html` + `admin.html` (thin shells), the committed `airtight-kit.js`, plus vendored `vendor/` (React) and `fonts/`. No CDN, no network. |
@@ -67,7 +67,31 @@ house rule, not decoration: this lane already shipped one control that looked
 interactive and silently discarded input (D3's claim textareas). If it looks
 done, it must be done — or say plainly that it isn't.
 
-Current seams: episodic memory and ingested records (both empty), the ablation
+Episodic memory is no longer one of them: `jobs.py` and the synchronous
+`POST /api/draft` both pass `sources.episode_sink()`, so with
+`AIRTIGHT_EPISODES_ENABLED=true` a finished draft records itself and the panel
+counts up. The write is still gated inside `draft_patent`, and the M4 harness
+passes no sink at all, so nothing here can reach a judged ablation.
+
+Its seam has **three** states, because collapsing any two misdirects the fix:
+flag off (nothing will ever fill it), flag on but nothing drafted yet (the next
+draft will), and `NOTHING LEARNED YET` — episodes recorded that distilled nothing
+new. That last one is where a stub-mode demo actually sits, and it used to be
+invisible: `lessons` counted the raw `distilled` list, which `compress_run` seeds
+with the run's *retrieved* records, so two runs that learned nothing reported "10
+lessons distilled."
+
+**A lesson is what `compress_run` minted** — `source` starting `episode:` — not
+everything the episode carried. Counting "records not already in the corpus"
+instead looks right until a draft carrying live USPTO prior art lands, at which
+point the panel credits the agent with learning 5 references it merely copied.
+
+Both stores are gitignored, so a fresh clone starts empty — populate them with
+`.venv/bin/python scripts/seed_memory.py --n 5`, which runs the real paths rather
+than writing fixture records. Ingest seeds honestly offline (the clean fixture is
+admitted, the poisoned one quarantined); lessons need `AIRTIGHT_MODE=live`.
+
+Current seams: ingested records (empty), the ablation
 run (superseded corpus, awaiting the GPU re-run), containment enforcement
 (simulated — `print()`, not Landlock), `inference.local` (naming contract, no
 gateway until F5), and claim editing (needs `PATCH /api/draft/{job_id}`).
