@@ -108,6 +108,31 @@ Raw result **2 wins / 2 losses / 6 ties**. Do not quote it. Cause, found mid-run
 - 📌 **Steady-state drafting is ~30s/arm on `a100-bf16`, not the ~99s the first arm shows.**
   The first arm after warm-up is unrepresentative; do not project a window from it.
 
+🔴 **THE REPAIRED NUMBER IS IN, AND IT IS NEGATIVE. Warmed does not beat empty.**
+`results/rejudge/20260718-192244/` (live A100, ~7 min, `af2cb43`, SHA captured at run start,
+`kind: rejudge`, drafts reused from `20260718-183817` — nothing re-drafted).
+
+| | |
+|---|---|
+| **Total loopholes caught** | **empty 13 · warmed 9** |
+| All 10 pairs | 1 win · 3 losses · 6 ties |
+| **8 pairs with clean symmetric scoring (≤1.5×)** | **0 wins · 3 losses · 5 ties** |
+
+The single "win" (`uspto-19325156`, +1) sits on a **2.49× asymmetric** pair and is not
+trustworthy. **Across every pair where the judge saw comparable text, warmed never won.**
+Losses: `18797574` (2→0), `19014047` (3→1), `19032884` (1→0).
+
+This is the project's **first ablation number with symmetric scoring and honest provenance**,
+and it contradicts the 5/6 headline it was meant to re-derive. **Track-1's "memory compounds"
+claim is not supported by the current measurement.** Do not put the 5/6 on a slide.
+
+Before concluding memory is harmful, the confound below must be settled: these drafts were
+generated under `--fast`, and the warmed arm — the only one carrying extra context — showed
+genre drift under the output cap. **The decisive next experiment is re-drafting a few
+disclosures WITHOUT `--fast` and re-judging**, which separates "retrieval hurts quality" from
+"capped output plus office-action priming crowds out claims". Until that runs, the honest
+statement is *"warmed does not beat empty under `--fast`; cause not yet isolated."*
+
 **Repair is built and rehearsed — `python -m agent.eval.rejudge --run <dir>` (`5199425`).**
 Re-scores banked drafts against the fixed parser without re-drafting: ~2 sequential
 round-trips per arm instead of the full 4 drafting turns, so the next window is short.
