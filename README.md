@@ -84,9 +84,9 @@ python3 -m venv .venv && .venv/bin/pip install -e ".[dev,web,poison]" && .venv/b
 
 Take the `web` and `poison` extras even if you aren't touching the surface or the E5
 security demo. `tests/test_surface.py` `importorskip`s fastapi and the two poison-PDF tests
-`importorskip` pdfplumber *by design*, so a `.[dev]`-only clone reports a green **129 passed,
-27 skipped** — green, but with all 27 surface tests and both poison-PDF tests silently
-not run (`.[dev,web]` without `poison` is **154 passed, 2 skipped**). **156 passed** (no
+`importorskip` pdfplumber *by design*, so a `.[dev]`-only clone reports a green **166 passed,
+34 skipped** — green, but with all 32 surface tests and both poison-PDF tests silently
+not run (`.[dev,web]` without `poison` is **198 passed, 2 skipped**). **200 passed** (no
 skips) is the number that means "everything a fresh clone can run, ran."
 
 Then see it: `uvicorn surface.app:app` serves the applicant intake at `/` and the engine

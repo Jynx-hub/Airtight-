@@ -301,6 +301,7 @@ def test_ablation_tolerates_incomplete_and_older_runs(monkeypatch, tmp_path):
         {"fingerprint": {"mode": "live", "prompt_sha256": {}}, "results": [], "pairs": []}))
 
     monkeypatch.setattr(sources, "ABLATION_DIR", root)
+    monkeypatch.setattr(sources, "REJUDGE_DIR", tmp_path / "rejudge")
     out = sources.ablation_runs()
 
     by_id = {r["id"]: r for r in out["runs"]}
@@ -308,14 +309,52 @@ def test_ablation_tolerates_incomplete_and_older_runs(monkeypatch, tmp_path):
     assert by_id["20260718-100851"]["seam"]["source"].endswith("20260718-100851/")
     assert by_id["20260718-042609"]["fingerprint"]["revise_rounds"] is None
     assert by_id["20260718-042609"]["fingerprint"]["has_revise_prompt"] is False
-    # Newest complete run wins, and the caveat travels with the numbers.
+    # With no rejudge on disk, the newest complete ablation wins and carries the
+    # superseded warning.
     assert out["selected"]["id"] == "20260718-122807"
     assert out["selected"]["totals"]["warmed"]["caught"] == 4
     assert out["caveat"]["label"] == "SUPERSEDED RUN"
 
 
+def test_ablation_prefers_rejudge_over_a_newer_raw_run(monkeypatch, tmp_path):
+    """A rejudge outranks a raw ablation even when the ablation sorts newer, and the
+    caveat swaps with it. Regression: the panel opened on `results/ablation/latest/`
+    — a copy of the asymmetric-scoring run — and showed the pre-rejudge warning."""
+    abl, rej = tmp_path / "ablation", tmp_path / "rejudge"
+    run = {
+        "fingerprint": {"mode": "live", "k": 5, "prompt_sha256": {}},
+        "corpus_size": 17, "disclosures_completed": 1,
+        "results": [
+            {"disclosure_id": "d1", "condition": "empty", "loopholes_caught": 1,
+             "checklist_size": 6, "drafting_seconds": 10.0, "defect_count": 2},
+            {"disclosure_id": "d1", "condition": "warmed", "loopholes_caught": 4,
+             "checklist_size": 6, "drafting_seconds": 9.0, "defect_count": 1},
+        ],
+        "pairs": [{"disclosure_id": "d1", "loopholes_caught_delta": 3}],
+    }
+    # The raw run sorts newest by name, and `latest/` sorts above both.
+    for name in ("20260718-999999", "latest"):
+        (abl / name).mkdir(parents=True)
+        (abl / name / "results.json").write_text(json.dumps(run))
+    (rej / "20260718-192244").mkdir(parents=True)
+    (rej / "20260718-192244" / "results.json").write_text(json.dumps(run))
+
+    monkeypatch.setattr(sources, "ABLATION_DIR", abl)
+    monkeypatch.setattr(sources, "REJUDGE_DIR", rej)
+    out = sources.ablation_runs()
+
+    assert out["selected"]["id"] == "20260718-192244"
+    assert out["selected"]["kind"] == "rejudge"
+    assert out["caveat"]["label"] == "WARMED DOES NOT BEAT EMPTY"
+    # `latest/` is a copy, not a run — it must not appear as its own row.
+    assert "latest" not in {r["id"] for r in out["runs"]}
+
+
 def test_ablation_without_any_runs_is_a_seam(monkeypatch, tmp_path):
+    # Both dirs must point at nothing. Patching only ABLATION_DIR made this assert
+    # "no runs on disk" while reading the repo's real results/rejudge/.
     monkeypatch.setattr(sources, "ABLATION_DIR", tmp_path / "nope")
+    monkeypatch.setattr(sources, "REJUDGE_DIR", tmp_path / "nope-either")
     out = sources.ablation_runs()
     assert out["runs"] == [] and out["selected"] is None and out["seam"]["source"]
 

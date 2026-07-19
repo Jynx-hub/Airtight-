@@ -22,10 +22,14 @@ What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.m
 | **Containment** | ✅ real enforcement (Plan B) + LIVE | offline demo (A3/A6); **`containment/planb/` enforces the four tiers on a Linux kernel — real 403, non-root, read-only fs, no route off-box (A1 Plan B, A5 sweep)**; **LIVE at https://airtight-openshell.vercel.app — real `policy.decide`, real HTTP 403 over the internet, operator approve/reject (`containment/live/`)**. Vendor `nemoclaw` binary still DGX-gated |
 | **Surface** | ✅ two frames | intake (retrieval → live pipeline → grant) + engine panel over every committed artifact; D3's dishonest edit boxes replaced with a labelled seam |
 
-Suite: `.venv/bin/pytest tests/` → **197 passed**, 0 skipped, stub mode, no network — now
+Suite: `.venv/bin/pytest tests/` → **200 passed**, 0 skipped, stub mode, no network — now
 verified in *both* environments (real `USPTO_API_KEY` in `.env` and keyless), not just the
 keyless one. See the Surface entry: "no network" was previously an assumption, not a control.
-(+11 over the 186 baseline: 6 claim-parsing invariants, 5 re-judge provenance tests.)
+(+14 over the 186 baseline: 6 claim-parsing invariants, 5 re-judge provenance tests, 2 surface
+intake tests, 1 rejudge-preference regression.) Reduced-extra counts, re-measured 2026-07-18:
+`.[dev,web]` → **198 passed, 2 skipped**; `.[dev]` → **166 passed, 34 skipped**. Every count
+in `CLAUDE.md` and `README.md` was stale against the tree before this — check the number, not
+just the colour.
 
 📌 **Product path now assembles the airtight draft — recorded and graded.** The stated end
 goal (describe an invention → find the loopholes from prior similar patents → draft against
@@ -579,6 +583,64 @@ SC1/SC2 built; SC3 Fed. Register verified LIVE; SC4 recurring workflow committed
     synthetic and says so rather than showing 77 test-suite blocks as agent activity.
     `tests/test_surface.py` redirects `_SECURITY_DIR` to `tmp_path`; the other suites
     that write there do not.
+- **Demo fallback pointed at the one run we must not quote — fixed 2026-07-18.**
+  `scripts/demo.sh` beat 1 selected a chart by **mtime** (`ls -dt results/ablation/2026*/`),
+  which resolved to `20260718-183817` — the asymmetric-scoring run this board says produced
+  no usable number. The offline fallback, the thing rehearsed for a dead venue network,
+  would have shown a judge the discredited number. Now reads `results/rejudge/` and prints
+  the honest totals **computed from the data, not hardcoded**: empty 13 · warmed 9, all 10
+  pairs 1W/3L/6T, and the 8 symmetric pairs at 0W/3L/5T, followed by the "cause not yet
+  isolated" read. Falls back to an ablation run only if no rejudge exists, and says so.
+  Also repointed the no-result hint from the deleted `data/real-eval` to `data/real`.
+  📌 The general defect: **selecting evidence by recency picks whatever ran last, which is
+  not the same as whatever is true.** Two more instances of it are open, both found while
+  fixing this one: `docs/GPU-RERUN-RUNBOOK.md:84` (step 5 verifies `memory_py_sha` on the
+  newest `results/ablation/*` and would silently skip a run written to any other `--out`
+  dir), and `surface/sources.py:149` — see the next entry.
+- ✅ **The rejudge number IS attributable to today's ranker — verified 2026-07-18 by git,
+  not by the fingerprint.** Running the (now fixed) step-5 gate over every run on disk
+  returns **`NO STAMP` for all five**: `fingerprint.memory_py_sha` postdates every run we
+  have, so no run self-documents its retriever. That reads like "nothing is quotable" — but
+  checking the ranker's source directly across the relevant commits shows
+  `agent/memory.py` is **byte-identical at `4aa8cee` (C2, the last intentional ranker
+  change), `15a54d8` (the drafts), `0a289d8` (`183817` written), `af2cb43` (the rejudge) and
+  `6b0ca19` (HEAD)** — all `b44efec3…`. So **empty 13 · warmed 9 was produced by exactly the
+  retrieval that is on disk today**, and the standing "produced by code that no longer
+  exists" caveat does *not* apply to it.
+  - Residual gap: git can't prove the working tree was clean during those runs, which is
+    precisely the hole `memory_py_sha` exists to close. So this is strong evidence, not the
+    guarantee the stamp gives. Treat the first stamped run as the first fully self-evidencing one.
+  - **This narrows what the GPU window is for.** Retrieval provenance is no longer the open
+    question on the negative result; the `--fast` confound is. Verified that the harness does
+    stamp correctly going forward (`config_fingerprint` returns `b44efec3…` on HEAD), so the
+    gate is live rather than aspirational — it had never actually produced a stamped run.
+- ⚠️ **The judged surface defaults to the discredited run, and its caveat describes the
+  wrong problem.** `ablation_runs()` sorts run dirs `reverse=True` and selects the first
+  complete one; `"latest"` sorts above every `2026…` name, and `results/ablation/latest/`
+  is a **copy of `20260718-183817`** — the asymmetric-scoring run. So `/api/ablation`, the
+  panel judges actually click, opens on the number this board says not to quote. Worse, the
+  attached caveat still reads "do not quote until the GPU re-run lands" and blames the
+  deleted `data/real-eval` corpus — **that re-run has since landed** (`results/rejudge/`),
+  and the current honest position is the opposite one: empty 13 · warmed 9, warmed does not
+  beat empty. The surface had no knowledge of `results/rejudge/` at all — `ablation_runs()`
+  only ever read `ABLATION_DIR`. **Fixed 2026-07-18:** it now scans both dirs, tags each run
+  `kind`, **prefers the newest rejudge** (a raw run may have scored its arms on up to 13x
+  different amounts of text, making its delta an artifact of markdown), drops the duplicate
+  `latest/` row, and swaps the caveat with the selection. Panel now opens on
+  `empty 13 · warmed 9` under a `WARMED DOES NOT BEAT EMPTY` seam. Regression test asserts a
+  rejudge outranks a newer-sorting raw run.
+  - Two smaller defects fell out of it. `admin.js` hardcoded `+${delta}`, so the repaired
+    negative rendered as **`+-4`** — signed now. And `test_ablation_without_any_runs_is_a_seam`
+    patched only `ABLATION_DIR`, so it asserted "no runs on disk" while reading the repo's
+    real `results/rejudge/`; it now patches both. Same shape as
+    `test-asserting-a-credential-is-absent-is-a-live-call`: **a test asserting absence is only
+    as good as its most-forgotten seam.**
+- **The spend ledger had drifted — corrected 2026-07-18.** `docs/COSTS.md` logged only the
+  F2/F4 benchmark windows and reported a **$2.45** running total while **four metered live
+  runs** (three ablations + the rejudge) went unlogged — a ~$3.20 gap on a fixed credit that
+  the judged demo comes out of. Real total is **≈$5.65 of ~$30**. The two ablation rows with
+  no recorded wall-clock are reconstructed from `drafting_seconds` at the 3.3x drafting→wall
+  ratio `183817` measured, and are marked as estimates rather than presented as measurements.
 
 ---
 

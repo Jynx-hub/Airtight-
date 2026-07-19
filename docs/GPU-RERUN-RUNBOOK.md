@@ -78,21 +78,52 @@ for plumbing checks only:
 The fingerprint must match the freeze — and thanks to `memory_py_sha`, this holds even if the
 tree drifted:
 
+Check **every** run the window produced, not just the newest one under `results/ablation/`.
+A run written to any other `--out` dir (`results/ablation-nofast/`, `results/rejudge/`) is
+invisible to a `results/ablation/*` glob, so its provenance would go unverified — and an
+unverified run is not quotable, which is the whole point of this step.
+
 ```bash
 python3 - <<'PY'
-import json, glob, os, hashlib, pathlib
-f = sorted(glob.glob('results/ablation/*/results.json'), key=os.path.getmtime)[-1]
-fp = json.load(open(f))['fingerprint']
+import json, glob, hashlib, pathlib
 live = hashlib.sha256(pathlib.Path('agent/memory.py').read_bytes()).hexdigest()
-print("results.json:", f)
-print("run  memory_py_sha:", fp['memory_py_sha'])
-print("disk memory_py_sha:", live)
-print("git_sha:", fp['git_sha'])
-print("MATCH" if fp['memory_py_sha'] == live else "MISMATCH — ranker changed mid-window, run is NOT quotable")
+print("disk memory_py_sha:", live, "\n")
+files = sorted(glob.glob('results/*/*/results.json'))
+if not files:
+    raise SystemExit("no results.json anywhere under results/ — nothing to verify")
+bad = 0
+for f in files:
+    fp = json.load(open(f)).get('fingerprint', {})
+    # A rejudge re-scores banked drafts and never invokes the ranker, so it carries the
+    # SOURCE run's hash rather than its own. Checking it against the live ranker would
+    # flag every rejudge as a mismatch and train you to ignore this gate.
+    rejudge = fp.get('kind') == 'rejudge'
+    run_sha = fp.get('source_memory_py_sha') if rejudge else fp.get('memory_py_sha')
+    if run_sha is None:
+        verdict, stale = 'NO STAMP', True          # predates memory_py_sha — not attributable
+    else:
+        stale = run_sha != live
+        verdict = 'MISMATCH' if stale else 'MATCH   '
+    bad += stale
+    print(f"{verdict} {f}{'  (rejudge → source hash)' if rejudge else ''}")
+    print(f"         memory_py_sha={run_sha} git_sha={fp.get('git_sha')} "
+          f"captured={fp.get('git_sha_captured', 'at-write-time')}")
+raise SystemExit(bad and "\nNOT ALL RUNS ATTRIBUTABLE — see above; those runs are NOT quotable"
+                 or "\nall runs attributable")
 PY
 ```
 
-If it prints `MISMATCH`, something edited the ranker during the window — re-freeze and re-run.
+Expected on a tree that has not yet re-run: **every run currently on disk prints `NO STAMP`.**
+`memory_py_sha` was added after all of them, so none is attributable by this gate — which is
+itself the reason the re-run exists. The check is live and correct; confirm with
+`python3 -c "from agent.eval.harness import config_fingerprint as f; print(f(5,1)['memory_py_sha'])"`,
+which must equal the reference hash above.
+
+If any line prints `MISMATCH`, something edited the ranker during the window — re-freeze and
+re-run **that** run. Note older runs on disk will legitimately mismatch; what matters is the
+ones this window produced. Also check `git_sha_captured`: `at-write-time` means the SHA was
+stamped when `results.json` was written, so a commit landing mid-run can misattribute it
+(this is what happened to `20260718-183817`).
 
 ### 6. Record it on the board
 

@@ -51,13 +51,26 @@ container costs ~12 minutes of dead air. Both measured 2026-07-18 — `docs/THRO
 
 Modal bills per-second only while a container is up. Log every metered window here.
 
-| Date (UTC) | What | GPU | Billed time | ~Cost |
+| Date | What | GPU | Billed time | ~Cost |
 |---|---|---|---|---|
-| 2026-07-18 05:5x–06:2x | F2 throughput sweeps (runs A + B) + cold starts | A100 | ~30 min | ~$1.25 |
-| 2026-07-18 06:43–07:21 | F4 L40S re-benchmark: 2 cold starts + sweep | L40S | ~37 min | ~$1.20 |
+| 2026-07-18 05:5x–06:2x UTC | F2 throughput sweeps (runs A + B) + cold starts | A100 | ~30 min | ~$1.25 |
+| 2026-07-18 06:43–07:21 UTC | F4 L40S re-benchmark: 2 cold starts + sweep | L40S | ~37 min | ~$1.20 |
+| 2026-07-18 04:26 CDT | M4 ablation `20260718-042609`, 4 arms (1.8 min drafting) | A100 | ~8 min † | ~$0.35 † |
+| 2026-07-18 12:28 CDT | M4 ablation `20260718-122807`, 12 arms (7.9 min drafting) | A100 | ~25 min † | ~$1.05 † |
+| 2026-07-18 18:38 CDT | M4 ablation `20260718-183817`, 20 arms — **no usable number** (scoring asymmetry) | A100 | ~35 min | ~$1.50 |
+| 2026-07-18 19:22 CDT | Rejudge `20260718-192244` — re-scored the banked drafts, no re-drafting | A100 | ~7 min | ~$0.30 |
 
-**Running total ≈ $2.45** of the ~$30 credit. The judged demo window (~1 hr pinned warm on
+† Wall-clock reconstructed from `drafting_seconds` in `results.json` plus judging and
+cold-start overhead, at the ~3.3x drafting→wall ratio the `183817` run recorded. The last
+two rows are measured. `results/ablation/latest/` is a copy of `183817`, not a fifth run.
+
+**Running total ≈ $5.65** of the ~$30 credit. The judged demo window (~1 hr pinned warm on
 A100) is budgeted at ~$2.50, leaving ample headroom for rehearsals.
+
+📌 **The four ablation/rejudge rows were reconstructed on 2026-07-18, after the fact.** The
+ledger had drifted to reporting only the F2/F4 benchmark windows while four metered live
+runs went unlogged — a $3.20 gap on a fixed credit. Log the window when you close it, not
+when someone notices.
 
 ## The one thing that could push cost up
 

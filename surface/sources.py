@@ -24,6 +24,10 @@ from airtight import config
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 ABLATION_DIR = ROOT / "results" / "ablation"
+# Rejudge runs re-score banked drafts against the fixed `_split_claims` parser. They are
+# the only ablation numbers on disk whose two arms were judged on comparable text, so the
+# panel prefers them over any raw ablation run — see `ablation_runs`.
+REJUDGE_DIR = ROOT / "results" / "rejudge"
 SECURITY_DIR = ROOT / "results" / "security"
 BENCH_DIR = ROOT / "runtime" / "bench-results"
 CORPUS_DIR = ROOT / "data" / "real" / "groundtruth"
@@ -90,30 +94,39 @@ def ablation_runs() -> dict:
     and the REVISE_SYSTEM prompt hash postdate the older run, and reading them
     positionally is how this 500s.
     """
-    if not ABLATION_DIR.exists():
+    if not ABLATION_DIR.exists() and not REJUDGE_DIR.exists():
         return {"runs": [], "selected": None, "seam": seam(
             "NO RUNS ON DISK",
             "The ablation has not been run in this clone.",
             "python -m agent.eval --layout pooled --data-root data/real",
         )}
 
+    # Both families, newest first. Directory names are timestamps, so a reverse name sort
+    # is chronological — with one trap: `results/ablation/latest/` is a *copy* of another
+    # run and sorts above every `2026…` name. Selecting it is exactly how this panel came
+    # to open on the superseded `183817`. Drop it; it is a pointer, not a run.
+    candidates = []
+    for base, kind in ((ABLATION_DIR, "ablation"), (REJUDGE_DIR, "rejudge")):
+        if base.exists():
+            candidates += [(d, kind) for d in base.iterdir() if d.is_dir() and d.name != "latest"]
+    candidates.sort(key=lambda c: c[0].name, reverse=True)
+
     runs = []
-    for d in sorted(ABLATION_DIR.iterdir(), reverse=True):
-        if not d.is_dir():
-            continue
+    for d, kind in candidates:
         data = _read_json(d / "results.json")
         transcripts = sorted((d / "transcripts").glob("*.json")) if (d / "transcripts").exists() else []
         if not isinstance(data, dict):  # missing, null, or a bare list
             # Killed mid-run: transcripts exist, the file the chart needs doesn't.
             runs.append({
                 "id": d.name,
+                "kind": kind,
                 "complete": False,
                 "transcript_count": len(transcripts),
                 "seam": seam(
                     "INCOMPLETE RUN",
                     f"{len(transcripts)} transcripts written, no results.json — the run was killed "
                     "before it aggregated.",
-                    f"results/ablation/{d.name}/",
+                    f"results/{kind}/{d.name}/",
                 ),
             })
             continue
@@ -123,6 +136,7 @@ def ablation_runs() -> dict:
         results = [r for r in results if isinstance(r, dict)]
         runs.append({
             "id": d.name,
+            "kind": kind,
             "complete": True,
             "transcript_count": len(transcripts),
             "corpus_size": data.get("corpus_size"),
@@ -146,20 +160,38 @@ def ablation_runs() -> dict:
             },
         })
 
-    selected = next((r for r in runs if r["complete"]), None)
-    return {
-        "runs": runs,
-        "selected": selected,
-        # The caveat travels with the data. WORKSTREAMS: the corpus that produced
-        # these numbers is gone from the tree and retrieval has changed twice since.
-        "caveat": seam(
+    # Prefer a rejudge: a raw ablation run may have scored its two arms on wildly
+    # different amounts of text (up to 13x before the `_split_claims` fix), which makes
+    # its delta an artifact of markdown rather than of memory.
+    selected = next((r for r in runs if r["complete"] and r["kind"] == "rejudge"), None)
+    if selected is None:
+        selected = next((r for r in runs if r["complete"]), None)
+
+    # The caveat travels with the data, and which caveat is true depends on which run is
+    # on screen. Getting this wrong is not cosmetic: the panel previously showed the
+    # superseded warning ("do not quote until the GPU re-run lands") *after* that re-run
+    # had landed and returned the opposite result.
+    if selected is not None and selected["kind"] == "rejudge":
+        caveat = seam(
+            "WARMED DOES NOT BEAT EMPTY",
+            "Re-scored against the fixed _split_claims parser, so both arms are judged on "
+            "comparable text — this is the first ablation number on this board with symmetric "
+            "scoring and honest provenance, and it is negative: empty 13 · warmed 9, with 0 wins "
+            "across the 8 symmetric pairs. The learning mechanism is real and demos live; the "
+            "positive delta is the open question. Drafts were generated under --fast and only "
+            "the warmed arm carries extra context, so the cause is not yet isolated.",
+            "docs/WORKSTREAMS.md · results/rejudge/",
+        )
+    else:
+        caveat = seam(
             "SUPERSEDED RUN",
             "Warmed on a corpus (data/real-eval/) no longer in the tree, and retrieval has been "
-            "rewritten twice since (C1 statute diversification, C2 BM25 b=0.3). Directionally real, "
-            "not currently reproducible — do not quote until the GPU re-run lands.",
+            "rewritten twice since (C1 statute diversification, C2 BM25 b=0.3). Judged before the "
+            "_split_claims fix, so the two arms may not have been scored on comparable text. "
+            "Directionally real, not currently reproducible — do not quote.",
             "docs/WORKSTREAMS.md · results/ablation/",
-        ),
-    }
+        )
+    return {"runs": runs, "selected": selected, "caveat": caveat}
 
 
 def _ablation_totals(results: list[dict]) -> dict:

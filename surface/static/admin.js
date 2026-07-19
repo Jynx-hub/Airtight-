@@ -281,14 +281,18 @@ async function loadAblation() {
 
   const run = a.selected;
   const t = run.totals;
-  $("abl-meta").textContent = `${run.id} · ${run.fingerprint.mode} · corpus ${run.corpus_size}`;
+  $("abl-meta").textContent =
+    `${run.id} · ${run.kind} · ${run.fingerprint.mode} · corpus ${run.corpus_size}`;
 
   const s = el("div", "stats");
   s.style.marginBottom = ".9rem";
+  // Sign the delta rather than prefixing "+". The repaired number is negative, and a
+  // hardcoded "+" rendered it as "+-4".
+  const delta = t.warmed.caught - t.empty.caught;
   s.append(
     stat(`${t.empty.caught}/${t.empty.checklist}`, "caught · empty", "muted"),
     stat(`${t.warmed.caught}/${t.warmed.checklist}`, "caught · warmed"),
-    stat(`+${t.warmed.caught - t.empty.caught}`, "delta"),
+    stat(`${delta > 0 ? "+" : ""}${delta}`, "delta"),
     stat(run.disclosures_completed, "disclosures", "muted"),
   );
   body.append(s);
