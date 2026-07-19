@@ -19,7 +19,7 @@ The engine runs in two modes: **hit-mode** (point it at an existing patent → l
 
 | Track | How Airtight fits | Ceiling |
 |-------|-------------------|---------|
-| **Recursive Intelligence** | Statute-indexed edge-case failure library + episodic memory + RAG-from-self; measurable first-run vs last-run delta on loopholes-caught / time / correctness | 9/10 |
+| **Recursive Intelligence** | Statute-indexed edge-case failure library + episodic memory + RAG-from-self (all three learning mechanisms the track asks for); compounding is live and demonstrable. The controlled first-vs-last delta is measured honestly and currently negative (warmed 9 vs empty 13) after we fixed a scoring bug that had faked a positive — see SUBMISSION.md | mechanism 9/10, delta open |
 | **HiddenLayer Runtime Security** | Every interaction (prompt, response, tool call, tool result, ingested doc) routed through HiddenLayer AIDR; graded response policy | 9/10 |
 | **NemoClaw + OpenShell Containment** | Capable agent (live filing creds + client datastore) contained by a 3-tier OpenShell policy with Policy-Advisor human-in-the-loop | 8/10 |
 | **Best Use of vLLM** ($500) | Agent inference served on self-hosted vLLM behind inference.local; concurrent sub-agent retrieval exploits continuous batching; Nano = small-model-punch | cross-cutting |
