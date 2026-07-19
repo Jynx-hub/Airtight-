@@ -22,7 +22,9 @@ What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.m
 | **Containment** | ✅ real enforcement (Plan B) + LIVE | offline demo (A3/A6); **`containment/planb/` enforces the four tiers on a Linux kernel — real 403, non-root, read-only fs, no route off-box (A1 Plan B, A5 sweep)**; **LIVE at https://airtight-openshell.vercel.app — real `policy.decide`, real HTTP 403 over the internet, operator approve/reject (`containment/live/`)**. Vendor `nemoclaw` binary still DGX-gated |
 | **Surface** | ✅ two frames | intake (retrieval → live pipeline → grant) + engine panel over every committed artifact; D3's dishonest edit boxes replaced with a labelled seam |
 
-Suite: `.venv/bin/pytest tests/` → **186 passed**, 0 skipped, stub mode, no network.
+Suite: `.venv/bin/pytest tests/` → **186 passed**, 0 skipped, stub mode, no network — now
+verified in *both* environments (real `USPTO_API_KEY` in `.env` and keyless), not just the
+keyless one. See the Surface entry: "no network" was previously an assumption, not a control.
 
 📌 **Product path now assembles the airtight draft — recorded and graded.** The stated end
 goal (describe an invention → find the loopholes from prior similar patents → draft against
@@ -452,6 +454,19 @@ SC1/SC2 built; SC3 Fed. Register verified LIVE; SC4 recurring workflow committed
     product — `loopholes_closed` was structurally always `[]`. And `g.AUDIT_LOG` was read
     whole after each draft, so every request re-reported every earlier request's findings.
     Both now have regression tests that were confirmed to fail against the old code.
+  - **The suite's "no network" was an assumption, not a control (found 2026-07-18).**
+    `test_surface.py` asserted `report["prior_art"] == []` on the *comment* "no USPTO key in
+    the test env". `airtight/config` calls `load_dotenv()`, so on any machine with a real
+    `USPTO_API_KEY` in the repo-root `.env` the draft path fired a **live USPTO call inside
+    the offline suite** and the test failed — 185/1, not the documented 186/0. The count was
+    environment-dependent and nobody could see it, because the machines that ran it most
+    were keyless. Fixed in the autouse `force_stub` fixture (`monkeypatch.delenv`), so
+    hermeticity is enforced for the whole file rather than assumed; tests that *want* prior
+    art still patch `search_prior_art` at source. Now 186/0 with the key present and
+    without it, and the file runs 5.31s → 1.97s with the network call gone.
+    **Worth generalising:** `test_prior_art.py` was already disciplined about this (every
+    test `delenv`s or sets a dummy). A green suite is only evidence about the environment
+    it ran in — an assertion that encodes "this credential is absent" is a latent live call.
   - **`◐` D3 is still `◐`, deliberately.** Claims render read-only behind an
     `EDITING NOT WIRED` seam naming `PATCH /api/draft/{job_id}`. The textareas that
     silently ate every edit are gone; real editing is still unbuilt.
