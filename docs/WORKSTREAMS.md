@@ -22,12 +22,12 @@ What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.m
 | **Containment** | ✅ real enforcement (Plan B) + LIVE | offline demo (A3/A6); **`containment/planb/` enforces the four tiers on a Linux kernel — real 403, non-root, read-only fs, no route off-box (A1 Plan B, A5 sweep)**; **LIVE at https://airtight-openshell.vercel.app — real `policy.decide`, real HTTP 403 over the internet, operator approve/reject (`containment/live/`)**. Vendor `nemoclaw` binary still DGX-gated |
 | **Surface** | ✅ two frames | intake (retrieval → live pipeline → grant) + engine panel over every committed artifact; D3's dishonest edit boxes replaced with a labelled seam |
 
-Suite: `.venv/bin/pytest tests/` → **200 passed**, 0 skipped, stub mode, no network — now
+Suite: `.venv/bin/pytest tests/` → **205 passed**, 0 skipped, stub mode, no network — now
 verified in *both* environments (real `USPTO_API_KEY` in `.env` and keyless), not just the
 keyless one. See the Surface entry: "no network" was previously an assumption, not a control.
-(+14 over the 186 baseline: 6 claim-parsing invariants, 5 re-judge provenance tests, 2 surface
+(+19 over the 186 baseline: 6 claim-parsing invariants, 5 re-judge provenance tests, 5 revise-delta tests, 2 surface
 intake tests, 1 rejudge-preference regression.) Reduced-extra counts, re-measured 2026-07-18:
-`.[dev,web]` → **198 passed, 2 skipped**; `.[dev]` → **166 passed, 34 skipped**. Every count
+`.[dev,web]` → **203 passed, 2 skipped**; `.[dev]` → **171 passed, 34 skipped**. Every count
 in `CLAUDE.md` and `README.md` was stale against the tree before this — check the number, not
 just the colour.
 
@@ -241,6 +241,27 @@ proven offline).**
   replies carry no defect keyword, so stub does 0 revises and the ablation stub-delta-0
   invariant is untouched. `REVISE_SYSTEM` is in `scaffold_proof` + the fingerprint;
   `revise_rounds` is stamped; `--revise-rounds` on the CLI. Tests: `tests/test_revise.py`.
+  - 📌 **At the default `--revise-rounds 1` the loop never re-critiques**, so a round-1 run
+    structurally cannot say whether the revise fixed anything: `loop.py:131` skips the
+    re-critique after the last permitted revise. Every banked run to date is round-1, so
+    "the loop self-corrects" is currently a claim about the *mechanism*, not a measurement.
+    **`--revise-rounds 2` is what makes it measurable** — it banks `critique` and `critique-2`.
+- [x] **B1a · Within-run defect reduction is now readable off disk — built 2026-07-18.**
+  `python -m agent.eval.revise_delta --run <dir>` (`agent/eval/revise_delta.py`) counts
+  `material_defects` lines in `critique` vs `critique-2` per arm. **No model calls, no GPU** —
+  it reads banked transcripts, following the `rejudge.py` precedent. Written *before* the
+  window on purpose, so the analysis isn't debugged afterwards against data that cost credit.
+  Validated two ways offline: it correctly refuses the existing round-1 runs ("no arm has a
+  re-critique turn") and produces correct totals on a synthetic round-2 run. Tests:
+  `tests/test_revise_delta.py` (5), including that a round-1 arm is *skipped* rather than
+  scored as 0.
+  - ⚠️ **Instrument caveat, and it is load-bearing.** `material_defects` counts critique
+    lines naming a statute or defect keyword; `judge.count_defects` requires verbatim-grounded
+    quotes and caps at 6, and is what `results.json`'s `defect_count` reports. **They are not
+    the same measurement.** Report this as "critique lines naming a defect fell from X to Y",
+    never as a drop in judged defects — conflating them is the `_split_claims` error again,
+    two instruments presented as one. The output embeds its own `instrument` string so the
+    caveat travels with the number.
 - [x] **B2 · Episodic write — done.** The dead `EPISODES_ENABLED` now gates the write
   (`sink AND flag`). **Isolation is absolute:** the harness passes no sink, so no env flip
   writes during the ablation — regression-locked by `test_ablation_uncontaminated_by_episodes`
