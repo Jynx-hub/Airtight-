@@ -20,16 +20,42 @@ What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.m
 | **Inference** | ✅ first half | Nemotron on vLLM/Modal, `INFERENCE_BACKEND=modal\|nim\|gateway`, 10.67× batching on record; `inference.local` gateway injects creds host-side (A4) |
 | **Agent** | ◐ built, deepening | loop now self-corrects (revise turn) and compounds (episodic write, isolated from the ablation); retrieval is statute-diversified and BM25-ranked, and ingest writes into it. B, C and D all done offline — **every quality gain is still unmeasured live** |
 | **Containment** | ✅ real enforcement (Plan B) + LIVE | offline demo (A3/A6); **`containment/planb/` enforces the four tiers on a Linux kernel — real 403, non-root, read-only fs, no route off-box (A1 Plan B, A5 sweep)**; **LIVE at https://airtight-openshell.vercel.app — real `policy.decide`, real HTTP 403 over the internet, operator approve/reject (`containment/live/`)**. Vendor `nemoclaw` binary still DGX-gated |
-| **Surface** | ✅ two frames, reskinned | intake (retrieval → live pipeline → grant) + engine panel over every committed artifact; D3's dishonest edit boxes replaced with a labelled seam. **Ported to the Pete design language 2026-07-19** — React, self-hosted fonts, zero CDN requests, every panel re-verified against live endpoints |
+| **Surface** | ✅ two frames, reskinned | intake (retrieval → live pipeline → grant) + engine panel over every committed artifact; D3's dishonest edit boxes replaced with a labelled seam. **Ported to the Pete design language 2026-07-19** — React, self-hosted fonts, zero CDN requests, every panel re-verified against live endpoints. **Drafting now compounds (B4)** — both product routes pass an episode sink and `AIRTIGHT_EPISODES_ENABLED` is on in `.env` |
 
-Suite: `.venv/bin/pytest tests/` → **205 passed**, 0 skipped, stub mode, no network — now
+Suite: `.venv/bin/pytest tests/` → **214 passed**, 0 skipped, stub mode, no network — now
 verified in *both* environments (real `USPTO_API_KEY` in `.env` and keyless), not just the
 keyless one. See the Surface entry: "no network" was previously an assumption, not a control.
 (+19 over the 186 baseline: 6 claim-parsing invariants, 5 re-judge provenance tests, 5 revise-delta tests, 2 surface
-intake tests, 1 rejudge-preference regression.) Reduced-extra counts, re-measured 2026-07-18:
-`.[dev,web]` → **203 passed, 2 skipped**; `.[dev]` → **171 passed, 34 skipped**. Every count
+intake tests, 1 rejudge-preference regression; +3 on 2026-07-19 for the doorway truncation
+guard; +2 on 2026-07-19 for the surface episodic write; +2 on 2026-07-19 pinning both
+prior-art guardrail payloads — one per hop.) Reduced-extra counts, re-measured 2026-07-19:
+`.[dev,web]` → **212 passed, 2 skipped**; `.[dev]` → **177 passed, 37 skipped**. Every count
 in `CLAUDE.md` and `README.md` was stale against the tree before this — check the number, not
 just the colour.
+
+✅ **"Smoke-tested live" is now one command — `.venv/bin/python scripts/verify_live.py`.**
+A handoff claimed all six of surface / Plan B 403 / Vercel gate / HiddenLayer 5-hops /
+gateway / USPTO were smoke-tested live; auditing them by hand found three that were not.
+The script re-derives each against the real system and **refuses to report green on a
+prerequisite it does not have** — a missing credential prints `BLOCKED`, never `PASS`.
+It also asserts the two properties whose absence previously let a stub look live: the
+HiddenLayer `event_id` must be a real AIDR UUID, and USPTO hits must land in the
+disclosure's own CPC class. Measured **2026-07-19: 6/6, with live HiddenLayer credentials
+in `.env`.** Getting there took three defects that *only a live key could expose* — all
+three are below, and all three were invisible to a green 213-test suite.
+
+| Check | Verdict | Evidence |
+|---|---|---|
+| Surface | ✔ PASS | 8/8 frames + read-side API routes 200 on the current tree |
+| Plan B 403 | ✔ PASS | real `hard_deny` + `default_deny_escalate` 403s, prop-0001 rejected / prop-0002 approved, allowed GET forwards to a real 200, no direct route off-box |
+| Vercel gate | ✔ PASS | HTTP 200 from `airtight-openshell.vercel.app/api/gate`, 4 real policies |
+| HiddenLayer | ✔ **PASS** | **Credentials landed 2026-07-19 and the bus is live.** Poisoned prior art quarantined on `tool_result` with a real AIDR UUID (`04087d61-cd9b-4eee-a799-8a7eab755290`), category `prompt_injection`. This is the project's **first** genuine live AIDR verification — every one of the 257 previously banked hops was a fixture. Key expires 24h (`AITX-2026`, `prod-us`); re-issue before judging |
+| Gateway | ✔ PASS | all 5 `gateway_smoke.py` checks: dummy token 401 direct / 200 via gateway, model pinned, key absent from agent env. Provider is the local mock — proves the credential boundary, **not** a live GPU round-trip |
+| USPTO prior-art | ✔ PASS | live ODP call, 5 hits, `extraction_confidence 0.5`. **Re-measured 2026-07-19 with HiddenLayer LIVE** — both hops now pass on real event ids (`874254eb` tool_call, `6e35792e` tool_result). The earlier PASS in this row was taken while HL was BLOCKED, i.e. with `analyze()` short-circuiting; with creds present the same call returned **0 hits** until the payload fixes below |
+
+📌 Two caveats the table does not carry: the Surface's **live draft quality** is still `◐`
+(needs the GPU window, same as the ablation re-run), and Plan B's path rules remain
+HTTP-demo-scoped. Both are recorded in their own items below.
 
 📌 **Product path now assembles the airtight draft — recorded and graded.** The stated end
 goal (describe an invention → find the loopholes from prior similar patents → draft against
@@ -50,6 +76,55 @@ them → self-correct) is now the path the Surface runs. Three pieces, all **pro
   unclassified filings (display devices, biology) — now a fielded query scoped to granted
   REGULAR applications in the disclosure's CPC class (mirrors `data/pull_uspto.py`), which
   flips the hits to in-domain G06F software patents.
+- ⚠️ **The guarded search returned 0 hits the moment HiddenLayer went live — twice, for two
+  different reasons, one per hop** (`agent/prior_art.py`, 2026-07-19). Both were AIDR reading
+  *machine-generated structure* as an attack, and both were invisible because
+  `search_prior_art` degrades to `[]`: the search looked keyless rather than blocked.
+  - **tool_call** — the 306-char Lucene string (`field:value` pairs, quoted literals, AND/OR)
+    scored `prompt_injection`, 3/3 deterministic on real event ids, while every fragment
+    scored clean alone. Fix: guard the **semantic** args (disclosure terms + CPC) and assemble
+    the query in `_lucene` *after* the hop. Not a weakening — terms/CPC are the only
+    attacker-controlled surface; the scaffolding is a fixed template this module emits.
+  - **tool_result** — then the *response* quarantined on
+    `["personally_identifiable_information", "url", "denial_of_service"]`. All three are
+    **correct calls on benign data**: an ODP record carries real inventor names and
+    correspondence addresses, uspto.gov asset links, and ~22k chars each (122k for five).
+    Fix: `_project` reduces each record to the two fields `_to_loophole` actually reads, so
+    the payload drops ~100× and the triggers vanish — **with `POLICY` untouched**, so the
+    fail-closed invariant and Claim 2 stand. `inventionTitle` is the only field reaching the
+    draft, hence the only injection vector, and it still crosses the bus and is still checked.
+  - **[x]** — both hops PASS live on real event ids (`874254eb`, `6e35792e`), 5 in-domain
+    hits; two regression tests pin each payload (attacker text must still cross, scaffolding
+    and PII must not). **The lesson worth keeping: a category allowlist would have "fixed"
+    both by turning the detector off. Narrowing what crosses the bus fixed them by sending
+    the classifier only what the draft actually consumes.**
+- ✅ **`verify_live.py`'s CPC assertion was tautological — found by review, now fixed.**
+  It compared `LoopholeRecord.technology_class` against the disclosure's, but `_to_loophole`
+  *copies* that field from the disclosure, so "all 5 hits in-domain" was self-referential and
+  could not fail. **A check that cannot fail is worse than no check, because it reads as
+  evidence** — and this one was cited in the row above. It now reads each record's own
+  `cpcClassificationBag` off the raw fetch, and reports both figures instead of one flattering
+  one: **5/5 carry a G06F class (what `cpcClassificationBag:G06F*` actually filters on), 4/5
+  have it as the PRIMARY class** — `19542535` is G06Q/H04L primary but does carry `G06F 21/64`,
+  so the filter is behaving correctly and the honest phrasing is "CPC-filtered, relevance-
+  weighted within that", not "CPC-scoped".
+
+- ⚠️ **Third live-only defect: the graded response policy was keyed on a category AIDR never
+  emits, and it failed OPEN.** `POLICY[MODEL_RESPONSE]` mapped `{"pii": REDACT}` and `_redact`
+  filtered on `det.category == "pii"`. Enumerated against the real API 2026-07-19, the ruleset
+  emits **`personally_identifiable_information`** — plus `prompt_injection`, `code`, `url`,
+  `denial_of_service`, `language`, `guardrails`. There is no `"pii"`. So a real PII detection
+  missed the map, fell to `default_detected` (PASS on that hop) and **returned the PII
+  unredacted**, while `SUBMISSION.md` claimed "PII is redacted". Every fixture used `"pii"`
+  too, so the suite was structurally incapable of catching it — the same shape as
+  [[test-asserting-a-credential-is-absent-is-a-live-call]]: green in the wrong environment.
+  Fixed via a `PII_CATEGORIES` frozenset covering both names, with a regression test written
+  in the name the live API actually emits (mutation-checked: reverting the map fails it).
+  **Verified live end-to-end** — inventor name + address + SSN on `MODEL_RESPONSE` now returns
+  `action=redact`, event `d7bb1deb-7635-4e06-9e23-99cabb89b8ea`, text replaced. That also
+  falsifies this board's earlier note that redact is "a tested capability, not a live demo
+  beat": **all four graded actions (pass / redact / quarantine / block) are now live-verified
+  on real event ids.**
 - **Wired into the Surface draft path** (`surface/jobs.py` `draft_guardrails`, this change) —
   the drafting turn is now primed with retrieved memory **plus** live prior art for the
   disclosure (appended, deduped by id, so a live reference always reaches the draft it was
@@ -166,6 +241,59 @@ setting, because only the warmed arm carries the extra context. **Do not treat `
 free speed knob in a judged run until this is tested** — it is a candidate explanation for
 "warmed does worse" that has nothing to do with retrieval quality.
 
+⚠️ **That decisive no-`--fast` experiment was attempted 2026-07-19 and produced NO data.
+~36 min A100, ~$1.50, zero transcripts written.** Recorded here because the failure mode is
+cheap to repeat and the cause was not what the confound above predicts.
+
+`DRAFT_GEN` was `{"temperature": 0.0, "seed": 1234}` — **no `max_tokens` at all**. The cap
+lived only in `FAST_DRAFT_GEN`, so dropping `--fast` removed the token cap *and* the
+reasoning-off flag together. The first drafting turn fell into a degenerate repetition loop
+and generated for **30 min / ~216k tokens at ~120 tok/s** (vLLM logs: `Running: 1 reqs`
+unbroken, KV cache climbing 8.6% → 11.4%) until **Modal's own 1800s function timeout** killed
+it with a 500 — which the OpenAI SDK then silently **retried**, starting the whole thing over.
+The client-side `AIRTIGHT_TIMEOUT_S=900` did not save it: the SDK's default `max_retries=2`
+means one call can burn ~45–90 min before it finally raises.
+
+- 📌 **It was the `empty` arm.** The harness runs `("empty", empty)` before `("warmed", warmed)`,
+  and zero transcripts means the first arm never finished — so this was `uspto-18797574`
+  (rank 0 at seed 1234) drafting with **no retrieved records at all**. The office-action-priming
+  hypothesis above therefore does **not** explain it: uncapped reasoning-on greedy decoding
+  degenerates on this corpus independent of retrieval. The `--fast` confound remains open and
+  untested; this failure is a *separate* baseline problem sitting in front of it.
+- 📌 **Nothing was observable while it ran.** The run command piped through `tail -50`, which
+  buffers until exit, so the shell showed an empty output file for 30 min. Transcripts are
+  written per-arm at `harness.py:224`, so `ls results/ablation/<run>/transcripts/` is the real
+  progress meter — an empty dir after minutes means the first arm is still going.
+- 📌 **`--deadline-min` could never have fired.** It is checked at the disclosure boundary,
+  which requires a *completed pair*. A run that hangs inside arm 1 never reaches the check.
+  It is a pacing guard, not a runaway guard.
+- 📌 **Killing the client does not stop the GPU.** vLLM kept generating the orphaned request
+  after the local process died; `modal app stop -y <app-id>` was required to actually end it.
+
+**Fixed (code side, offline-verified):**
+- `DRAFT_GEN` now carries `max_tokens: 16000` — a runaway guard, not a depth limit. A healthy
+  reasoning-on draft is ~7k tokens, so this leaves >2× headroom while bounding a looping turn
+  to ~2 min instead of 30.
+- `call_model` **raises on `finish_reason == "length"`**, on any truncation rather than only
+  the empty-content case. This closes the silent-failure path where a capped reasoning-on turn
+  returns `content=None` with the answer stranded in `reasoning_content`
+  (`runtime/inference_local.py`) and `content or ""` handed the ablation an empty draft to
+  score as a legitimate zero. It also makes the `--fast` non-arm-neutrality *structurally
+  unrepeatable*: a cap that binds on one arm and not the other is now an error, not a quiet
+  bias.
+- Verified offline: all 3 turns leave `draft_patent` carrying the cap, with
+  `enable_thinking=False` on the tool turn and `True` on the draft/critique turns;
+  `FAST_DRAFT_GEN` unchanged at 1100. Suite **208 passed** (was 205; +3 doorway truncation
+  tests), 0 skipped, stub mode, no network.
+
+**Still open — this is plumbing, not a result.** Whether reasoning-on drafting produces a
+*usable* draft on this corpus is unproven: the cap makes the run bounded and loud, it does not
+make the model stop looping. `mock_endpoint.py` cannot test this (it always returns
+`finish_reason: "stop"`). Retest with **`--n 1 --seed 1234`** — rank 0 is `uspto-18797574`,
+the exact disclosure that ran away, so ~4 min / ~$0.17 either confirms the fix live or
+reproduces the loop as a clean `RuntimeError`. Do not commit the full `--n 10` before that
+returns two complete arms. Corrected commands in `docs/GPU-RERUN-RUNBOOK.md` §4.
+
 ---
 
 ## The focus now
@@ -273,6 +401,86 @@ proven offline).**
   distills a CAPPED (`DISTILL_CAP=3`), cleaned set with `§NNN` in the pattern so the validator
   derives `.statute`. Headers/preambles/bare bullets never become records. Tests cover the
   filter, the cap, and no-poison-in-stub.
+
+- [x] **B4 · Episodic write turned on and wired into the product path — done 2026-07-19.**
+  B2 built the gate but nothing in the product ever passed a sink, so the flag was reachable
+  only from `run_smoke --episodes`: the surface could never compound and its panel read
+  `NOT POPULATED` forever. `.env` now sets `AIRTIGHT_EPISODES_ENABLED=true`, and both product
+  routes — the job worker (`surface/jobs.py`) and the synchronous `POST /api/draft`
+  (`surface/app.py`) — pass `sources.episode_sink()`. The sink is a separate reader from
+  `episode_store()` on purpose: a read tolerates a missing directory, `record()` raises on it.
+  Observed, not reported: two consecutive drafts took the panel `0 → 1 → 2` episodes with the
+  seam clearing, against a `AIRTIGHT_EPISODES_DIR` tmp dir so no evidence was minted into the
+  tree. Tests: 2 in `tests/test_surface.py`, **verified to fail with the sink removed**.
+  - 📌 **The ablation is still untouched** — the gate stayed inside `draft_patent` and the
+    harness passes no sink, so this changes nothing about a judged run.
+  - ⚠️ **A test run would have minted real episodes.** `config.py` calls `load_dotenv()`, so
+    the moment the flag went true in `.env`, every drafting test wrote into `memory/episodes/`
+    — memory the next draft retrieves and the panel counts, indistinguishable on disk from a
+    demo-generated one. Closed by an autouse `_isolate_episode_writes` fixture in `conftest.py`
+    pinning `EPISODES_DIR` to `tmp_path`, exactly mirroring `_isolate_security_log`. Same shape
+    as the "green in which environment?" class of bug: the tests were green *because* the flag
+    was off.
+  - ⚠️ **Open scope decision — live prior art now enters memory.** `draft_guardrails` appends
+    freshly-fetched USPTO prior art to the guardrails, and `compress_run` distils the *whole*
+    guardrail set, so ~5 `priorart-*` records per draft become permanent episode lessons
+    retrievable for **other** disclosures. Not a trust-gate problem — they carry
+    `PRIOR_ART_CONFIDENCE = 0.5`, below `_TRUSTED_CONFIDENCE`, so they never take a reserved
+    statute slot and enter only by out-ranking. But it is unbounded growth, and it softens
+    `jobs.py`'s stated contract that prior art is fetched fresh rather than read from memory.
+    Fixing it means excluding prior art from `distilled` while keeping it in `retrieved_ids`
+    for provenance — a change to B-lane `agent/episodes.py`, deliberately **not** made here.
+- [x] **B4a · "lessons distilled" was over-counting — fixed 2026-07-19, found while seeding.**
+  `memory_stats` counted the raw `distilled` list, but `compress_run` *seeds* that list with
+  the records the run retrieved, so every episode carries k corpus duplicates before minting
+  anything. Two stub runs that learned nothing reported **"10 lessons distilled"** on the
+  engine panel. Over-counts on a live run too (5 retrieved + 3 minted read as 8). `lessons`
+  now counts only records not already retrievable — which is also the only set that can
+  change a future draft, since `CompositeStore` dedups by id with base winning. Caught by an
+  existing assertion (`seam is None` after populating) starting to fail, which is the test
+  doing its job.
+  - 📌 **New third seam state, `NOTHING LEARNED YET`** — episodes recorded, nothing novel
+    distilled. Previously indistinguishable from real compounding on a stat tile, and it is
+    the state a stub-mode demo is *actually* in: the critique turn returns canned text naming
+    no defect, so `material_defects` is empty and there is nothing to distil. Names
+    `AIRTIGHT_MODE=live` as what fills it.
+- [x] **B4a-fix · "Novel" was the wrong signal; provenance is the right one — 2026-07-19.**
+  B4a counted a lesson as "a record not already in the corpus". That held until a draft run
+  through the UI carried **live USPTO prior art** — those 5 `priorart-*` records aren't in the
+  corpus either, so the panel reported **"lessons distilled 5"** for references the agent
+  *copied*, not anything it learned. Same overclaim as B4a, through a different door, and it
+  took real data to expose it: the proxy passed every stub test. `lessons` now counts records
+  whose `source` starts with `episode:`, which `compress_run` stamps on precisely what it
+  minted and nothing else does. Regression test builds an episode carrying one prior-art
+  record, one corpus copy and one minted lesson, and asserts the count is **1**.
+  - 📌 This is the *display* half of B4's open prior-art caveat. The memory-hygiene half is
+    still open: prior art continues to be persisted into episodic memory, it is simply no
+    longer miscounted as learning.
+- [x] **B4b · Seeding is a script, not hand-authored JSON — `scripts/seed_memory.py`.**
+  `memory/episodes/**/*.json` is gitignored, so a fresh clone and every demo machine starts
+  at zero. The seeder drafts real disclosures through the real product path; it does **not**
+  write fabricated episodes, which would render as learning that never happened. Skips
+  `draft_guardrails` on purpose so no live prior art is fetched or distilled (B4's caveat
+  above). Verified the seed cannot perturb the demo — retrieval against the sample disclosure
+  returns a **byte-identical top-5** before and after seeding, for both stores.
+  - **Ingested records seed for real offline, and the gate is real.** `--only ingested` runs
+    both fixtures through `ingest_to_memory`: `prior_art_clean.txt` **ADMITTED → 1 record**,
+    `poisoned_prior_art.txt` **QUARANTINED → 0 records**, on live AIDR round-trips
+    (`prod-us`). That pairing is the point — an ingest store with no quarantine beside it
+    proves writing works, not that gating does. The seeder **refuses to fall back to
+    `--fake-clean`** when the bus is off: a store whose gate was faked is indistinguishable
+    on disk from one whose gate fired. Works offline because `STUB_REPLIES["distill"]` is
+    record-shaped by design, and the minted record self-labels
+    `[UNVERIFIED STUB — not a real extraction]` at confidence 0.3.
+  - ⚠️ **Lessons are NOT seedable offline, and shouldn't be.** A lesson needs a critique
+    naming a defect; the stub reply deliberately carries no defect keyword, because that is
+    what holds stub at 0 revise rounds and keeps the ablation's stub-delta-0 invariant (B1).
+    Editing the stub to name a defect would trade a load-bearing eval invariant for a filled
+    stat tile. `AIRTIGHT_MODE=live` runs the identical path and mints them for real.
+  - ⚠️ **Stub-mode episode data is structurally real and substantively empty.** It proves the
+    write/read/compound path end to end and nothing about quality. Do not point a judge at
+    the episode count as evidence of learning — that is the same overclaim B4a removed from
+    the panel. The live run is what makes it a quality claim.
 
 Correctness items closed: the `rglob` (episodes, subdirs) vs `glob` (flat corpus) difference
 is now documented as intentional on both; `.gitignore` is `memory/episodes/**/*.json`, so
@@ -521,6 +729,29 @@ SC1/SC2 built; SC3 Fed. Register verified LIVE; SC4 recurring workflow committed
 
 ## Done
 
+- **README restructured to the submission checklist (2026-07-19)** — `README.md` now
+  carries the five required sections explicitly: quick start, tech stack + architecture
+  diagram, demo reproduction (env-var table, where each key comes from, sample `.env`),
+  datasets & provenance, and known limitations & next steps. Test count **re-verified by
+  running the suite, not copied from a doc** — `214 passed, 0 skipped`. Datasets section
+  audited against the tree and corrected three stale claims the old README/CLAUDE.md
+  carried: the holdout is **94 paired / 40 unpaired of 134**, not "10-of-38"; the 193
+  records come from **office actions (CTNF/CTFR), not PTAB** — no PTAB data is in this
+  tree at all; and the CPC mix is H04L 50 / G06F 44 / G06N 40, not G06N-only. Limitations
+  section states the negative ablation delta, both failed GPU re-runs, the Plan-B-not-vendor
+  containment caveat, and the untested redact path in the README itself rather than only in
+  `SUBMISSION.md`.
+  - ⚠️ **Four stale counts found in code comments while auditing, NOT fixed** (out of scope
+    for a docs change, all pre-date `c7a9229` broadening the corpus past G06N):
+    `agent/eval/harness.py` ~L64 says "12 of the 50 in data/real" (actually 40 of 134) and
+    ~L92 says "the union of all 38 checklists" (actually 94); `tests/test_retrieval_ranking.py:5`
+    cites "the real 167-record pooled corpus" (actually 193). Comments only — no behaviour
+    depends on them, but they are the same drift that put wrong numbers in the README.
+  - ⚠️ **`data/corpus/loopholes/warming-fixtures.json` placeholders were never filled** —
+    all 6 records still carry `"FIXTURE — replace with PTAB citation (Person 1, E2)"` as
+    their source, and this file is the warming corpus for the **default** `fixtures` eval
+    layout. Now stated as a caveat in the README's synthetic-data table rather than left
+    implicit. E2 is marked done; this is the part of it that isn't.
 - **Data (E1–E5)** — 134 patents across G06N/G06F/H04L with real abstracts and claims;
   94 held-out checklists; 193 defects mined from real office actions (§103 ×111, §101 ×27,
   §112 ×39, §102 ×16). Tracked in git — `main` gets you the data, no key needed to consume.
@@ -567,6 +798,28 @@ SC1/SC2 built; SC3 Fed. Register verified LIVE; SC4 recurring workflow committed
   diversification passed over, the ablation, the guardrail bus, the throughput curve, and
   the four containment tiers. Read-side logic is in `surface/sources.py` +
   `surface/explain.py`; neither touches `agent/memory.py` or `agent/loop.py`.
+  - 📌 **The failure library opens paged, not whole (2026-07-19).** It fetches 60 of the
+    193 records but rendered every one of them, so the panel opened as a wall of table
+    that buried the ablation and containment cards below it. Now it shows the first 8
+    behind a `▸ Show N more` toggle, and a filter change collapses it back rather than
+    leaving the page open mid-scroll on rows nobody asked for. The card meta tracks what
+    is actually visible (`8 of 193` → `60 of 193`), and when expanded it says plainly
+    that the remaining 133 are beyond the read limit — the fetch cap was always there,
+    it was just invisible while the table looked exhaustive. Browser-driven check
+    (headless Chrome over CDP, live `/admin`): 8 rows → click → 60 rows → filter §101 →
+    8 rows with a recomputed `Show 19 more`. JSX-only change, so the 208-test suite
+    covers it no better than before — the evidence is the browser walk.
+  - 📌 **The guardrail bus event list pages the same way (2026-07-19).** `security_events`
+    hands back a 40-hop tail and the panel rendered all 40, so the card ran long enough to
+    push its own `NO LIVE EVENTS` provenance seam off-screen — the one thing on that panel
+    a judge must not miss. Now 8 rows behind the same `▸ Show N more` toggle, reusing the
+    failure library's control rather than a second one. Expanded it says how many audited
+    hops sit **beyond** the tail (`· 217 older hops beyond the tail`), because 40 rows read
+    as the whole log when the census is 257. The hop × action matrix above it is unchanged
+    and still counts all 257 — the collapse is the tail only. Browser-driven check (headless
+    Chrome, live `/admin`): 8 rows → `▸ Show 32 more` → click → 40 rows + the tail note →
+    click → back to 8, no page errors. JSX-only, so again the evidence is the browser walk,
+    not the suite.
   - **Two engine bugs fixed on the way.** `POST /api/draft` never passed `guardrails`, so
     every UI draft silently ran the ablation's *control* arm and reported it as the
     product — `loopholes_closed` was structurally always `[]`. And `g.AUDIT_LOG` was read
@@ -605,13 +858,22 @@ SC1/SC2 built; SC3 Fed. Register verified LIVE; SC4 recurring workflow committed
     retrieval inspector asserted the passed-over rows had out-scored a pick (only true
     when diversification actually cost something), and the score column could contradict
     its own rank column because `_rank` sorts on class-match *before* BM25.
-  - **Found, not fixed:** `guardrails._persist()` writes unconditionally, so `pytest`
-    appends to the same `results/security/*.jsonl` the demo reads. All 130 audited hops in
-    the current log are fixtures (`e`, `evt-test`, `fake-*`) — **zero** carry a real AIDR
-    UUID, including the live run documented on 2026-07-18. The bus panel splits live from
-    synthetic and says so rather than showing 77 test-suite blocks as agent activity.
-    `tests/test_surface.py` redirects `_SECURITY_DIR` to `tmp_path`; the other suites
-    that write there do not.
+  - **✅ Fixed 2026-07-19 — `pytest` no longer pollutes the demo's evidence.**
+    `guardrails._persist()` writes unconditionally, so every suite run appended fixture
+    hops to the same `results/security/*.jsonl` the demo reads. `analyze` returns early
+    when `HL_ENABLED` is false, so it was never a *plain* run — it was the guardrail
+    tests, which call `hl_on()` with a canned `_raw_analyze` and take the full path
+    through `_persist`. `tests/test_guardrails.py` already redirected `_SECURITY_DIR` to
+    `tmp_path`; `test_containment.py`, `test_surface.py` and `test_statute_monitor.py`
+    did not, which is where the `e` / `fake-rehears*` / `fake-clean` ids came from.
+    The log had grown from the 130 audited hops to **257, still with zero real AIDR
+    UUIDs** — one more suite run in this session added ~127. Now an **autouse fixture in
+    the root `conftest.py`** pins `_SECURITY_DIR` under `tmp_path` for every test, so no
+    suite can reach the file regardless of which fixtures it declares. Observed: two full
+    208-test runs left the log byte-frozen at 257/116/48. A companion fixture does the
+    same for `memory/episodes/`, which had the identical hazard via `episode_sink`.
+    ⚠️ The 257 banked hops are still **all fixtures** — the log is now trustworthy going
+    forward, but nothing already in it evidences a live AIDR call.
 - **Demo fallback pointed at the one run we must not quote — fixed 2026-07-18.**
   `scripts/demo.sh` beat 1 selected a chart by **mtime** (`ls -dt results/ablation/2026*/`),
   which resolved to `20260718-183817` — the asymmetric-scoring run this board says produced
