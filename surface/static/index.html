@@ -4,105 +4,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Airtight — Intake</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23F6F4EF'/%3E%3Crect x='9' y='9' width='14' height='14' rx='2' fill='%23505B4B'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="/static/airtight.css">
 </head>
 <body>
 
-<div class="bar">
-  <div class="brand"><b>■ AIRTIGHT</b> <span class="sep">/</span> INTAKE</div>
-  <div class="leds">
-    <span class="led" id="led-mode">MODE <b>…</b></span>
-    <span class="led" id="led-model">MODEL <b>…</b></span>
-    <span class="led" id="led-hl">HIDDENLAYER <b>…</b></span>
-  </div>
-  <nav>
-    <a href="/" aria-current="page">Intake</a>
-    <a href="/admin">Engine</a>
-  </nav>
-</div>
+<!-- The frame is named here rather than inferred, so `/` paints intake on the
+     first render instead of flashing the wrong frame and correcting itself. -->
+<div id="root" data-view="intake"></div>
 
-<main>
-  <div class="grid side">
+<noscript>
+  <p style="font-family:var(--font-sans);color:var(--muted);padding:2rem">
+    AIRTIGHT / INTAKE needs JavaScript — the surface renders client-side against
+    the JSON contract in surface/app.py. The same data is available directly from
+    <code>/api/health</code>, <code>/api/sample</code> and <code>/api/draft/start</code>.
+  </p>
+</noscript>
 
-    <!-- ---------------- disclosure ---------------- -->
-    <section class="panel">
-      <div class="panel-hd">
-        <h2>01 · Disclosure</h2>
-        <span class="meta" id="disc-meta">awaiting input</span>
-      </div>
-      <div class="panel-bd">
-        <label for="f-title">Title</label>
-        <input id="f-title">
-
-        <label for="f-class">Technology class · CPC</label>
-        <input id="f-class" placeholder="G06F">
-
-        <label for="f-inventors">Inventors</label>
-        <input id="f-inventors" placeholder="comma separated">
-
-        <label for="f-summary">Summary</label>
-        <textarea id="f-summary"></textarea>
-
-        <label for="f-details">Details</label>
-        <textarea id="f-details" style="min-height:8rem"></textarea>
-
-        <div class="row">
-          <button class="btn" id="btn-draft">Draft patent</button>
-          <button class="btn ghost" id="btn-sample" type="button">Load sample</button>
-        </div>
-        <p class="small muted" id="status" style="margin:.7rem 0 0"></p>
-      </div>
-    </section>
-
-    <!-- ---------------- context match ---------------- -->
-    <section class="panel">
-      <div class="panel-hd">
-        <h2>02 · Context match</h2>
-        <span class="meta" id="ctx-meta">—</span>
-      </div>
-      <div class="panel-bd" id="ctx-body">
-        <p class="empty">Submit a disclosure to see which recorded failure modes it matches.</p>
-      </div>
-    </section>
-  </div>
-
-  <!-- ---------------- pipeline ---------------- -->
-  <section class="panel" id="pipeline-panel" style="margin-top:1rem">
-    <div class="panel-hd">
-      <h2>03 · Pipeline</h2>
-      <span class="meta" id="pipe-meta">idle</span>
-    </div>
-    <div class="panel-bd" id="pipeline">
-      <p class="empty">The drafting loop runs plan → draft → critique, then revises itself while the
-        examiner turn still finds a material defect.</p>
-    </div>
-  </section>
-
-  <!-- ---------------- grant ---------------- -->
-  <section class="panel hidden" id="grant-panel" style="margin-top:1rem">
-    <div class="panel-hd">
-      <h2>04 · Grant</h2>
-      <span class="meta" id="grant-meta">—</span>
-    </div>
-    <div class="panel-bd">
-      <div class="grid two">
-        <div>
-          <h3 class="mono small" style="color:var(--muted);letter-spacing:.12em;text-transform:uppercase">Claims</h3>
-          <div id="claims"></div>
-        </div>
-        <div>
-          <h3 class="mono small" style="color:var(--muted);letter-spacing:.12em;text-transform:uppercase">Loophole report</h3>
-          <div id="report"></div>
-        </div>
-      </div>
-      <details style="margin-top:1rem">
-        <summary class="mono small muted" style="cursor:pointer">Full specification</summary>
-        <pre class="small mono wrap" id="spec" style="color:var(--muted);margin-top:.6rem"></pre>
-      </details>
-    </div>
-  </section>
-</main>
-
-<script src="/static/intake.js"></script>
+<script src="/static/vendor/react.production.min.js"></script>
+<script src="/static/vendor/react-dom.production.min.js"></script>
+<script src="/static/airtight-kit.js"></script>
 </body>
 </html>

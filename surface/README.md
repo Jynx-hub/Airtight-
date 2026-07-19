@@ -14,6 +14,17 @@ Works in stub mode with no network, no GPU and no keys — every panel reads
 committed artifacts off disk. Set `AIRTIGHT_MODE=live` (+ the Modal URL) for real
 drafts.
 
+**No Node needed to run it.** `static/airtight-kit.js` is committed. You only need
+esbuild if you edit the JSX:
+
+```bash
+bash surface/build.sh                 # ui/*.jsx → static/airtight-kit.js
+```
+
+React and the three font families are vendored under `static/`, so the surface
+renders correctly with the network off. That is a hard requirement, not a
+nicety — do not reintroduce a CDN `<script>` or a Google Fonts `@import`.
+
 ## The frames
 
 **`/` — intake.** Disclosure in → matched context → live pipeline → grant.
@@ -38,7 +49,9 @@ and the four containment tiers.
 | `sources.py` | Tolerant read-only views over `results/`, `data/`, `memory/`, `runtime/bench-results/`. Nothing raises; missing or stale data becomes a labelled seam. |
 | `explain.py` | Recomputes *why* retrieval picked what it picked, reusing `agent/memory.py`'s own `_rank` / `diversify_by_statute` / BM25 constants. |
 | `jobs.py` | In-process job registry + the worker that runs a draft with a live transcript. |
-| `static/` | `airtight.css` (shared tokens), `index.html`+`intake.js`, `admin.html`+`admin.js`. No build step, no CDN. |
+| `ui/` | JSX source for both frames — `Intake.jsx`, `Engine.jsx`, `App.jsx`, the seam renderer in `common.jsx`, and the vendored Pete design-system components in `ui/ds/`. Not served. |
+| `build.sh` | Compiles `ui/` → `static/airtight-kit.js` with esbuild. Run it only after editing `ui/`. |
+| `static/` | `airtight.css` (the token layer), `index.html` + `admin.html` (thin shells), the committed `airtight-kit.js`, plus vendored `vendor/` (React) and `fonts/`. No CDN, no network. |
 
 **Do not** reach into `agent/memory.py` or `agent/loop.py` from here. Retrieval is
 frozen at a recorded SHA for the GPU re-run, and the loop's system prompts are

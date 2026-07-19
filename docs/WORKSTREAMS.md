@@ -20,7 +20,7 @@ What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.m
 | **Inference** | ✅ first half | Nemotron on vLLM/Modal, `INFERENCE_BACKEND=modal\|nim\|gateway`, 10.67× batching on record; `inference.local` gateway injects creds host-side (A4) |
 | **Agent** | ◐ built, deepening | loop now self-corrects (revise turn) and compounds (episodic write, isolated from the ablation); retrieval is statute-diversified and BM25-ranked, and ingest writes into it. B, C and D all done offline — **every quality gain is still unmeasured live** |
 | **Containment** | ✅ real enforcement (Plan B) + LIVE | offline demo (A3/A6); **`containment/planb/` enforces the four tiers on a Linux kernel — real 403, non-root, read-only fs, no route off-box (A1 Plan B, A5 sweep)**; **LIVE at https://airtight-openshell.vercel.app — real `policy.decide`, real HTTP 403 over the internet, operator approve/reject (`containment/live/`)**. Vendor `nemoclaw` binary still DGX-gated |
-| **Surface** | ✅ two frames | intake (retrieval → live pipeline → grant) + engine panel over every committed artifact; D3's dishonest edit boxes replaced with a labelled seam |
+| **Surface** | ✅ two frames, reskinned | intake (retrieval → live pipeline → grant) + engine panel over every committed artifact; D3's dishonest edit boxes replaced with a labelled seam. **Ported to the Pete design language 2026-07-19** — React, self-hosted fonts, zero CDN requests, every panel re-verified against live endpoints |
 
 Suite: `.venv/bin/pytest tests/` → **205 passed**, 0 skipped, stub mode, no network — now
 verified in *both* environments (real `USPTO_API_KEY` in `.env` and keyless), not just the
@@ -550,7 +550,15 @@ SC1/SC2 built; SC3 Fed. Register verified LIVE; SC4 recurring workflow committed
   evidence isn't literally in the claims. Stub mode has zero delta by construction, so a
   green suite proves plumbing, not effect. Doorway timeout and `--deadline-min` landed
   after the `--n 10` run hung on a call with no timeout and burned GPU credit.
-- **Surface (D1–D5)** — two frames, static HTML/CSS/JS, no build step, one `uvicorn`.
+- **Surface (D1–D5)** — two frames, React rendered client-side, one `uvicorn`, **no CDN**.
+  Since 2026-07-19 the surface is the **Pete design language** (warm paper, one forest-green
+  accent, Newsreader/Instrument Sans/JetBrains Mono) ported from the Claude Design project
+  `572e9c78`. Source is JSX under `surface/ui/`; `surface/build.sh` compiles it once with
+  esbuild into the committed `static/airtight-kit.js`, so a clean clone still runs on
+  `uvicorn surface.app:app` alone with **no Node and no npm install**. React, ReactDOM and
+  all three font families are vendored under `static/vendor/` and `static/fonts/` — a
+  browser walk confirms **zero third-party requests**, which is what keeps the offline
+  claim true.
   *Intake* (`/`): disclosure → retrieved context → live pipeline → grant. Retrieval runs
   as you type (BM25 only, no model call), and drafting goes through a job + poll so the
   loop's turns are visible instead of a multi-minute spinner — polling, not streaming,
