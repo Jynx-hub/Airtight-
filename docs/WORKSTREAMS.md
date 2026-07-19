@@ -108,6 +108,32 @@ Raw result **2 wins / 2 losses / 6 ties**. Do not quote it. Cause, found mid-run
 - 📌 **Steady-state drafting is ~30s/arm on `a100-bf16`, not the ~99s the first arm shows.**
   The first arm after warm-up is unrepresentative; do not project a window from it.
 
+**Repair is built and rehearsed — `python -m agent.eval.rejudge --run <dir>` (`5199425`).**
+Re-scores banked drafts against the fixed parser without re-drafting: ~2 sequential
+round-trips per arm instead of the full 4 drafting turns, so the next window is short.
+Validated end-to-end on `mock_endpoint.py` against all 20 banked arms — **scoring asymmetry
+falls from up to 13.2× to ~1.05× on 8 of 10 pairs.** Every re-judge emits per-pair
+`scoring_asymmetry`, so this defect class is visible in the output rather than silent.
+
+⚠️ **The two pairs that stayed asymmetric are a SECOND, separate confound — and it is real,
+not a parser artifact.** Healthy pairs keep 99% of the raw reply as claims; these keep 32%
+and 52%, because the **warmed arm drifted out of the claim-drafting genre entirely**:
+
+- `uspto-19264594` warmed produced a **fabricated court opinion** ("IN THE UNITED STATES
+  DISTRICT COURT… OPINION OF THE COURT", *Alice v. CLS Bank* cited) instead of claims. The
+  only numbered items in it are the Alice two-step test.
+- `uspto-19325156` warmed opened with `**TITLE**` / `**BACKGROUND**` boilerplate, so barely
+  half its capped output was claims at all.
+- Both **empty** arms on those disclosures produced clean `**PATENT CLAIMS**` + numbered claims.
+
+Working hypothesis: the retrieved records are distilled from **office actions**, so priming
+the drafting turn with them pulls the model toward examiner/opinion prose — and under
+`--fast`'s capped `max_tokens` the warmed arm then spends its budget on scaffolding rather
+than claims. If that holds, **`--fast` is not arm-neutral** even though both arms share the
+setting, because only the warmed arm carries the extra context. **Do not treat `--fast` as a
+free speed knob in a judged run until this is tested** — it is a candidate explanation for
+"warmed does worse" that has nothing to do with retrieval quality.
+
 ---
 
 ## The focus now
