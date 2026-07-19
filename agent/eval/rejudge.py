@@ -157,6 +157,12 @@ def rejudge_run(run_dir: Path, data_root: Path, out_root: Path) -> Path:
             "git_sha_captured": "run-start",
             "source_run": str(run_dir),
             "source_git_sha": source.get("fingerprint", {}).get("git_sha"),
+            # Carried so `docs/GPU-RERUN-RUNBOOK.md` step 5 can verify a re-judge the
+            # same way it verifies a fresh run. Null for runs that predate b2d395e —
+            # which is honest: those cannot prove which ranker produced their drafts.
+            # Re-judging performs no retrieval, so the ranker that matters is the
+            # SOURCE run's, never this process's.
+            "source_memory_py_sha": source.get("fingerprint", {}).get("memory_py_sha"),
             "source_draft_gen": source.get("fingerprint", {}).get("draft_gen"),
             "source_split": source.get("fingerprint", {}).get("split"),
             "drafts_regenerated": False,

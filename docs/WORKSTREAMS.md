@@ -22,9 +22,10 @@ What's canonical vs superseded after the lane merges: `docs/INTEGRATION-STATUS.m
 | **Containment** | ✅ real enforcement (Plan B) + LIVE | offline demo (A3/A6); **`containment/planb/` enforces the four tiers on a Linux kernel — real 403, non-root, read-only fs, no route off-box (A1 Plan B, A5 sweep)**; **LIVE at https://airtight-openshell.vercel.app — real `policy.decide`, real HTTP 403 over the internet, operator approve/reject (`containment/live/`)**. Vendor `nemoclaw` binary still DGX-gated |
 | **Surface** | ✅ two frames | intake (retrieval → live pipeline → grant) + engine panel over every committed artifact; D3's dishonest edit boxes replaced with a labelled seam |
 
-Suite: `.venv/bin/pytest tests/` → **186 passed**, 0 skipped, stub mode, no network — now
+Suite: `.venv/bin/pytest tests/` → **197 passed**, 0 skipped, stub mode, no network — now
 verified in *both* environments (real `USPTO_API_KEY` in `.env` and keyless), not just the
 keyless one. See the Surface entry: "no network" was previously an assumption, not a control.
+(+11 over the 186 baseline: 6 claim-parsing invariants, 5 re-judge provenance tests.)
 
 📌 **Product path now assembles the airtight draft — recorded and graded.** The stated end
 goal (describe an invention → find the loopholes from prior similar patents → draft against
