@@ -2,6 +2,7 @@
 
 import json
 import pathlib
+from types import SimpleNamespace
 
 import pytest
 
@@ -43,6 +44,39 @@ def test_stream_yields_chunks():
     chunks = list(call_model([{"role": "user", "content": "x"}], role="draft", stream=True))
     assert len(chunks) > 1
     assert "".join(chunks).strip() == doorway.STUB_REPLIES["draft"]
+
+
+def _fake_live_client(monkeypatch, *, content, finish_reason, reasoning_content=""):
+    """A live client that never touches the network — the response is handed in."""
+    monkeypatch.setattr(config, "MODE", "live")
+    message = SimpleNamespace(content=content, reasoning_content=reasoning_content)
+    resp = SimpleNamespace(choices=[SimpleNamespace(message=message, finish_reason=finish_reason)])
+    monkeypatch.setattr(doorway, "_client", lambda: SimpleNamespace(
+        chat=SimpleNamespace(completions=SimpleNamespace(create=lambda **kw: resp))))
+
+
+def test_truncated_turn_raises_instead_of_scoring_as_an_empty_draft(monkeypatch):
+    # A capped reasoning-on turn spends the budget thinking and returns content=None.
+    # Returning "" here would let the ablation record a failed call as a real zero.
+    _fake_live_client(monkeypatch, content=None, finish_reason="length",
+                      reasoning_content="thinking " * 500)
+    with pytest.raises(RuntimeError, match="hit max_tokens"):
+        call_model([{"role": "user", "content": "x"}], role="draft")
+
+
+def test_truncation_raises_even_when_partial_content_came_back(monkeypatch):
+    # A half-written draft still scores, so one arm truncating and the other not would
+    # silently compare two different things (arm-invariance).
+    _fake_live_client(monkeypatch, content="1. A method comprising", finish_reason="length")
+    with pytest.raises(RuntimeError, match="hit max_tokens"):
+        call_model([{"role": "user", "content": "x"}], role="draft")
+
+
+def test_complete_turn_passes_through(monkeypatch):
+    _fake_live_client(monkeypatch, content="1. A method.", finish_reason="stop")
+    reply = call_model([{"role": "user", "content": "x"}], role="draft")
+    assert reply.mode == "live"
+    assert reply.text == "1. A method."
 
 
 def test_shapes_roundtrip_via_fixture():

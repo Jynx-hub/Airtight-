@@ -20,8 +20,14 @@ from agent.eval import judge
 from agent.eval.chart import write_chart
 from agent.memory import LoopholeStore, tokens
 
-# Default: reasoning-on, uncapped drafting (the intended experiment, per ARCHITECTURE).
-DRAFT_GEN = {"temperature": 0.0, "seed": 1234}
+# Default: reasoning-on drafting (the intended experiment, per ARCHITECTURE), capped.
+# The cap is a runaway guard, not a depth limit. Uncapped, a temperature-0.0 draft
+# turn fell into a degenerate repetition loop and generated for 30 min / ~216k tokens
+# at ~120 tok/s until Modal's 1800s function timeout killed it with a 500 — which the
+# SDK then retried, twice. A healthy reasoning-on draft is ~7k tokens, so 16k leaves
+# >2x headroom while bounding the worst case to ~2 min a turn. Truncation is not
+# silently tolerated: hitting this cap raises at the doorway (see call_model).
+DRAFT_GEN = {"temperature": 0.0, "seed": 1234, "max_tokens": 16000}
 # --fast: reasoning off + capped drafts. An uncapped reasoning-on draft ran ~50s /
 # ~7k tokens, making a full run 15+ min; this trades draft depth for a quick,
 # still-valid ablation (same setting on both arms). Recorded in the fingerprint.
