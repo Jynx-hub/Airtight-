@@ -122,6 +122,24 @@ def get(job_id: str) -> Job | None:
         return _JOBS.get(job_id)
 
 
+def apply_claim_edits(job_id: str, claims: list[str]) -> Job | None:
+    """Persist applicant-steered claims onto a finished job's draft.
+
+    Closes the "edits are discarded" seam without a model turn: the claims are the
+    steerable artifact, so a hand-edit is a legitimate final draft. The specification
+    stays the model's original draft (the reference the claims were parsed from).
+    Returns None if the job is unknown or has no draft yet.
+    """
+    with _LOCK:
+        job = _JOBS.get(job_id)
+        if job is None or job.draft is None:
+            return None
+        cleaned = [c.strip() for c in claims if c and c.strip()]
+        if cleaned:
+            job.draft = job.draft.model_copy(update={"claims": cleaned})
+        return job
+
+
 def security_findings(offset: int) -> list[dict]:
     """Non-pass guardrail events recorded since `offset`.
 

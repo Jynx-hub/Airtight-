@@ -231,27 +231,43 @@ function renderGrant(snap) {
   $("grant-panel").classList.remove("hidden");
   $("grant-meta").textContent = `${draft.claims.length} claims · ${snap.elapsed_s}s`;
 
+  // Claims are editable and edits persist — PATCH /api/draft/{job_id} accepts the
+  // steered draft, so a hand-edit is a legitimate final draft, not a discarded one.
   const claims = $("claims");
   claims.innerHTML = "";
+  const boxes = [];
   draft.claims.forEach((c, i) => {
     const row = el("div");
     row.style.cssText = "display:grid;grid-template-columns:2rem 1fr;gap:.5rem;padding:.5rem 0;border-top:1px solid var(--line)";
     const n = el("div", "mono", String(i + 1) + ".");
     n.style.color = "var(--accent)";
-    row.append(n, el("div", "small", c));
+    const box = el("textarea", "small");
+    box.value = c;
+    box.style.cssText = "width:100%;min-height:3.2rem;background:transparent;color:inherit;border:1px solid var(--line);border-radius:4px;padding:.35rem;font:inherit;resize:vertical";
+    boxes.push(box);
+    row.append(n, box);
     claims.append(row);
   });
 
-  // D3 was a textarea that silently discarded every edit. A read-only claim plus
-  // an honest note is worth more than a control that pretends.
-  const seam = el("div", "seam inline");
-  seam.style.marginTop = ".7rem";
-  seam.append(
-    el("span", "label", "Editing not wired"),
-    el("div", "detail", "Claims are read-only. Steering them needs a route that accepts a modified Draft."),
-    el("div", "src", "PATCH /api/draft/{job_id} · surface/app.py"),
-  );
-  claims.append(seam);
+  const bar = el("div");
+  bar.style.cssText = "display:flex;gap:.6rem;align-items:center;margin-top:.7rem";
+  const save = el("button", "btn", "Save claim edits");
+  const status = el("span", "small muted");
+  save.onclick = async () => {
+    save.disabled = true; status.textContent = "Saving…";
+    try {
+      const res = await fetch(`/api/draft/${activeJob}`, {
+        method: "PATCH", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ claims: boxes.map((b) => b.value) }),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const snap = await res.json();
+      status.textContent = `Saved ${snap.draft.claims.length} steered claims.`;
+    } catch (e) { status.textContent = "Save failed: " + e.message; }
+    finally { save.disabled = false; }
+  };
+  bar.append(save, status);
+  claims.append(bar);
 
   const rep = $("report");
   rep.innerHTML = "";

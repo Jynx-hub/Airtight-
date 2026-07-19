@@ -200,6 +200,31 @@ def test_job_status_404_for_unknown_id():
     assert client.get("/api/draft/nosuchjob").status_code == 404
 
 
+def test_patch_persists_applicant_claim_edits():
+    """The edit seam the intake frame names: a hand-edited claim must stick,
+    not be silently discarded (the D3 regression)."""
+    disclosure = client.get("/api/sample").json()
+    started = client.post("/api/draft/start", json=disclosure).json()
+    poll_job(started["job_id"])
+    edited = ["1. An applicant-steered independent claim, comprising: a widget.",
+              "2. The method of claim 1, wherein the widget is blue."]
+    res = client.patch(f"/api/draft/{started['job_id']}", json={"claims": edited})
+    assert res.status_code == 200
+    assert res.json()["draft"]["claims"] == edited
+    # and it persists — a subsequent GET returns the steered claims
+    assert client.get(f"/api/draft/{started['job_id']}").json()["draft"]["claims"] == edited
+
+
+def test_patch_ignores_blank_claims_and_404s_unknown():
+    disclosure = client.get("/api/sample").json()
+    started = client.post("/api/draft/start", json=disclosure).json()
+    poll_job(started["job_id"])
+    # blanks are dropped, not persisted as empty claims
+    res = client.patch(f"/api/draft/{started['job_id']}", json={"claims": ["  ", ""]})
+    assert res.status_code == 200 and len(res.json()["draft"]["claims"]) >= 2  # unchanged
+    assert client.patch("/api/draft/nosuchjob", json={"claims": ["x"]}).status_code == 404
+
+
 # ---------------------------------------------------------------------------
 # Memory + retrieval explain
 # ---------------------------------------------------------------------------

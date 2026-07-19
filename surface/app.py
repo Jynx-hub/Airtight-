@@ -131,6 +131,20 @@ def draft_status(job_id: str) -> dict:
     return jobs.snapshot(job)
 
 
+class ClaimEdit(BaseModel):
+    claims: list[str]
+
+
+@app.patch("/api/draft/{job_id}")
+def draft_edit(job_id: str, edit: ClaimEdit) -> dict:
+    """Steer the draft: persist applicant-edited claims. The route the intake
+    frame's edit seam names, so a hand-edit is no longer silently discarded."""
+    job = jobs.apply_claim_edits(job_id, edit.claims)
+    if job is None:
+        raise HTTPException(status_code=404, detail="unknown job or no draft to edit")
+    return jobs.snapshot(job)
+
+
 # ---------------------------------------------------------------------------
 # Engine views (admin frame) — all read-only
 # ---------------------------------------------------------------------------
