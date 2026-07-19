@@ -150,6 +150,60 @@ def draft_patent(
     return result
 
 
+# A claim marker: line start, at most a small indent, optional markdown emphasis
+# around the number ("**1.**", "__1.__", "1)", "1."). The indent bound and the
+# emphasis handling both matter — a nested "(a)"/"i." limitation must NOT read as
+# a new claim, and a bolded "**1.**" MUST read as one.
+_CLAIM_MARK = re.compile(
+    r"^[ \t]{0,3}(?:\*{1,2}|_{1,2})?(\d{1,3})[.)](?:\*{1,2}|_{1,2})?[ \t]+",
+    re.MULTILINE,
+)
+
+# Where claims stop and prose begins. `judge.count_defects` scores claims and the
+# specification as separate arguments, so letting the spec bleed into the last
+# claim inflates one arm's scoring target against the other's.
+_SPEC_HEAD = re.compile(
+    r"^\W*(?:specification|detailed\s+description|abstract)\b",
+    re.MULTILINE | re.IGNORECASE,
+)
+
+
 def _split_claims(text: str) -> list[str]:
-    claims = re.findall(r"^\s*\d+\.\s+(.+)$", text, flags=re.MULTILINE)
+    """Split a drafted claim set into individual claims.
+
+    **Formatting-insensitive by contract.** `**1.**` and `1.` must yield the same
+    claims, and each claim must keep its full multi-line body.
+
+    Both properties are load-bearing for the M4 ablation, which judges two arms
+    against each other. The original regex (`^\\s*\\d+\\.\\s+(.+)$`) broke both:
+    markdown bold defeated it, so those drafts fell through to the whole-text
+    fallback and were judged on the entire document *including the
+    specification*, while plainly-numbered drafts parsed and were truncated to
+    each claim's FIRST LINE by `(.+)$`. Whether an arm took the long or short
+    path came down to formatting the model happened to choose that turn, so the
+    judge scored paired arms on targets differing by up to 13x and the
+    empty-vs-warmed comparison measured markdown, not memory. Observed
+    2026-07-18 in `results/ablation/20260718-183817`: 4 of 6 pairs asymmetric.
+    """
+    spec = _SPEC_HEAD.search(text)
+    body = text[: spec.start()] if spec else text
+
+    # Keep only the run that counts 1, 2, 3… — this drops stray numbered lines
+    # (dates, citations) and any nested enumeration that cleared the indent bound.
+    kept: list[re.Match] = []
+    expected = 1
+    for mark in _CLAIM_MARK.finditer(body):
+        if int(mark.group(1)) == expected:
+            kept.append(mark)
+            expected += 1
+
+    if not kept:
+        return [text.strip()]
+
+    claims = []
+    for i, mark in enumerate(kept):
+        end = kept[i + 1].start() if i + 1 < len(kept) else len(body)
+        claim = body[mark.end() : end].strip()
+        if claim:
+            claims.append(claim)
     return claims or [text.strip()]

@@ -77,6 +77,90 @@ them → self-correct) is now the path the Surface runs. Three pieces, all **pro
   by code that no longer exists. **Neither belongs on a slide until the GPU re-run lands** —
   the retrieval is sound, the measurement is the last step.
 
+⚠️ **The GPU re-run happened (2026-07-18, ~35 min A100, ~$1.50) and produced NO usable
+number — the harness was scoring the wrong thing.** Run: `results/ablation/20260718-183817/`,
+pooled over `data/real`, `--n 10 --k 5 --fast`, 10/10 pairs, `stopped_early: false`.
+Raw result **2 wins / 2 losses / 6 ties**. Do not quote it. Cause, found mid-run:
+
+- **`_split_claims` (`agent/loop.py`) let markdown decide how much of a draft got judged.**
+  `^\s*\d+\.` cannot match `**1.**`, so bolded drafts matched nothing and hit the
+  `claims or [text.strip()]` fallback — judged on the **whole document, specification
+  included**. Plainly-numbered drafts parsed, and `(.+)$` then truncated each claim to its
+  **first line**, dropping every nested limitation. Which branch an arm took came down to
+  formatting the model happened to pick that turn. **4 of 6 inspected pairs scored their
+  two arms on asymmetric targets, one at 13× (1694 vs 128 chars).** Exactly one pair
+  (`uspto-19014047`, 1.0×) was genuinely comparable. Fixed with regression tests on branch
+  `fix/split-claims-scoring-asymmetry` (`0a289d8`), confirmed failing against the old parser.
+- **This casts doubt on C1's validation.** The "backwards 4/10 → 1/10" run that motivated
+  the statute-blind-ranker diagnosis has the same signature (`100851`: empty 5/5 whole-text
+  fallback vs warmed 4/5 — asymmetric). The 5/6 headline (`122807`) was **symmetric**
+  (6/6 both arms whole-text), so it is more defensible than the others. **Re-check whether
+  C1 fixed a real problem or a misdiagnosis before citing it.**
+- **Banked, and the cheap path forward:** all 20 arms stored raw `reply` text, so the same
+  drafts can be **re-judged** against the fixed parser for ~half the GPU of a re-draft. That
+  is the next window, not a full re-run.
+- 📌 **The fingerprint's `git_sha` is captured when `results.json` is WRITTEN, not at run
+  start.** This run is stamped `0a289d8` (the parser-fix commit) though its drafts were
+  produced by `15a54d8` code — a commit landed on another branch while the run was in
+  flight. Provenance on that file is wrong. **Capture the SHA at run start**, and do not
+  touch the tree during a metered run.
+- 📌 **`--deadline-min` is not a hard stop** — checked only at the disclosure boundary, so
+  an in-flight pair always completes and the run overshoots by up to one full pair. The
+  comment at `harness.py:274` claims it prevents firing calls past the window; it does not.
+- 📌 **Steady-state drafting is ~30s/arm on `a100-bf16`, not the ~99s the first arm shows.**
+  The first arm after warm-up is unrepresentative; do not project a window from it.
+
+🔴 **THE REPAIRED NUMBER IS IN, AND IT IS NEGATIVE. Warmed does not beat empty.**
+`results/rejudge/20260718-192244/` (live A100, ~7 min, `af2cb43`, SHA captured at run start,
+`kind: rejudge`, drafts reused from `20260718-183817` — nothing re-drafted).
+
+| | |
+|---|---|
+| **Total loopholes caught** | **empty 13 · warmed 9** |
+| All 10 pairs | 1 win · 3 losses · 6 ties |
+| **8 pairs with clean symmetric scoring (≤1.5×)** | **0 wins · 3 losses · 5 ties** |
+
+The single "win" (`uspto-19325156`, +1) sits on a **2.49× asymmetric** pair and is not
+trustworthy. **Across every pair where the judge saw comparable text, warmed never won.**
+Losses: `18797574` (2→0), `19014047` (3→1), `19032884` (1→0).
+
+This is the project's **first ablation number with symmetric scoring and honest provenance**,
+and it contradicts the 5/6 headline it was meant to re-derive. **Track-1's "memory compounds"
+claim is not supported by the current measurement.** Do not put the 5/6 on a slide.
+
+Before concluding memory is harmful, the confound below must be settled: these drafts were
+generated under `--fast`, and the warmed arm — the only one carrying extra context — showed
+genre drift under the output cap. **The decisive next experiment is re-drafting a few
+disclosures WITHOUT `--fast` and re-judging**, which separates "retrieval hurts quality" from
+"capped output plus office-action priming crowds out claims". Until that runs, the honest
+statement is *"warmed does not beat empty under `--fast`; cause not yet isolated."*
+
+**Repair is built and rehearsed — `python -m agent.eval.rejudge --run <dir>` (`5199425`).**
+Re-scores banked drafts against the fixed parser without re-drafting: ~2 sequential
+round-trips per arm instead of the full 4 drafting turns, so the next window is short.
+Validated end-to-end on `mock_endpoint.py` against all 20 banked arms — **scoring asymmetry
+falls from up to 13.2× to ~1.05× on 8 of 10 pairs.** Every re-judge emits per-pair
+`scoring_asymmetry`, so this defect class is visible in the output rather than silent.
+
+⚠️ **The two pairs that stayed asymmetric are a SECOND, separate confound — and it is real,
+not a parser artifact.** Healthy pairs keep 99% of the raw reply as claims; these keep 32%
+and 52%, because the **warmed arm drifted out of the claim-drafting genre entirely**:
+
+- `uspto-19264594` warmed produced a **fabricated court opinion** ("IN THE UNITED STATES
+  DISTRICT COURT… OPINION OF THE COURT", *Alice v. CLS Bank* cited) instead of claims. The
+  only numbered items in it are the Alice two-step test.
+- `uspto-19325156` warmed opened with `**TITLE**` / `**BACKGROUND**` boilerplate, so barely
+  half its capped output was claims at all.
+- Both **empty** arms on those disclosures produced clean `**PATENT CLAIMS**` + numbered claims.
+
+Working hypothesis: the retrieved records are distilled from **office actions**, so priming
+the drafting turn with them pulls the model toward examiner/opinion prose — and under
+`--fast`'s capped `max_tokens` the warmed arm then spends its budget on scaffolding rather
+than claims. If that holds, **`--fast` is not arm-neutral** even though both arms share the
+setting, because only the warmed arm carries the extra context. **Do not treat `--fast` as a
+free speed knob in a judged run until this is tested** — it is a candidate explanation for
+"warmed does worse" that has nothing to do with retrieval quality.
+
 ---
 
 ## The focus now

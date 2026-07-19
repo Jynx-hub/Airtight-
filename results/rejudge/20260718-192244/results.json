@@ -1,0 +1,551 @@
+{
+  "fingerprint": {
+    "kind": "rejudge",
+    "timestamp": "2026-07-18T19:22:44-05:00",
+    "mode": "live",
+    "model": "nemotron",
+    "base_url_host": "steven-ortega426--airtight-nemotron-serve.modal.run",
+    "judge_gen": {
+      "temperature": 0.0,
+      "seed": 1234
+    },
+    "k": 5,
+    "runs": 1,
+    "draft_gen": {
+      "temperature": 0.0,
+      "seed": 1234,
+      "max_tokens": 1100,
+      "extra_body": {
+        "chat_template_kwargs": {
+          "enable_thinking": false
+        }
+      }
+    },
+    "git_sha": "af2cb4348e4884d5040cacf3487f0f7e621d7eb2",
+    "git_sha_captured": "run-start",
+    "source_run": "results/ablation/20260718-183817",
+    "source_git_sha": "0a289d86dc67f9cef0f4530636e504d10bf820c4",
+    "source_draft_gen": {
+      "temperature": 0.0,
+      "seed": 1234,
+      "max_tokens": 1100,
+      "extra_body": {
+        "chat_template_kwargs": {
+          "enable_thinking": false
+        }
+      }
+    },
+    "source_split": {
+      "seed": 1234,
+      "n": 10,
+      "paired": 94,
+      "holdout_ids": [
+        "uspto-18797574",
+        "uspto-19014047",
+        "uspto-19032884",
+        "uspto-19178757",
+        "uspto-19206781",
+        "uspto-19264594",
+        "uspto-19273060",
+        "uspto-19281668",
+        "uspto-19325156",
+        "uspto-19387326"
+      ],
+      "graded_records": 26,
+      "corpus_records": 167,
+      "unpaired_disclosure_ids": [
+        "uspto-18736078",
+        "uspto-18742301",
+        "uspto-18747859",
+        "uspto-18755402",
+        "uspto-18762848",
+        "uspto-18766522",
+        "uspto-18771770",
+        "uspto-18784145",
+        "uspto-18811624",
+        "uspto-18831408",
+        "uspto-18880616",
+        "uspto-18888036",
+        "uspto-18945370",
+        "uspto-19007620",
+        "uspto-19016076",
+        "uspto-19025047",
+        "uspto-19027045",
+        "uspto-19031160",
+        "uspto-19036723",
+        "uspto-19044241",
+        "uspto-19044532",
+        "uspto-19051011",
+        "uspto-19060062",
+        "uspto-19064670",
+        "uspto-19064870",
+        "uspto-19074955",
+        "uspto-19088853",
+        "uspto-19173428",
+        "uspto-19188116",
+        "uspto-19195181",
+        "uspto-19196866",
+        "uspto-19204644",
+        "uspto-19243683",
+        "uspto-19270384",
+        "uspto-19271709",
+        "uspto-19286686",
+        "uspto-19303043",
+        "uspto-19309601",
+        "uspto-19315393",
+        "uspto-19319712"
+      ]
+    },
+    "drafts_regenerated": false
+  },
+  "corpus_size": 167,
+  "results": [
+    {
+      "disclosure_id": "uspto-18797574",
+      "condition": "empty",
+      "loopholes_caught": 2,
+      "checklist_size": 3,
+      "drafting_seconds": 30.05,
+      "defect_count": 4
+    },
+    {
+      "disclosure_id": "uspto-18797574",
+      "condition": "warmed",
+      "loopholes_caught": 0,
+      "checklist_size": 3,
+      "drafting_seconds": 33.18,
+      "defect_count": 0
+    },
+    {
+      "disclosure_id": "uspto-19014047",
+      "condition": "empty",
+      "loopholes_caught": 3,
+      "checklist_size": 3,
+      "drafting_seconds": 29.31,
+      "defect_count": 0
+    },
+    {
+      "disclosure_id": "uspto-19014047",
+      "condition": "warmed",
+      "loopholes_caught": 1,
+      "checklist_size": 3,
+      "drafting_seconds": 32.17,
+      "defect_count": 0
+    },
+    {
+      "disclosure_id": "uspto-19032884",
+      "condition": "empty",
+      "loopholes_caught": 1,
+      "checklist_size": 1,
+      "drafting_seconds": 30.75,
+      "defect_count": 5
+    },
+    {
+      "disclosure_id": "uspto-19032884",
+      "condition": "warmed",
+      "loopholes_caught": 0,
+      "checklist_size": 1,
+      "drafting_seconds": 32.23,
+      "defect_count": 4
+    },
+    {
+      "disclosure_id": "uspto-19178757",
+      "condition": "empty",
+      "loopholes_caught": 2,
+      "checklist_size": 3,
+      "drafting_seconds": 30.24,
+      "defect_count": 6
+    },
+    {
+      "disclosure_id": "uspto-19178757",
+      "condition": "warmed",
+      "loopholes_caught": 2,
+      "checklist_size": 3,
+      "drafting_seconds": 31.46,
+      "defect_count": 5
+    },
+    {
+      "disclosure_id": "uspto-19206781",
+      "condition": "empty",
+      "loopholes_caught": 1,
+      "checklist_size": 1,
+      "drafting_seconds": 31.41,
+      "defect_count": 6
+    },
+    {
+      "disclosure_id": "uspto-19206781",
+      "condition": "warmed",
+      "loopholes_caught": 1,
+      "checklist_size": 1,
+      "drafting_seconds": 32.3,
+      "defect_count": 6
+    },
+    {
+      "disclosure_id": "uspto-19264594",
+      "condition": "empty",
+      "loopholes_caught": 0,
+      "checklist_size": 5,
+      "drafting_seconds": 32.3,
+      "defect_count": 0
+    },
+    {
+      "disclosure_id": "uspto-19264594",
+      "condition": "warmed",
+      "loopholes_caught": 0,
+      "checklist_size": 5,
+      "drafting_seconds": 34.04,
+      "defect_count": 2
+    },
+    {
+      "disclosure_id": "uspto-19273060",
+      "condition": "empty",
+      "loopholes_caught": 0,
+      "checklist_size": 1,
+      "drafting_seconds": 31.24,
+      "defect_count": 0
+    },
+    {
+      "disclosure_id": "uspto-19273060",
+      "condition": "warmed",
+      "loopholes_caught": 0,
+      "checklist_size": 1,
+      "drafting_seconds": 33.05,
+      "defect_count": 0
+    },
+    {
+      "disclosure_id": "uspto-19281668",
+      "condition": "empty",
+      "loopholes_caught": 1,
+      "checklist_size": 2,
+      "drafting_seconds": 31.81,
+      "defect_count": 0
+    },
+    {
+      "disclosure_id": "uspto-19281668",
+      "condition": "warmed",
+      "loopholes_caught": 1,
+      "checklist_size": 2,
+      "drafting_seconds": 32.95,
+      "defect_count": 6
+    },
+    {
+      "disclosure_id": "uspto-19325156",
+      "condition": "empty",
+      "loopholes_caught": 0,
+      "checklist_size": 3,
+      "drafting_seconds": 31.47,
+      "defect_count": 0
+    },
+    {
+      "disclosure_id": "uspto-19325156",
+      "condition": "warmed",
+      "loopholes_caught": 1,
+      "checklist_size": 3,
+      "drafting_seconds": 33.02,
+      "defect_count": 6
+    },
+    {
+      "disclosure_id": "uspto-19387326",
+      "condition": "empty",
+      "loopholes_caught": 3,
+      "checklist_size": 4,
+      "drafting_seconds": 32.17,
+      "defect_count": 6
+    },
+    {
+      "disclosure_id": "uspto-19387326",
+      "condition": "warmed",
+      "loopholes_caught": 3,
+      "checklist_size": 4,
+      "drafting_seconds": 33.44,
+      "defect_count": 1
+    }
+  ],
+  "pairs": [
+    {
+      "disclosure_id": "uspto-18797574",
+      "loopholes_caught_delta": -2,
+      "drafting_seconds_delta": 3.13,
+      "defect_count_delta": -4
+    },
+    {
+      "disclosure_id": "uspto-19014047",
+      "loopholes_caught_delta": -2,
+      "drafting_seconds_delta": 2.86,
+      "defect_count_delta": 0
+    },
+    {
+      "disclosure_id": "uspto-19032884",
+      "loopholes_caught_delta": -1,
+      "drafting_seconds_delta": 1.48,
+      "defect_count_delta": -1
+    },
+    {
+      "disclosure_id": "uspto-19178757",
+      "loopholes_caught_delta": 0,
+      "drafting_seconds_delta": 1.22,
+      "defect_count_delta": -1
+    },
+    {
+      "disclosure_id": "uspto-19206781",
+      "loopholes_caught_delta": 0,
+      "drafting_seconds_delta": 0.89,
+      "defect_count_delta": 0
+    },
+    {
+      "disclosure_id": "uspto-19264594",
+      "loopholes_caught_delta": 0,
+      "drafting_seconds_delta": 1.74,
+      "defect_count_delta": 2
+    },
+    {
+      "disclosure_id": "uspto-19273060",
+      "loopholes_caught_delta": 0,
+      "drafting_seconds_delta": 1.81,
+      "defect_count_delta": 0
+    },
+    {
+      "disclosure_id": "uspto-19281668",
+      "loopholes_caught_delta": 0,
+      "drafting_seconds_delta": 1.14,
+      "defect_count_delta": 6
+    },
+    {
+      "disclosure_id": "uspto-19325156",
+      "loopholes_caught_delta": 1,
+      "drafting_seconds_delta": 1.55,
+      "defect_count_delta": 6
+    },
+    {
+      "disclosure_id": "uspto-19387326",
+      "loopholes_caught_delta": 0,
+      "drafting_seconds_delta": 1.27,
+      "defect_count_delta": -5
+    }
+  ],
+  "scoring_asymmetry": [
+    {
+      "disclosure_id": "uspto-18797574",
+      "empty_judged_chars": 4906,
+      "warmed_judged_chars": 4769,
+      "ratio": 1.03
+    },
+    {
+      "disclosure_id": "uspto-19014047",
+      "empty_judged_chars": 5742,
+      "warmed_judged_chars": 5496,
+      "ratio": 1.04
+    },
+    {
+      "disclosure_id": "uspto-19032884",
+      "empty_judged_chars": 5561,
+      "warmed_judged_chars": 5269,
+      "ratio": 1.06
+    },
+    {
+      "disclosure_id": "uspto-19178757",
+      "empty_judged_chars": 5639,
+      "warmed_judged_chars": 5279,
+      "ratio": 1.07
+    },
+    {
+      "disclosure_id": "uspto-19206781",
+      "empty_judged_chars": 5875,
+      "warmed_judged_chars": 5559,
+      "ratio": 1.06
+    },
+    {
+      "disclosure_id": "uspto-19264594",
+      "empty_judged_chars": 5480,
+      "warmed_judged_chars": 1207,
+      "ratio": 4.54
+    },
+    {
+      "disclosure_id": "uspto-19273060",
+      "empty_judged_chars": 5911,
+      "warmed_judged_chars": 5652,
+      "ratio": 1.05
+    },
+    {
+      "disclosure_id": "uspto-19281668",
+      "empty_judged_chars": 5637,
+      "warmed_judged_chars": 5455,
+      "ratio": 1.03
+    },
+    {
+      "disclosure_id": "uspto-19325156",
+      "empty_judged_chars": 5702,
+      "warmed_judged_chars": 2291,
+      "ratio": 2.49
+    },
+    {
+      "disclosure_id": "uspto-19387326",
+      "empty_judged_chars": 4905,
+      "warmed_judged_chars": 5313,
+      "ratio": 1.08
+    }
+  ],
+  "rescored": [
+    {
+      "disclosure_id": "uspto-18797574",
+      "condition": "empty",
+      "claims_parsed": 3,
+      "judged_chars": 4906,
+      "old_loopholes_caught": 1,
+      "new_loopholes_caught": 2
+    },
+    {
+      "disclosure_id": "uspto-18797574",
+      "condition": "warmed",
+      "claims_parsed": 15,
+      "judged_chars": 4769,
+      "old_loopholes_caught": 1,
+      "new_loopholes_caught": 0
+    },
+    {
+      "disclosure_id": "uspto-19014047",
+      "condition": "empty",
+      "claims_parsed": 12,
+      "judged_chars": 5742,
+      "old_loopholes_caught": 2,
+      "new_loopholes_caught": 3
+    },
+    {
+      "disclosure_id": "uspto-19014047",
+      "condition": "warmed",
+      "claims_parsed": 14,
+      "judged_chars": 5496,
+      "old_loopholes_caught": 1,
+      "new_loopholes_caught": 1
+    },
+    {
+      "disclosure_id": "uspto-19032884",
+      "condition": "empty",
+      "claims_parsed": 11,
+      "judged_chars": 5561,
+      "old_loopholes_caught": 0,
+      "new_loopholes_caught": 1
+    },
+    {
+      "disclosure_id": "uspto-19032884",
+      "condition": "warmed",
+      "claims_parsed": 14,
+      "judged_chars": 5269,
+      "old_loopholes_caught": 0,
+      "new_loopholes_caught": 0
+    },
+    {
+      "disclosure_id": "uspto-19178757",
+      "condition": "empty",
+      "claims_parsed": 2,
+      "judged_chars": 5639,
+      "old_loopholes_caught": 2,
+      "new_loopholes_caught": 2
+    },
+    {
+      "disclosure_id": "uspto-19178757",
+      "condition": "warmed",
+      "claims_parsed": 3,
+      "judged_chars": 5279,
+      "old_loopholes_caught": 0,
+      "new_loopholes_caught": 2
+    },
+    {
+      "disclosure_id": "uspto-19206781",
+      "condition": "empty",
+      "claims_parsed": 8,
+      "judged_chars": 5875,
+      "old_loopholes_caught": 0,
+      "new_loopholes_caught": 1
+    },
+    {
+      "disclosure_id": "uspto-19206781",
+      "condition": "warmed",
+      "claims_parsed": 10,
+      "judged_chars": 5559,
+      "old_loopholes_caught": 1,
+      "new_loopholes_caught": 1
+    },
+    {
+      "disclosure_id": "uspto-19264594",
+      "condition": "empty",
+      "claims_parsed": 10,
+      "judged_chars": 5480,
+      "old_loopholes_caught": 0,
+      "new_loopholes_caught": 0
+    },
+    {
+      "disclosure_id": "uspto-19264594",
+      "condition": "warmed",
+      "claims_parsed": 2,
+      "judged_chars": 1207,
+      "old_loopholes_caught": 0,
+      "new_loopholes_caught": 0
+    },
+    {
+      "disclosure_id": "uspto-19273060",
+      "condition": "empty",
+      "claims_parsed": 16,
+      "judged_chars": 5911,
+      "old_loopholes_caught": 0,
+      "new_loopholes_caught": 0
+    },
+    {
+      "disclosure_id": "uspto-19273060",
+      "condition": "warmed",
+      "claims_parsed": 16,
+      "judged_chars": 5652,
+      "old_loopholes_caught": 0,
+      "new_loopholes_caught": 0
+    },
+    {
+      "disclosure_id": "uspto-19281668",
+      "condition": "empty",
+      "claims_parsed": 4,
+      "judged_chars": 5637,
+      "old_loopholes_caught": 1,
+      "new_loopholes_caught": 1
+    },
+    {
+      "disclosure_id": "uspto-19281668",
+      "condition": "warmed",
+      "claims_parsed": 9,
+      "judged_chars": 5455,
+      "old_loopholes_caught": 1,
+      "new_loopholes_caught": 1
+    },
+    {
+      "disclosure_id": "uspto-19325156",
+      "condition": "empty",
+      "claims_parsed": 11,
+      "judged_chars": 5702,
+      "old_loopholes_caught": 0,
+      "new_loopholes_caught": 0
+    },
+    {
+      "disclosure_id": "uspto-19325156",
+      "condition": "warmed",
+      "claims_parsed": 7,
+      "judged_chars": 2291,
+      "old_loopholes_caught": 1,
+      "new_loopholes_caught": 1
+    },
+    {
+      "disclosure_id": "uspto-19387326",
+      "condition": "empty",
+      "claims_parsed": 12,
+      "judged_chars": 4905,
+      "old_loopholes_caught": 3,
+      "new_loopholes_caught": 3
+    },
+    {
+      "disclosure_id": "uspto-19387326",
+      "condition": "warmed",
+      "claims_parsed": 12,
+      "judged_chars": 5313,
+      "old_loopholes_caught": 3,
+      "new_loopholes_caught": 3
+    }
+  ],
+  "disclosures_completed": 10
+}
