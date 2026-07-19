@@ -94,5 +94,25 @@ def call_model(
         return _gen()
 
     resp = client.chat.completions.create(**params)
-    text = _analyze("output", resp.choices[0].message.content or "")
+    choice = resp.choices[0]
+    content = choice.message.content or ""
+
+    # A capped reasoning-on turn spends max_tokens inside the thinking block and comes
+    # back finish_reason="length" with content=None and the answer stranded in
+    # reasoning_content (runtime/inference_local.py). `content or ""` used to turn that
+    # into an empty draft, which the ablation would then score as a legitimate zero
+    # rather than a failed call. Raise on ANY truncation, not just the empty case: a
+    # half-written draft still scores, and a run where one arm truncates and the other
+    # doesn't is comparing two different things. The cap is a runaway guard set well
+    # above a healthy turn, so reaching it means the cap is wrong or the turn is looping
+    # — an operator problem either way, never a data point.
+    if choice.finish_reason == "length":
+        stranded = len(getattr(choice.message, "reasoning_content", None) or "")
+        raise RuntimeError(
+            f"model turn (role={role}) hit max_tokens — {len(content)} chars of content, "
+            f"{stranded} stranded in reasoning_content. Raise max_tokens, or the turn is "
+            f"in a repetition loop. Refusing to score a truncated turn."
+        )
+
+    text = _analyze("output", content)
     return ModelReply(text=text, raw=resp, mode="live")

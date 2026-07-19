@@ -39,9 +39,17 @@ _SEVERITY = [Action.PASS, Action.REDACT, Action.QUARANTINE, Action.BLOCK]
 _PHASE = {Hop.MODEL_RESPONSE: "output"}  # every other hop analyzes as input
 
 
+# The category names the live AIDR ruleset actually emits in analysis[].name,
+# enumerated against the real API 2026-07-19 (event key AITX-2026, prod-us):
+#   prompt_injection · personally_identifiable_information · code · url ·
+#   denial_of_service · language · guardrails
+# This module was written against `"pii"`, which AIDR NEVER emits — see PII_CATEGORIES.
+PII_CATEGORIES = frozenset({"personally_identifiable_information", "pii"})
+
+
 @dataclass
 class Detection:
-    category: str  # analysis[].name, e.g. "prompt_injection", "pii"
+    category: str  # analysis[].name, e.g. "prompt_injection", "personally_identifiable_information"
     phase: str
     detected: bool
     matches: list  # findings.matches, passed through raw — shape UNVERIFIED
@@ -78,7 +86,11 @@ class HopPolicy:
 # The response-policy table from docs/ARCHITECTURE.md Claim 2, as data.
 POLICY = {
     Hop.USER_PROMPT: HopPolicy({}, Action.PASS, Action.PASS),  # detect-only; fail-open
-    Hop.MODEL_RESPONSE: HopPolicy({"pii": Action.REDACT}, Action.PASS, Action.PASS),
+    # Keyed on every name that means PII, because keying it on the wrong one fails
+    # OPEN: an unmatched category falls to default_detected (PASS here), so real PII
+    # was returned unredacted while the suite stayed green on `"pii"` fixtures.
+    Hop.MODEL_RESPONSE: HopPolicy({c: Action.REDACT for c in PII_CATEGORIES},
+                                  Action.PASS, Action.PASS),
     Hop.TOOL_CALL: HopPolicy({}, Action.BLOCK, Action.BLOCK),  # FAIL-CLOSED
     Hop.TOOL_RESULT: HopPolicy({}, Action.QUARANTINE, Action.PASS),
     Hop.INGESTED_DOCUMENT: HopPolicy({}, Action.QUARANTINE, Action.BLOCK),  # FAIL-CLOSED
@@ -181,7 +193,7 @@ def _redact(text: str, detections: list[Detection], event_id: str | None) -> str
     redacted = text
     hit = False
     for det in detections:
-        if not (det.detected and det.category == "pii"):
+        if not (det.detected and det.category in PII_CATEGORIES):
             continue
         for match in det.matches:
             if isinstance(match, dict) and isinstance(match.get("text"), str):

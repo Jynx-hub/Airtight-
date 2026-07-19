@@ -62,15 +62,37 @@ default; an idle A100 bills against the same fixed credit the demo comes out of)
 generation, pooled over the real 193-record corpus — **not `--fast`**, which is reasoning-off and
 for plumbing checks only:
 
+**Probe with `--n 1` first (~4 min, ~$0.17).** Rank 0 at seed 1234 is `uspto-18797574` — the
+exact disclosure whose *empty* arm ran away on 2026-07-19 (see WORKSTREAMS §"no-`--fast`
+runaway"). It is the cheapest possible retest that the cap holds under live reasoning-on
+generation. Only commit the full `--n 10` once this returns two complete arms:
+
 ```bash
 .venv/bin/python -m agent.eval \
-  --data-root data --layout pooled --n 10 --seed 0 \
-  --deadline-min 25 \
+  --data-root data/real --layout pooled --n 1 --seed 1234 \
+  --deadline-min 10 \
   --out results/ablation
 ```
 
-- `--deadline-min` is the credit guard that already saved one burned window — keep it.
-- `--seed` makes the holdout reproducible; `--n 10` is the graded holdout size.
+Then the real run:
+
+```bash
+.venv/bin/python -m agent.eval \
+  --data-root data/real --layout pooled --n 10 --seed 1234 \
+  --deadline-min 50 \
+  --out results/ablation
+```
+
+- `--data-root data/real`, **not `data`** — `data` resolves to zero records and dies with
+  `holdout n=10 of 0`. Costs a launch slot, not credit, but it is still a wasted step.
+- `--seed 1234`, **not 0** — the banked run recorded `split.seed: 1234`. A different seed
+  draws a different holdout, so the result could not be compared against `empty 13 / warmed 9`,
+  which is the entire point. Ordering is `sha256(seed|id)` truncated at `ranked[:n]`, so `--n 1`
+  and `--n 4` are strict prefixes of the `--n 10` holdout at the same seed.
+- `--deadline-min 50`, not 25 — a no-`--fast` arm is ~12–15k tokens across its turns at
+  ~120 tok/s single-stream, so ~2 min/arm × 20 arms ≈ 35–50 min. A 25-min deadline stops
+  around disclosure 6 and the run reports `stopped_early: true`. It is also **not a hard
+  stop** (checked only at the disclosure boundary, so it overshoots by up to a full pair).
 - Re-pause Modal the moment the run finishes.
 
 ### 5. Verify the number is attributable

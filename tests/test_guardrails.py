@@ -75,6 +75,25 @@ def test_pii_in_output_redacts_and_continues(monkeypatch):
     assert "555-0100" not in verdict.text and "[REDACTED]" in verdict.text
 
 
+def test_pii_redacts_under_the_name_the_live_api_actually_emits(monkeypatch):
+    """AIDR emits `personally_identifiable_information`, never `"pii"`.
+
+    Enumerated against the real API 2026-07-19: prompt_injection ·
+    personally_identifiable_information · code · url · denial_of_service ·
+    language · guardrails. The policy was keyed on `"pii"`, so a real PII
+    detection missed the map and fell to `default_detected` — which is PASS on
+    this hop, i.e. it failed **open** and returned the PII unredacted, while
+    SUBMISSION.md claimed "PII is redacted". Every fixture used `"pii"` too, so
+    the suite could never see it. This test is the one that would have caught it.
+    """
+    hl_on(monkeypatch, fake_response(
+        ("personally_identifiable_information", True, ["555-0100"])))
+    verdict = g.analyze(g.Hop.MODEL_RESPONSE, "call 555-0100 now")
+    assert verdict.action is g.Action.REDACT, (
+        "real PII category fell through to default_detected — the bus is failing open")
+    assert "555-0100" not in verdict.text and "[REDACTED]" in verdict.text
+
+
 def test_redaction_falls_back_on_unknown_matches_shape(monkeypatch):
     hl_on(monkeypatch, fake_response(("pii", True, [{"weird": "shape"}])))
     verdict = g.analyze(g.Hop.MODEL_RESPONSE, "some text with pii")

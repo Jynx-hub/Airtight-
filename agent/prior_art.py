@@ -42,8 +42,8 @@ def _query(disclosure: Disclosure) -> str:
     return " ".join(list(dict.fromkeys(words))[:_MAX_TERMS]) or disclosure.title
 
 
-def _fielded_query(disclosure: Disclosure) -> str:
-    """A fielded query, not free-text `q=<terms>` — mirrors data/pull_uspto.py.
+def _lucene(terms: str, cpc: str) -> str:
+    """Assemble the fielded query, not free-text `q=<terms>` — mirrors data/pull_uspto.py.
 
     Plain terms match preexam/reissue/reexam wrappers that carry no CPC and no
     real claims, and effectively return the most recent filings rather than
@@ -52,25 +52,84 @@ def _fielded_query(disclosure: Disclosure) -> str:
     """
     parts = ['applicationMetaData.applicationStatusDescriptionText:"Patented Case"',
              'applicationMetaData.applicationTypeCategory:"REGULAR"']
-    cpc = (disclosure.technology_class or "").strip()
+    cpc = (cpc or "").strip()
     if cpc:
         parts.insert(0, f"applicationMetaData.cpcClassificationBag:{cpc}*")
-    terms = _query(disclosure).split()
-    if terms:
-        parts.append("(" + " OR ".join(terms) + ")")  # OR for recall; rank sorts relevance
+    if terms.split():
+        parts.append("(" + " OR ".join(terms.split()) + ")")  # OR for recall; rank sorts relevance
     return " AND ".join(parts)
 
 
-@g.guarded_tool
-def _search(query: str, limit: int) -> list:
-    """The external fetch, wrapped so tool_call args + tool_result cross the
-    HiddenLayer bus. The API key is read from env INSIDE (never a guarded arg, so
-    it is not sent to the analysis API)."""
+def _fielded_query(disclosure: Disclosure) -> str:
+    """The full query this module sends for a disclosure. Assembly only — the
+    product path goes through `_search`, which builds the same string internally."""
+    return _lucene(_query(disclosure), disclosure.technology_class)
+
+
+def _fetch(terms: str, cpc: str, limit: int) -> list:
+    """The raw ODP call. Split out of `_search` so the projection and the guard
+    are testable without a network stub — the API key is read here, inside, so it
+    is never a guarded arg and never reaches the analysis API."""
     key = os.getenv("USPTO_API_KEY", "")
-    url = f"{API}?{urllib.parse.urlencode({'q': query, 'rows': limit})}"
+    url = f"{API}?{urllib.parse.urlencode({'q': _lucene(terms, cpc), 'rows': limit})}"
     req = urllib.request.Request(url, headers={"X-API-KEY": key})
     with urllib.request.urlopen(req, timeout=30) as resp:
         return json.loads(resp.read()).get("patentFileWrapperDataBag", [])[:limit]
+
+
+def _project(rec: dict) -> dict:
+    """Reduce an ODP record to the two fields `_to_loophole` actually reads.
+
+    This is the tool_result-hop twin of the `_lucene`-after-the-hop fix above:
+    analyze what the draft actually consumes, not the raw transport envelope.
+
+    A full ODP record is ~22k chars of filing metadata, and five of them put
+    122k chars across the bus. AIDR quarantined every live search on
+    ["personally_identifiable_information", "url", "denial_of_service"] — all
+    three *correct* calls on benign data, because a patent record genuinely
+    carries inventor names with correspondence addresses (PII), uspto.gov asset
+    links (url), and enough bulk to read as resource exhaustion. TOOL_RESULT
+    quarantines on any detected category, so `guarded_tool` swapped in the
+    placeholder and `search_prior_art` returned [] — the same zero-hits symptom
+    as the tool_call block, one hop later.
+
+    Projecting fixes it without touching POLICY: the payload drops ~100x and the
+    three categories lose their trigger, while `inventionTitle` — the only field
+    that reaches the draft, hence the only injection vector — still crosses the
+    bus and is still checked for prompt_injection.
+    """
+    meta = rec.get("applicationMetaData") or {}
+    return {"applicationNumberText": rec.get("applicationNumberText"),
+            "applicationMetaData": {"inventionTitle": meta.get("inventionTitle")}}
+
+
+@g.guarded_tool
+def _search(terms: str, cpc: str, limit: int) -> list:
+    """The external fetch, wrapped so tool_call args + tool_result cross the
+    HiddenLayer bus. The API key is read from env inside `_fetch` (never a guarded
+    arg, so it is not sent to the analysis API).
+
+    The guarded args are the **semantic** inputs — the disclosure-derived terms and
+    the CPC class — and the Lucene string is assembled here, *after* the hop. That
+    is deliberate and it is a precision fix, not a weakening: the terms and CPC are
+    the only attacker-controlled surface (they come from user-submitted disclosure
+    text), while the field names, quoted literals and AND/OR scaffolding are a fixed
+    template this module emits. The endpoint is the hardcoded `API` constant and the
+    key is read from env inside, so a caller cannot redirect the request.
+
+    Passing the assembled string was a live demo-breaker: AIDR's prompt-injection
+    classifier reads a 306-char Lucene expression (field:value pairs, quoted phrases,
+    AND/OR) as an instruction-injection pattern and BLOCKed every search — 3/3
+    deterministic, real event ids. Each fragment scored clean on its own; only the
+    full assembly tripped it. `search_prior_art` swallows `GuardrailBlocked` and
+    returns [], so with `AIRTIGHT_HL_ENABLED=true` live prior art silently returned
+    zero hits on every disclosure. Verified after this change: an injection planted
+    in the disclosure summary still BLOCKs on this hop (tests/test_prior_art.py).
+
+    The return value is projected by `_project` for the same reason, one hop later —
+    see that function.
+    """
+    return [_project(r) for r in _fetch(terms, cpc, limit) if isinstance(r, dict)]
 
 
 def _to_loophole(rec: dict, disclosure: Disclosure) -> LoopholeRecord:
@@ -96,7 +155,7 @@ def search_prior_art(disclosure: Disclosure, limit: int = 5) -> list[LoopholeRec
     if not os.getenv("USPTO_API_KEY"):
         return []  # no key, no search
     try:
-        raw = _search(_fielded_query(disclosure), limit)
+        raw = _search(_query(disclosure), disclosure.technology_class or "", limit)
     except Exception:
         return []
     if not isinstance(raw, list):

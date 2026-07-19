@@ -223,8 +223,13 @@ def _run(job: Job, k: int) -> None:
             job.status = "drafting"
             # `job.transcript` is handed in by reference — draft_patent appends
             # to it as each turn returns, which is what the poll route reads.
+            # The sink is what makes the product path compound: this run's
+            # critique becomes a lesson the next disclosure retrieves. Passed
+            # unconditionally — `draft_patent` no-ops it unless the operator set
+            # AIRTIGHT_EPISODES_ENABLED, so the gate stays in one place.
             job.draft = draft_patent(
-                job.disclosure, guardrails=guardrails, transcript=job.transcript)
+                job.disclosure, guardrails=guardrails, transcript=job.transcript,
+                episode_sink=sources.episode_sink())
             job.findings = security_findings(offset)  # inside the lock, by contract
         job.status = "done"
     except Exception as exc:

@@ -7,8 +7,11 @@ report. The whole pipeline is scoped to software and electronics patents, where 
 failure modes are 101 eligibility (Alice/Mayo), 112(f) means-plus-function, 112 indefiniteness,
 and prior-art anticipation.
 
-Everything below runs. It was verified live end to end, not mocked. Suite: `.venv/bin/pytest tests/`
-is green in stub mode with no network.
+Everything below runs, and you can re-derive it: `.venv/bin/python scripts/verify_live.py`
+checks all six live systems and prints **6/6** (2026-07-19). It refuses to report green on a
+prerequisite it lacks — a missing credential prints `BLOCKED`, never `PASS` — and it asserts
+the properties whose absence would let a stub look live, so the number means what it says.
+Suite: `.venv/bin/pytest tests/` is green in stub mode with no network.
 
 ## The one flow that hits three sponsors at once
 
@@ -113,9 +116,34 @@ the response, which is the actual API shape (see `research/hiddenlayer.md`).
 
 **Response policy.** Detections drive a graded response: ingested-document injections are
 quarantined before they reach the model, PII is redacted, and tool exfiltration is blocked, all
-recorded in an audit log scoped per request. Verified live: a poisoned prior-art document was
-caught on the ingested-document hop and quarantined while drafting continued clean, with all five
-hops firing (`agent/poison_demo.py`).
+recorded in an audit log scoped per request. **Verified against the live AIDR API on
+2026-07-19, with real event ids you can check** — poisoned prior art quarantined on the
+tool_result hop (`04087d61-cd9b-4eee-a799-8a7eab755290`, `prompt_injection`), and an inventor
+name + address + SSN redacted on the model_response hop
+(`d7bb1deb-7635-4e06-9e23-99cabb89b8ea`, `personally_identifiable_information`). All four
+graded actions — pass, redact, quarantine, block — have now fired against the real engine.
+Re-run it with `scripts/verify_live.py`.
+
+**What going live cost us, and why we think it matters.** Three defects survived a green
+213-test suite and only surfaced against the real API, all three because the fixtures encoded
+assumptions the live ruleset does not share:
+
+1. The policy was keyed on the category `"pii"`. AIDR emits
+   `personally_identifiable_information`. An unmatched category falls through to the hop
+   default, which on model_response is PASS — so the bus **failed open and returned PII
+   unredacted**, while every test passed on `"pii"` fixtures.
+2. Sending the assembled Lucene prior-art query across the tool_call hop tripped
+   `prompt_injection` deterministically, so live prior-art search was **BLOCKed on every
+   disclosure**. Fixed by analyzing the disclosure-derived terms and assembling the query
+   after the hop — the attacker-controlled surface still crosses the bus.
+3. A full ODP record is ~22k chars of filing metadata; five of them tripped
+   `personally_identifiable_information`, `url` and `denial_of_service` — all *correct* calls
+   on benign patent data — and quarantined every result. Fixed by projecting the record to the
+   fields the draft actually consumes.
+
+The tempting fix for 2 and 3 was a category allowlist, which "works" by turning the detector
+off. We narrowed what crosses the bus instead, so the classifier still sees every byte the
+draft consumes. Regression tests pin both payloads.
 
 ---
 
