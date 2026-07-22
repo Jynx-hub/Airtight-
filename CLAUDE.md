@@ -40,7 +40,7 @@ Shell scripts in `runtime/` load `.env` **non-destructively** — an already-exp
 - **Finish any task by updating `docs/WORKSTREAMS.md` in the same change that finishes it.** That file is the team's shared status board across four lanes — an unrecorded result is one a teammate re-does or a demo plans around wrongly. This applies to *anything* the file tracks: a lane item done, a status that shifted, a claim it makes that your work just falsified (a gitignore rule, a test count, a model alias, a cost estimate). Grep it for what you touched before calling the work done.
   - Respect the notation the file defines at its own head: `[x]` means **verified working**, `◐` means real code exists but the item's defining requirement is not met, and the status glyphs are ✅ done / ⚠️ caveat-or-blocker / 📌 operational note. Never promote `[ ]` or `◐` to `[x]` on the strength of code existing or tests passing — that file's rule is that boxes are checked against observed behaviour, not against what anyone reported. A green suite in stub mode proves plumbing, not the requirement.
   - Record partial and failed outcomes with the same care as wins, including what it cost and what is still open. The entries that have saved the most time here are the honest ones (the `--n 10` timeout stall, the L40S cold-start reversal) — they are why the next person doesn't burn GPU credit rediscovering them.
-- This repo lives at `github.com/Jynx-hub/Airtight-`. Commit locally as you work; ask before pushing.
+- This repo lives at `github.com/Jynx-hub/Airtight`. Commit locally as you work; ask before pushing.
 
 ## Build order (do not reorder)
 

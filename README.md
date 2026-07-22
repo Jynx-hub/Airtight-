@@ -20,7 +20,7 @@ The engine runs in two modes: **hit-mode** (point it at an existing patent → l
 Python 3.10+ (3.12 is what the suite is verified on). No network, no GPU, no API keys.
 
 ```bash
-git clone https://github.com/Jynx-hub/Airtight- && cd Airtight
+git clone https://github.com/Jynx-hub/Airtight && cd Airtight
 python3 -m venv .venv
 .venv/bin/pip install -e ".[dev,web,poison]"
 .venv/bin/pytest tests/          # expect: 214 passed, 0 skipped
